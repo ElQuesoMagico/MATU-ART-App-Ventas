@@ -1,0 +1,24 @@
+.expense-filters { display:grid; gap:12px; margin-block:18px; grid-template-columns:repeat(2,minmax(0,1fr)); }
+.expense-filters > .search-field { grid-column:1/-1; }
+.expense-filters label { display:grid; gap:6px; font-size:12px; min-width:0; }
+.expense-filters select { min-height:44px; width:100%; padding:10px; border:1px solid var(--line); border-radius:6px; background:var(--surface); color:var(--ink); }
+.expense-list { display:grid; gap:14px; }
+.expense-list article { padding:16px; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+.expense-list header { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; font-size:15px; overflow-wrap:anywhere; }
+.expense-list header strong:first-child { flex:1; min-width:0; }
+.expense-list p { font-size:12px; line-height:1.6; margin-block:8px; overflow-wrap:anywhere; }
+.expense-list footer { border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.expense-list footer button { min-height:44px; }
+.expense-visible-total { font-size:13px; line-height:1.6; margin-block:16px; }
+.expense-form .form-actions { position:sticky; bottom:-20px; background:var(--surface); padding-block:12px; }
+.expense-form .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.expense-form input, .expense-form select, .expense-form textarea { min-width:0; width:100%; }
+.expense-category-field { display:flex; gap:10px; align-items:end; }
+.expense-category-field label { flex:1; min-width:0; }
+.expense-category-field > button { min-width:44px; }
+.expense-values { display:grid; gap:12px; margin-block:12px 20px; }
+.expense-values dt { font-size:11px; color:var(--muted); }
+.expense-values dd { margin:4px 0 0; font-size:14px; overflow-wrap:anywhere; white-space:pre-wrap; }
+.expense-audit-heading { margin-top:26px; padding-top:14px; border-top:3px double var(--line); font-family:var(--heading-font); }
+.audit-id { overflow-wrap:anywhere; font-size:11px; }
+@media(max-width:640px) { .expense-form .form-actions { bottom:-16px; } }

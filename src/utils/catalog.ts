@@ -1,0 +1,3 @@
+import type { CatalogCategory, CatalogProduct } from '../types/catalog'
+export const categoryNames = (product: CatalogProduct, categories: CatalogCategory[]) => product.categoryIds.map(id => { const category = categories.find(item => item.id === id); return category ? `${category.name}${category.isActive ? '' : ' (archivada)'}` : 'Categoría no disponible' }).join(' · ') || 'Sin categoría'
+export const movementLabels = { initial: 'Stock inicial', restock: 'Reposición', adjustment: 'Ajuste manual', count: 'Conteo físico', sale: 'Venta', sale_void: 'Anulación de venta', manual_reversal: 'Reversión manual' }

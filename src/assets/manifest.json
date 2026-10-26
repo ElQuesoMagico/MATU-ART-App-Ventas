@@ -1,0 +1,929 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-15",
+  "policy": "Todo recurso artístico confirmado como generado por IA es provisional y debe reemplazarse por trabajo de artistas. Pendiente no significa generado por IA.",
+  "resources": [
+    {
+      "id": "circus-tent",
+      "name": "Carpa circense principal",
+      "path": "src/assets/placeholders/illustrations/circus-tent.svg#circus-tent",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Inicio",
+        "Eventos"
+      ],
+      "components": [
+        "CircusIllustration"
+      ],
+      "format": "SVG symbol",
+      "dimensions": "320 × 300; 16:15",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Mantener composición, espacio transparente y legibilidad a 100 px. Conservar id circus-tent y viewBox o adaptar solo el wrapper. Colores mediante variables CSS. Extraída de JSX en 7.1; la extracción no acredita el origen."
+    },
+    {
+      "id": "demo-product-moon",
+      "name": "Ilustración de muestra: moon",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-moon",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Demostración legacy (fuera de navegación operativa)"
+      ],
+      "components": [
+        "ProductArt"
+      ],
+      "format": "SVG symbol",
+      "dimensions": "180 × 150; 6:5",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No usar como imagen de productos reales. Mantener símbolo y proporción al sustituir."
+    },
+    {
+      "id": "demo-product-flower",
+      "name": "Ilustración de muestra: flower",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-flower",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Demostración legacy (fuera de navegación operativa)"
+      ],
+      "components": [
+        "ProductArt"
+      ],
+      "format": "SVG symbol",
+      "dimensions": "180 × 150; 6:5",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No usar como imagen de productos reales. Mantener símbolo y proporción al sustituir."
+    },
+    {
+      "id": "demo-product-cat",
+      "name": "Ilustración de muestra: cat",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-cat",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Demostración legacy (fuera de navegación operativa)"
+      ],
+      "components": [
+        "ProductArt"
+      ],
+      "format": "SVG symbol",
+      "dimensions": "180 × 150; 6:5",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No usar como imagen de productos reales. Mantener símbolo y proporción al sustituir."
+    },
+    {
+      "id": "demo-product-planet",
+      "name": "Ilustración de muestra: planet",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-planet",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Demostración legacy (fuera de navegación operativa)"
+      ],
+      "components": [
+        "ProductArt"
+      ],
+      "format": "SVG symbol",
+      "dimensions": "180 × 150; 6:5",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No usar como imagen de productos reales. Mantener símbolo y proporción al sustituir."
+    },
+    {
+      "id": "demo-product-sun",
+      "name": "Ilustración de muestra: sun",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-sun",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Demostración legacy (fuera de navegación operativa)"
+      ],
+      "components": [
+        "ProductArt"
+      ],
+      "format": "SVG symbol",
+      "dimensions": "180 × 150; 6:5",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No usar como imagen de productos reales. Mantener símbolo y proporción al sustituir."
+    },
+    {
+      "id": "demo-product-ghost",
+      "name": "Ilustración de muestra: ghost",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-ghost",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Demostración legacy (fuera de navegación operativa)"
+      ],
+      "components": [
+        "ProductArt"
+      ],
+      "format": "SVG symbol",
+      "dimensions": "180 × 150; 6:5",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No usar como imagen de productos reales. Mantener símbolo y proporción al sustituir."
+    },
+    {
+      "id": "ornament-star",
+      "name": "Estrella de cuatro puntas",
+      "path": "src/components/Ornament.tsx#star",
+      "type": "decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Promociones",
+        "Eventos",
+        "Estadísticas",
+        "Formularios"
+      ],
+      "components": [
+        "Ornament",
+        "Modal",
+        "Navigation",
+        "ProductImage",
+        "Statistics"
+      ],
+      "format": "SVG JSX",
+      "dimensions": "64 × 64; 1:1",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "SVG breve centralizado; mantener props, aria-hidden y herencia currentColor. El rosetón también identifica imágenes ausentes."
+    },
+    {
+      "id": "ornament-starburst",
+      "name": "Estrella de ocho puntas",
+      "path": "src/components/Ornament.tsx#starburst",
+      "type": "decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Promociones",
+        "Eventos",
+        "Estadísticas",
+        "Formularios"
+      ],
+      "components": [
+        "Ornament",
+        "Modal",
+        "Navigation",
+        "ProductImage",
+        "Statistics"
+      ],
+      "format": "SVG JSX",
+      "dimensions": "64 × 64; 1:1",
+      "replacementStatus": "replaced-with-user-art",
+      "artistNotes": "SVG breve centralizado; mantener props, aria-hidden y herencia currentColor. El rosetón también identifica imágenes ausentes. Desde 7.2, esta variante renderiza el icono oficial aportado por el usuario; el motivo de pinchos anterior dejó de usarse."
+    },
+    {
+      "id": "ornament-rosette",
+      "name": "Sello rosetón",
+      "path": "src/components/Ornament.tsx#rosette",
+      "type": "decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Promociones",
+        "Eventos",
+        "Estadísticas",
+        "Formularios"
+      ],
+      "components": [
+        "Ornament",
+        "Modal",
+        "Navigation",
+        "ProductImage",
+        "Statistics"
+      ],
+      "format": "SVG JSX",
+      "dimensions": "64 × 64; 1:1",
+      "replacementStatus": "replaced-with-user-art",
+      "artistNotes": "SVG breve centralizado; mantener props, aria-hidden y herencia currentColor. El rosetón también identifica imágenes ausentes. Desde 7.2, esta variante renderiza el icono oficial aportado por el usuario; el motivo de pinchos anterior dejó de usarse."
+    },
+    {
+      "id": "ornament-divider",
+      "name": "Separador ornamental",
+      "path": "src/components/Ornament.tsx#divider",
+      "type": "decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Promociones",
+        "Eventos",
+        "Estadísticas",
+        "Formularios"
+      ],
+      "components": [
+        "Ornament",
+        "Modal",
+        "Navigation",
+        "ProductImage",
+        "Statistics"
+      ],
+      "format": "SVG JSX",
+      "dimensions": "240 × 36; 20:3",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "SVG breve centralizado; mantener props, aria-hidden y herencia currentColor. El rosetón también identifica imágenes ausentes."
+    },
+    {
+      "id": "ornament-bunting",
+      "name": "Banderines",
+      "path": "src/components/Ornament.tsx#bunting",
+      "type": "decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Promociones",
+        "Eventos",
+        "Estadísticas",
+        "Formularios"
+      ],
+      "components": [
+        "Ornament",
+        "Modal",
+        "Navigation",
+        "ProductImage",
+        "Statistics"
+      ],
+      "format": "SVG JSX",
+      "dimensions": "240 × 36; 20:3",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "SVG breve centralizado; mantener props, aria-hidden y herencia currentColor. El rosetón también identifica imágenes ausentes."
+    },
+    {
+      "id": "brand-icon-home",
+      "name": "Icono de navegación: home",
+      "path": "src/components/Icon.tsx#home",
+      "type": "artistic-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Navegación",
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Historial",
+        "Promociones",
+        "Eventos"
+      ],
+      "components": [
+        "Icon",
+        "Navigation"
+      ],
+      "format": "SVG path",
+      "dimensions": "24 × 24; 1:1",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Mantener trazo legible a 20–24 px y función reconocible. No modificar los nombres de IconName."
+    },
+    {
+      "id": "brand-icon-bag",
+      "name": "Icono de navegación: bag",
+      "path": "src/components/Icon.tsx#bag",
+      "type": "artistic-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Navegación",
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Historial",
+        "Promociones",
+        "Eventos"
+      ],
+      "components": [
+        "Icon",
+        "Navigation"
+      ],
+      "format": "SVG path",
+      "dimensions": "24 × 24; 1:1",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Mantener trazo legible a 20–24 px y función reconocible. No modificar los nombres de IconName."
+    },
+    {
+      "id": "brand-icon-box",
+      "name": "Icono de navegación: box",
+      "path": "src/components/Icon.tsx#box",
+      "type": "artistic-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Navegación",
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Historial",
+        "Promociones",
+        "Eventos"
+      ],
+      "components": [
+        "Icon",
+        "Navigation"
+      ],
+      "format": "SVG path",
+      "dimensions": "24 × 24; 1:1",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Mantener trazo legible a 20–24 px y función reconocible. No modificar los nombres de IconName."
+    },
+    {
+      "id": "brand-icon-clock",
+      "name": "Icono de navegación: clock",
+      "path": "src/components/Icon.tsx#clock",
+      "type": "artistic-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Navegación",
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Historial",
+        "Promociones",
+        "Eventos"
+      ],
+      "components": [
+        "Icon",
+        "Navigation"
+      ],
+      "format": "SVG path",
+      "dimensions": "24 × 24; 1:1",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Mantener trazo legible a 20–24 px y función reconocible. No modificar los nombres de IconName."
+    },
+    {
+      "id": "brand-icon-tent",
+      "name": "Icono de navegación: tent",
+      "path": "src/components/Icon.tsx#tent",
+      "type": "artistic-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Navegación",
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Historial",
+        "Promociones",
+        "Eventos"
+      ],
+      "components": [
+        "Icon",
+        "Navigation"
+      ],
+      "format": "SVG path",
+      "dimensions": "24 × 24; 1:1",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Mantener trazo legible a 20–24 px y función reconocible. No modificar los nombres de IconName."
+    },
+    {
+      "id": "brand-icon-sparkle",
+      "name": "Icono de navegación: sparkle",
+      "path": "src/components/Icon.tsx#sparkle",
+      "type": "artistic-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Navegación",
+        "Inicio",
+        "POS",
+        "Inventario",
+        "Historial",
+        "Promociones",
+        "Eventos"
+      ],
+      "components": [
+        "Icon",
+        "Navigation"
+      ],
+      "format": "SVG path",
+      "dimensions": "24 × 24; 1:1",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Mantener trazo legible a 20–24 px y función reconocible. No modificar los nombres de IconName."
+    },
+    {
+      "id": "functional-controls",
+      "name": "Controles estándar: buscar, flecha, más, menos y cierre",
+      "path": "src/components/Icon.tsx#paths",
+      "type": "functional-icons",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Todas"
+      ],
+      "components": [
+        "Icon"
+      ],
+      "format": "SVG paths",
+      "dimensions": "24 × 24",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Controles funcionales sencillos. No requieren conversión a imágenes ni reemplazo artístico obligatorio."
+    },
+    {
+      "id": "brand-wordmark",
+      "name": "Marca tipográfica Clown UFO",
+      "path": "src/navigation/Navigation.tsx#brand",
+      "type": "brand",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Recurso anterior, fuera de la interfaz activa"
+      ],
+      "components": [
+        "Navigation"
+      ],
+      "format": "HTML + CSS",
+      "dimensions": "Fluido; texto en dos líneas",
+      "replacementStatus": "retired",
+      "artistNotes": "Conservar nombre Clown UFO, etiqueta accesible y enlace a Inicio. Estrella registrada por separado. Sustituido por logo oficial MATU ART, proporcionado por el usuario el 14-10-2026."
+    },
+    {
+      "id": "brand-favicon",
+      "name": "Símbolo floral de pestaña",
+      "path": "public/clown-ufo.svg",
+      "type": "brand",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Recurso anterior, fuera de la interfaz activa"
+      ],
+      "components": [
+        "index.html"
+      ],
+      "format": "SVG",
+      "dimensions": "64 × 64; 1:1",
+      "replacementStatus": "retired",
+      "artistNotes": "Ruta pública estable. Probar legibilidad a 16 y 32 px; actualizar referencia central y favicon si se cambia ruta. Sustituido por logo oficial MATU ART, proporcionado por el usuario el 14-10-2026."
+    },
+    {
+      "id": "css-ticket-metrics",
+      "name": "Boletos de indicadores",
+      "path": "src/App.css#.metric, .ticket-stub, .ticket-content",
+      "type": "css-decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Todas"
+      ],
+      "components": [
+        "Home",
+        "Statistics"
+      ],
+      "format": "CSS",
+      "dimensions": "Fluido; muescas 16 px",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Preservar lectura numérica y perforación lateral. Etapa 7.3: los contornos activos de Eventos, Promociones y Resultados usan TicketFrame; las máscaras anteriores se conservan solo donde no se sustituyeron."
+    },
+    {
+      "id": "css-event-posters",
+      "name": "Carteles, marcos dobles y entradas de eventos",
+      "path": "src/App.css#.event-poster, .event-card, .event-card-art, .event-spotlight",
+      "type": "css-decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Todas"
+      ],
+      "components": [
+        "Home",
+        "Events"
+      ],
+      "format": "CSS",
+      "dimensions": "Adaptable",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Marcos y muescas sin invadir información ni controles."
+    },
+    {
+      "id": "css-navigation-paper",
+      "name": "Programa de circo de navegación",
+      "path": "src/App.css#.sidebar, .sidebar-note, .program-heading",
+      "type": "css-decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Todas"
+      ],
+      "components": [
+        "Navigation"
+      ],
+      "format": "CSS",
+      "dimensions": "Móvil inferior y escritorio lateral",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Conservar áreas táctiles y jerarquía."
+    },
+    {
+      "id": "css-brand-stripes",
+      "name": "Rayas de carpa de navegación y detalles",
+      "path": "src/styles/themes.css#--stripe",
+      "type": "css-decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Todas"
+      ],
+      "components": [
+        "Navigation",
+        "Home"
+      ],
+      "format": "CSS",
+      "dimensions": "Patrón repetido CSS",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Definido en themes.css; mantener contraste y densidad moderada."
+    },
+    {
+      "id": "css-editorial-separators",
+      "name": "Separadores y marcos editoriales de formularios",
+      "path": "src/App.css#.modal-header, .form-fields, .classification-layer",
+      "type": "css-decoration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Todas"
+      ],
+      "components": [
+        "Modal",
+        "ClassificationSelect",
+        "ProductForm",
+        "PromotionManager"
+      ],
+      "format": "CSS",
+      "dimensions": "Adaptable",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No modificar layout funcional para sustituir ornamentos."
+    },
+    {
+      "id": "analytics-frames",
+      "name": "Entradas y separadores de estadísticas",
+      "path": "src/styles/analytics.css#analytics-event-card,analytics-method",
+      "type": "css-decoration",
+      "origin": "confirmed-ai",
+      "evidence": "CSS creado por el asistente de IA durante la Etapa 7.1.",
+      "screens": [
+        "Inicio",
+        "Estadísticas"
+      ],
+      "components": [
+        "Statistics",
+        "Analytics"
+      ],
+      "format": "CSS",
+      "dimensions": "Fluido; bordes 4 px y 3 px",
+      "replacementStatus": "temporary-placeholder",
+      "artistNotes": "Solo reemplazar tratamiento ornamental; barras y cifras son visualizaciones de datos, no ilustraciones."
+    },
+    {
+      "id": "analytics-bars",
+      "name": "Gráficos de barras de datos",
+      "path": "src/components/analytics/Statistics.tsx#BarChart",
+      "type": "data-visualization",
+      "origin": "confirmed-ai",
+      "evidence": "Componente construido por el asistente en 7.1.",
+      "screens": [
+        "Estadísticas"
+      ],
+      "components": [
+        "BarChart"
+      ],
+      "format": "HTML + CSS",
+      "dimensions": "Ancho fluido; barras 14 px",
+      "replacementStatus": "functional-not-artwork",
+      "artistNotes": "Gráfico funcional, no recurso artístico. Conservar valores exactos y lectura accesible."
+    },
+    {
+      "id": "legacy-hero",
+      "name": "Capas geométricas violeta (plantilla antigua)",
+      "path": "src/assets/hero.png",
+      "type": "illustration",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "PNG",
+      "dimensions": "343 × 361",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Archivo conservado sin mover; revisar procedencia antes de reutilizar."
+    },
+    {
+      "id": "legacy-react",
+      "name": "Recurso de plantilla: react",
+      "path": "src/assets/react.svg",
+      "type": "vendor-mark",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG",
+      "dimensions": "viewBox 256 × 228; render original 35,93 × 32",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No es marca Clown UFO. Apariencia de recurso estándar de plantilla; autoría y licencia exactas pendientes de verificar."
+    },
+    {
+      "id": "legacy-vite",
+      "name": "Recurso de plantilla: vite",
+      "path": "src/assets/vite.svg",
+      "type": "vendor-mark",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG",
+      "dimensions": "77 × 47",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No es marca Clown UFO. Apariencia de recurso estándar de plantilla; autoría y licencia exactas pendientes de verificar."
+    },
+    {
+      "id": "legacy-favicon",
+      "name": "Recurso de plantilla: favicon",
+      "path": "public/favicon.svg",
+      "type": "vendor-mark",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG",
+      "dimensions": "48 × 46",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "No es marca Clown UFO. Apariencia de recurso estándar de plantilla; autoría y licencia exactas pendientes de verificar."
+    },
+    {
+      "id": "legacy-bluesky-icon",
+      "name": "Símbolo de plantilla: bluesky-icon",
+      "path": "public/icons.svg#bluesky-icon",
+      "type": "vendor-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG symbol",
+      "dimensions": "16 × 17",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Conservar archivo hasta confirmar uso y procedencia. No atribuir estas marcas a Clown UFO."
+    },
+    {
+      "id": "legacy-discord-icon",
+      "name": "Símbolo de plantilla: discord-icon",
+      "path": "public/icons.svg#discord-icon",
+      "type": "vendor-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG symbol",
+      "dimensions": "20 × 19",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Conservar archivo hasta confirmar uso y procedencia. No atribuir estas marcas a Clown UFO."
+    },
+    {
+      "id": "legacy-documentation-icon",
+      "name": "Símbolo de plantilla: documentation-icon",
+      "path": "public/icons.svg#documentation-icon",
+      "type": "vendor-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG symbol",
+      "dimensions": "21 × 20",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Conservar archivo hasta confirmar uso y procedencia. No atribuir estas marcas a Clown UFO."
+    },
+    {
+      "id": "legacy-github-icon",
+      "name": "Símbolo de plantilla: github-icon",
+      "path": "public/icons.svg#github-icon",
+      "type": "vendor-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG symbol",
+      "dimensions": "19 × 19",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Conservar archivo hasta confirmar uso y procedencia. No atribuir estas marcas a Clown UFO."
+    },
+    {
+      "id": "legacy-social-icon",
+      "name": "Símbolo de plantilla: social-icon",
+      "path": "public/icons.svg#social-icon",
+      "type": "vendor-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG symbol",
+      "dimensions": "20 × 20",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Conservar archivo hasta confirmar uso y procedencia. No atribuir estas marcas a Clown UFO."
+    },
+    {
+      "id": "legacy-x-icon",
+      "name": "Símbolo de plantilla: x-icon",
+      "path": "public/icons.svg#x-icon",
+      "type": "vendor-icon",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "Sin uso operativo"
+      ],
+      "components": [],
+      "format": "SVG symbol",
+      "dimensions": "19 × 19",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Conservar archivo hasta confirmar uso y procedencia. No atribuir estas marcas a Clown UFO."
+    },
+    {
+      "id": "fraunces-font",
+      "name": "Tipografía display Fraunces",
+      "path": "public/fonts/Fraunces-Variable.ttf",
+      "type": "font",
+      "origin": "not-ai",
+      "evidence": "La licencia local OFL-Fraunces.txt identifica autores y proyecto tipográfico.",
+      "screens": [
+        "Todas"
+      ],
+      "components": [
+        "themes.css"
+      ],
+      "format": "TTF variable",
+      "dimensions": "No aplica",
+      "replacementStatus": "licensed-keep",
+      "artistNotes": "No sustituir con imágenes. Conservar licencia OFL-Fraunces.txt."
+    },
+    {
+      "id": "catalog-user-images",
+      "name": "Imágenes aportadas al catálogo local",
+      "path": "IndexedDB:clown-ufo-catalog/products/{UUID}/image",
+      "type": "user-content",
+      "origin": "pending-verification",
+      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "screens": [
+        "POS",
+        "Inventario",
+        "Inicio",
+        "Edición"
+      ],
+      "components": [
+        "ProductImage",
+        "ProductForm"
+      ],
+      "format": "Blob (formato variable)",
+      "dimensions": "Variable; object-fit contain",
+      "replacementStatus": "awaiting-origin-review",
+      "artistNotes": "Registro de colección dinámica. No asumir origen IA ni sobrescribir imágenes del usuario. Para inventario final, obtener origen por cada UUID con autorización; no copiar blobs a recursos de la app."
+    },
+    {
+      "id": "matu-art-official-logo",
+      "name": "Logo oficial MATU ART",
+      "path": "src/assets/branding/matu-art-official.png",
+      "type": "brand",
+      "origin": "not-ai",
+      "evidence": "Archivo oficial clownufologo.png proporcionado por el usuario el 14-10-2026. Copia binaria sin edición; no es un placeholder generado por IA.",
+      "screens": [
+        "Navegación",
+        "Encabezado global",
+        "Favicon"
+      ],
+      "components": [
+        "Navigation",
+        "App",
+        "index.html",
+        "offlinePlugin.ts (manifest.webmanifest)"
+      ],
+      "format": "PNG",
+      "dimensions": "4000 × 4000; 1:1 (incluye márgenes originales)",
+      "replacementStatus": "official-user-supplied",
+      "artistNotes": "Conservar el original sin redibujar, recolorear ni recortar. La referencia está centralizada en artisticAssets.ts; favicon referenciado desde index.html."
+    },
+    {
+      "id": "admin-ticket-notches",
+      "name": "Muescas y perforación de tickets de administración",
+      "path": "src/App.css#admin-tickets",
+      "type": "decoration",
+      "origin": "confirmed-ai",
+      "evidence": "CSS creado por Codex para este ajuste del 14-10-2026.",
+      "screens": [
+        "Eventos",
+        "Promociones"
+      ],
+      "components": [
+        "Events",
+        "Promotions"
+      ],
+      "format": "CSS",
+      "dimensions": "Muescas de 22 × 22 px; tarjetas adaptables",
+      "replacementStatus": "superseded",
+      "artistNotes": "Preservar áreas táctiles y evitar recortar el contenido. Sustituible exclusivamente mediante CSS. En 7.2 las máscaras ticket-masks-72 sustituyen los círculos con contorno. Etapa 7.3: los contornos activos de Eventos, Promociones y Resultados usan TicketFrame; las máscaras anteriores se conservan solo donde no se sustituyeron."
+    },
+    {
+      "id": "matu-art-clown-icon",
+      "name": "Icono de payaso MATU ART",
+      "path": "src/assets/branding/clown-icon.png",
+      "type": "identity-icon",
+      "origin": "not-ai",
+      "evidence": "Archivo clown icon.png proporcionado por el usuario, copiado sin modificar el original.",
+      "screens": [
+        "Navegación",
+        "Inventario",
+        "POS",
+        "Eventos",
+        "Promociones"
+      ],
+      "components": [
+        "Ornament (variantes rosette y starburst)",
+        "ProductImage",
+        "Navigation",
+        "Events",
+        "Promotions"
+      ],
+      "format": "PNG",
+      "dimensions": "1414 × 2000 px; proporción 707:1000. Se conserva lienzo original.",
+      "replacementStatus": "official-user-supplied",
+      "artistNotes": "No redibujar ni reinterpretar. CSS muestra el arte centrado mediante una ventana cuadrada, sin modificar el archivo. Los iconos funcionales de navegación se conservan. Centrado sin editar el PNG: límites alfa (245,633)-(1106,1394), lienzo 1414×2000, aplicados en tickets.css."
+    },
+    {
+      "id": "ticket-masks-72",
+      "name": "Recortes transparentes y talón centrado de tickets",
+      "path": "src/App.css#ticket-notch",
+      "type": "decoration",
+      "origin": "confirmed-ai",
+      "evidence": "Máscaras CSS creadas por Codex en 7.2; no se generaron imágenes.",
+      "screens": [
+        "Inicio",
+        "Eventos",
+        "Promociones",
+        "Estadísticas"
+      ],
+      "components": [
+        "Home",
+        "Events",
+        "Promotions",
+        "MetricTickets",
+        "EventStatisticsCard"
+      ],
+      "format": "CSS",
+      "dimensions": "Muescas de radio 8–10 px; proporciones adaptables",
+      "replacementStatus": "temporary-placeholder",
+      "artistNotes": "Conservar transparencia real de muescas, borde exterior restante y separadores; etiquetas y adorno del talón se alinean en styles/analytics.css. Etapa 7.3: los contornos activos de Eventos, Promociones y Resultados usan TicketFrame; las máscaras anteriores se conservan solo donde no se sustituyeron."
+    },
+    {
+      "id": "ticket-vector-contour",
+      "name": "Contorno continuo de entradas",
+      "path": "src/components/TicketFrame.tsx",
+      "type": "decoration",
+      "origin": "confirmed-ai",
+      "evidence": "Geometría SVG programada por Codex en Etapa 7.3; no es el logo ni una modificación de ilustración oficial.",
+      "screens": [
+        "Inicio",
+        "Eventos",
+        "Promociones",
+        "Estadísticas"
+      ],
+      "components": [
+        "TicketFrame",
+        "MetricTickets",
+        "EventStatisticsCard"
+      ],
+      "format": "SVG generado con dimensiones reales",
+      "dimensions": "Adaptable; borde 1,5 px, muescas 8/10 px",
+      "replacementStatus": "temporary-placeholder",
+      "artistNotes": "Sustituible en TicketFrame y ticketGeometry; Eventos arriba/abajo, otros laterales. Mantener legibilidad y continuidad; no cambiar lógica comercial."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+/* Geometry belongs to TicketFrame, never to overlapping background patches. */
+.ticket-shaped.ticket-shaped { position:relative; isolation:isolate; background:transparent; border:0; border-radius:0; mask-image:none; overflow:visible; box-shadow:none; }
+.ticket-shaped > .ticket-frame { position:absolute; inset:0; width:100%; height:100%; z-index:-1; overflow:visible; pointer-events:none; filter:drop-shadow(0 2px 1px #34263109); }
+.ticket-frame path { fill:var(--ticket-fill,var(--surface)); stroke:var(--ticket-border,var(--accent)); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.ticket-shaped.peach { --ticket-fill:var(--rose); }.ticket-shaped.lavender { --ticket-fill:var(--lavender); }.ticket-shaped.butter { --ticket-fill:var(--butter); }.ticket-shaped.mint { --ticket-fill:var(--mint); }
+.ticket-shaped.event-finished { --ticket-border:var(--muted); }
+.ticket-shaped.event-card { padding-block:24px; }
+.analytics-tickets .ticket-shaped.metric { align-items:stretch; min-height:184px; }
+.analytics-tickets .ticket-content { display:flex; flex-direction:column; justify-content:center; padding:20px 17px; }
+.analytics-tickets .ticket-content > strong { letter-spacing:-.4px; line-height:1.25; overflow-wrap:normal; }
+.analytics-tickets .ticket-stub { margin-block:2px; padding:9px 4px; width:32px; flex-basis:32px; }
+.analytics-tickets .ticket-stub span { font-size:7px; letter-spacing:.6px; }
+@media(max-width:450px) { .analytics-tickets .ticket-shaped.metric { min-height:184px; }.analytics-tickets .ticket-content { padding:20px 12px; }.analytics-tickets .ticket-content > strong { font-size:23px; }.analytics-tickets .ticket-stub { width:30px; flex-basis:30px; min-height:180px; } }
+/* The old receipt flap extended below the cart and overrode its continuous border. */
+.cart-panel::after { content:none; }
+.cart-panel { border:1px solid var(--accent); outline:0; box-shadow:var(--paper-shadow); border-radius:8px; }
+.cart-panel::before { border-radius:7px 7px 0 0; }
+/* Small illustrations must not inherit the generic 12px placeholder padding. */
+.art-small .product-placeholder { width:100%; height:100%; padding:0; display:grid; place-items:center; }
+.product-placeholder .clown-icon { display:block; }
+/* Original alpha bounds: (245,633)-(1106,1394) on 1414×2000; fit the 861×761 artwork. */
+.ornament.clown-icon img { width:164.2288%; height:auto; left:-28.4553%; top:-67.71196%; transform:none; }

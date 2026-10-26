@@ -1,0 +1,71 @@
+/* Presentation only. Artistic frames are registered in assets/manifest.json. */
+.analytics-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+.analytics-tickets { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-block:18px; }
+.analytics-tickets .metric { min-width:0; padding:0; display:flex; }
+.analytics-tickets .ticket-stub { width:24px; flex:0 0 24px; }
+.analytics-tickets .ticket-content { padding:16px 12px; min-width:0; }
+.analytics-tickets .ticket-content > span { font-size:12px; font-weight:600; }
+.analytics-tickets .ticket-content strong { display:block; font-size:clamp(21px,3vw,32px); overflow-wrap:anywhere; margin-top:10px; }
+.analytics-tickets .ticket-content p { font-size:10px; line-height:1.6; margin-top:6px; }
+.analytics-tickets .metric:last-child { grid-column:1/-1; }
+.analytics-tickets strong small, .compact-metrics dd small { display:block; font:600 11px/1.6 var(--body-font, sans-serif); color:var(--accent); }
+.cost-quality { font-size:11px; line-height:1.6; color:var(--muted); margin-block:12px; display:flex; flex-direction:column; }
+.cost-incomplete { border-left:3px solid var(--accent); padding-left:10px; color:var(--ink); }
+.compact-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 12px; margin-block:18px; }
+.compact-metrics dt { color:var(--muted); font-size:11px; line-height:1.5; }
+.compact-metrics dd { font-size:17px; font-weight:650; margin:3px 0 0; overflow-wrap:anywhere; }
+.compact-metrics .profit-metric { grid-column:1/-1; border-top:1px dashed var(--line); padding-top:12px; }
+.analytics-events { display:grid; gap:18px; margin-block:18px; }
+.analytics-event-card { min-width:0; border-top:4px double var(--accent); }
+.analytics-event-card h3 { font-family:var(--heading-font); font-size:25px; color:var(--accent); margin-block:14px 8px; overflow-wrap:anywhere; }
+.analytics-event-card header .badge { margin:0 6px 6px 0; }
+.analytics-event-card header p { font-size:12px; line-height:1.6; }
+.chart-panel { margin-block:22px; }
+.chart-panel .section-heading { gap:10px; align-items:start; }
+.chart-panel h2 { font-size:21px; }
+.bar-chart { padding:0; margin:0; list-style:none; display:grid; gap:18px; }
+.bar-label { display:flex; gap:14px; justify-content:space-between; align-items:start; margin-bottom:7px; font-size:12px; }
+.bar-label > :first-child { min-width:0; overflow-wrap:anywhere; text-align:left; }
+.bar-label strong { flex-shrink:0; font-variant-numeric:tabular-nums; }
+.bar-label button { min-height:30px; }
+.bar-track { height:14px; border-radius:3px; background:var(--canvas); border:1px solid var(--line); overflow:hidden; }
+.bar-fill { height:100%; background:var(--cherry); border-right:1px solid var(--accent); }
+.bar-negative { background:var(--lavender); }
+.analytics-days { margin-block:20px; }
+.analytics-day { border-bottom:1px dashed var(--line); padding:10px 0; }
+.analytics-day summary { display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; cursor:pointer; min-height:44px; align-items:center; font-size:13px; }
+.analytics-day summary small { width:100%; color:var(--muted); }
+.analytics-day summary::after { content:'Ver detalle +'; font-size:11px; color:var(--accent); }
+.analytics-day[open] summary::after { content:'Ocultar detalle −'; }
+.analytics-pagination { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-block:16px; font-size:12px; }
+.analytics-ranking { margin-top:28px; }
+.analytics-ranking .section-heading { flex-wrap:wrap; gap:14px; }
+.analytics-ranking label { display:grid; gap:6px; font-size:12px; }
+.analytics-ranking select { padding:10px; min-height:44px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:6px; }
+.product-ranking { display:grid; gap:14px; list-style:none; padding:0; }
+.product-ranking h3 { font-size:18px; overflow-wrap:anywhere; }
+.product-ranking details { font-size:12px; line-height:1.6; overflow-wrap:anywhere; }
+.product-ranking summary, .all-events > summary, .analytics-method > summary { cursor:pointer; min-height:44px; padding-block:12px; }
+.analytics-method { border-top:3px double var(--line); margin-top:30px; font-size:12px; line-height:1.7; }
+.analytics-method p { margin-block:10px; }
+.analytics-filters > label { min-width:0; flex-basis:140px; }
+.analytics-filters > label:first-child { flex-basis:100%; }
+.all-events { border-top:1px dashed var(--line); margin-top:24px; }
+.home-statistics-link { margin-bottom:24px; max-width:100%; white-space:normal; text-align:left; }
+.home-event-results { margin-bottom:28px; }
+@media (min-width:700px) {
+ .analytics-tickets { grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .analytics-tickets .metric:first-child, .analytics-tickets .metric:last-child { grid-column:auto; }
+ .analytics-events, .product-ranking { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .analytics-filters > label:first-child { flex-basis:240px; }
+}
+@media (min-width:1200px) { .analytics-events { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+/* Align the stub independently of content height. */
+.analytics-tickets .ticket-stub { position:relative; width:32px; flex-basis:32px; padding:9px 5px; justify-content:space-between; min-height:174px; }
+.analytics-tickets .ticket-stub > .ornament { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+.analytics-tickets .ticket-stub span { font-size:7px; }
+.analytics-tickets .metric { align-items:stretch; }
+.financial-numbers { border-top:1px dashed var(--line); padding-top:14px; }
+.comparison-selector { display:grid; gap:8px; max-width:300px; font-size:13px; }
+.comparison-selector select { min-height:44px; padding:10px; border:1px solid var(--line); background:var(--surface); border-radius:6px; color:var(--ink); }
+@media(max-width:450px) { .analytics-tickets .ticket-content { padding-inline:10px; }.analytics-tickets .ticket-content > strong { font-size:23px; } }

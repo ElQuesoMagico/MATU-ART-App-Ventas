@@ -1,0 +1,1 @@
+{"name":"matu-art-api","private":true,"type":"module","scripts":{"dev":"wrangler dev","check":"tsc --noEmit","deploy":"wrangler deploy","bootstrap":"node --experimental-strip-types scripts/bootstrap.ts"},"devDependencies":{"wrangler":"^4.0.0","typescript":"~6.0.2","@types/node":"^24.13.3"}}

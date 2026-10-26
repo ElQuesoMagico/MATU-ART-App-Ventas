@@ -1,0 +1,16 @@
+.data-manager { display:grid; gap:20px; font-size:13px; line-height:1.6; min-width:0; }
+.data-manager fieldset { border:0; border-top:1px dashed var(--accent); padding:14px 0 0; min-width:0; }
+.data-manager legend { font:600 22px var(--heading-font); padding-right:12px; color:var(--accent); }
+.data-manager label { display:grid; gap:6px; min-width:0; margin-block:8px; }
+.data-manager input,.data-manager select { min-width:0; width:100%; min-height:46px; border:1px solid var(--line); border-radius:6px; background:var(--canvas); padding:10px; color:var(--ink); }
+.data-manager input[type=file] { padding:8px; font-size:12px; }
+.data-filter-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.data-filter-grid>label:has(select) { grid-column:1/-1; }
+.data-actions,.report-actions { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-block:12px; }
+.report-actions small,.report-actions .storage-error { flex-basis:100%; }
+.data-manager summary { cursor:pointer; min-height:44px; padding-block:10px; }
+.file-ready { display:grid; gap:6px; background:var(--rose); border:1px solid var(--accent); padding:14px; border-radius:8px; overflow-wrap:anywhere; }
+.backup-counts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.backup-counts div { border-bottom:1px dashed var(--line); padding:6px; overflow-wrap:anywhere; }
+.backup-counts dd { margin:0; font-weight:700; }
+@media(min-width:700px) { .data-filter-grid>label:has(select) { grid-column:auto; } }

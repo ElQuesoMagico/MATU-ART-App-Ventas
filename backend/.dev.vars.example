@@ -1,0 +1,6 @@
+# Solo servidor. Copiar a .dev.vars (ignorado). No usar prefijos VITE_.
+APP_ORIGIN=http://localhost:5173
+GAS_URL=
+GAS_KEY_ID=v1
+# Generar 32 bytes aleatorios como 64 caracteres hexadecimales en un gestor local.
+GAS_SECRET=

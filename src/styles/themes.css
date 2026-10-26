@@ -1,0 +1,30 @@
+@font-face {
+  font-family: 'Fraunces'; src: url('/fonts/Fraunces-Variable.ttf') format('truetype');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+/* Cherry Circus: paleta de papel, tintas y ornamentos de marca. */
+:root, [data-theme='cherry'], [data-theme='circus'] {
+  --cherry: #E89DAF; --rose: #F7D7DF; --cream: #FFF8EE;
+  --cherry-ink: #A83F58; --dark-ink: #342631;
+  --canvas: var(--cream); --surface: #fffdf7; --ink: var(--dark-ink); --muted: #73606a;
+  --line: #d9b9bd; --accent: var(--cherry-ink); --accent-hover: #8e3047; --on-accent: #FFF8EE;
+  --peach: var(--rose); --lavender: #E8DFF4; --mint: #DDEBDD; --butter: #F6E9B7;
+  --success-bg: #DDEBDD; --success-ink: #38553b; --warning-bg: #F6E9B7; --warning-ink: #6b4e1e;
+  --radius: 12px; --heading-font: 'Fraunces', Georgia, serif;
+  --body-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --paper-shadow: 0 4px 0 #a83f5810; --lift-shadow: 0 7px 14px #34263112;
+  --stripe: repeating-linear-gradient(90deg, var(--cherry) 0 12px, var(--cream) 12px 24px);
+}
+[data-theme='studio'] {
+  --canvas: #f3f5f6; --surface: #ffffff; --ink: #26333a; --muted: #5c6970;
+  --line: #dce3e7; --accent: #3d6273; --accent-hover: #294b5b; --on-accent: #ffffff;
+  --peach: #eadfda; --lavender: #e1e5f1; --mint: #dfeae7; --butter: #efeadb;
+  --heading-font: 'Segoe UI', system-ui, sans-serif; --radius: 14px;
+}
+[data-mode='dark'] {
+  color-scheme: dark; --canvas: #252522; --surface: #30302c; --ink: #f5f1e7;
+  --muted: #c4c0b5; --line: #494941; --accent: #e5a38e; --accent-hover: #f2b6a2; --on-accent: #30231f;
+  --peach: #4a3933; --lavender: #413a4e; --mint: #34443a; --butter: #484330;
+  --success-bg: #34443a; --success-ink: #c0dfc5; --warning-bg: #4b402a; --warning-ink: #f2d296;
+  --cherry: #bc788b; --rose: #49323b; --cream: #252522; --cherry-ink: #e5a3b5;
+}
