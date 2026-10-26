@@ -1560,3 +1560,16 @@ Antes de publicar revisar documentación histórica con cifras agregadas y
 correspondencias de nombres del importador; no contiene los CSV ni respaldos
 completos, que siguen excluidos. Se mantiene la decisión Pages primero, nube
 pendiente y la revisión del responsable antes de publicar. No cambios a IndexedDB.
+
+## Pages publicado y pantalla en blanco corregida — 26-10-2026
+
+Repositorio subido, commit de aplicación 2d7d0cf. Pages estaba configurado como
+legacy desde main / y servía index.html sin compilar, con /src/main.tsx y
+%BASE_URL% literales. Se cambió build_type a workflow y se ejecutó pages.yml.
+Run 40421105237 finalizó success: instalación, lint, pruebas, build y despliegue.
+URL: https://elquesomagico.github.io/MATU-ART-App-Ventas/
+Se verificó HTML compilado con recursos bajo /MATU-ART-App-Ventas/, carga de Inicio
+y navegación al POS en navegador. No se crearon ventas ni se importaron datos.
+La nube sigue deshabilitada. No se verificaron Android físico ni offline remoto.
+Publicaciones futuras: ejecutar manualmente Actions > Publicar MATU ART en GitHub
+Pages. Mantener Settings > Pages > Source en GitHub Actions, no Deploy from a branch.

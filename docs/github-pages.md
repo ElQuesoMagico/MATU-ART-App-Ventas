@@ -117,3 +117,16 @@ Verificación del 23-10-2026: build:pages correcto para `/` y `/matu-art/`
 258 pruebas aprobadas, sin omitidas. URL cloud ficticia de comprobación ausente
 del bundle final. Logs locales en artifacts/8-2-*-2026-10-23.log. No se repitió
 la comprobación visual del 21-10 ni se ejecutó el workflow remoto.
+
+## Pages publicado y pantalla en blanco corregida — 26-10-2026
+
+Repositorio subido, commit de aplicación 2d7d0cf. Pages estaba configurado como
+legacy desde main / y servía index.html sin compilar, con /src/main.tsx y
+%BASE_URL% literales. Se cambió build_type a workflow y se ejecutó pages.yml.
+Run 40421105237 finalizó success: instalación, lint, pruebas, build y despliegue.
+URL: https://elquesomagico.github.io/MATU-ART-App-Ventas/
+Se verificó HTML compilado con recursos bajo /MATU-ART-App-Ventas/, carga de Inicio
+y navegación al POS en navegador. No se crearon ventas ni se importaron datos.
+La nube sigue deshabilitada. No se verificaron Android físico ni offline remoto.
+Publicaciones futuras: ejecutar manualmente Actions > Publicar MATU ART en GitHub
+Pages. Mantener Settings > Pages > Source en GitHub Actions, no Deploy from a branch.
