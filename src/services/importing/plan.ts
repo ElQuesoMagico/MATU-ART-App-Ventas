@@ -40,19 +40,22 @@ export function buildImportPlan(data:DataSnapshot,sources:ImportSource[],choices
     if(maps.has(key)||seenKeys.has(key)){plan.alreadyImported++;return}
     try {
       const name=row.Nombres.trim();if(!name)throw new Error('Nombre vacío.')
-      const price=amount(row.Precios,'Precio'),categoryName=choices[`category:${key}`]||categoryFor(name,price)
+      const price=amount(row.Precios,'Precio'),categoryName=choices[`category:${key}`]||row.Categoria?.trim()||categoryFor(name,price)
       if(!categoryName){plan.issues.push({key:`category:${key}`,message:`${name}: indica categoría principal.`,text:true});return}
-      const categoryId=classification('categories',categoryName),familyId=classification('families',row.Familias),ipId=classification('ips',row.Ips)
-      if(!categoryId||!familyId||!ipId)return
+      const categoryId=classification('categories',categoryName)
+      const families=row.Familias.split('|').map(x=>x.trim()).filter(Boolean), ips=row.Ips.split('|').map(x=>x.trim()).filter(Boolean)
+      const familyIds=families.map(name=>classification('families',name)), ipIds=ips.map(name=>classification('ips',name))
+      if(!categoryId||familyIds.some(id=>!id)||ipIds.some(id=>!id))return
+      const resolvedFamilies=familyIds as string[], resolvedIps=ipIds as string[]
       const products=[...data.products,...additions.products]
       const candidates=products.filter(p=>normalizedName(p.name)===normalizedName(name))
       let product=products.find(p=>p.id===choices[key])
-      const exact=candidates.filter(p=>p.categoryId===categoryId&&p.price===price&&(p.familyIds??[]).includes(familyId)&&(p.ipIds??[]).includes(ipId))
+      const exact=candidates.filter(p=>p.categoryId===categoryId&&p.price===price&&resolvedFamilies.every(id=>(p.familyIds??[]).includes(id))&&resolvedIps.every(id=>(p.ipIds??[]).includes(id)))
       if(!product && exact.length===1)product=exact[0]
       if(!product&&candidates.length){plan.issues.push({key,message:`${name}: revisar formato, asociaciones o precio (origen $${price}). Se conserva íntegro el producto local seleccionado.`,options:candidates.map(p=>({id:p.id,label:`${p.name} · $${p.price}${p.isArchived?' · Archivado':''}`}))});return}
       if(product){if(product.price!==price)plan.warnings.push(`${name}: origen $${price}, local $${product.price}; se conserva precio local.`);if(product.isArchived)plan.warnings.push(`${name}: se conserva archivado.`)}
       else {
-        product={id:uid(key),name,categoryId,categoryIds:[categoryId],familyIds:[familyId],ipIds:[ipId],price,stock:0,stockCountPending:true,lowStockThreshold:0,averageCostIsProvisional:false,isFavorite:false,isArchived:false,createdAt:now,updatedAt:now,revision:1,activeName:normalizedName(name)}
+        product={id:uid(key),name,categoryId,categoryIds:[categoryId],familyIds:[...new Set(resolvedFamilies)],ipIds:[...new Set(resolvedIps)],price,stock:0,stockCountPending:true,lowStockThreshold:0,averageCostIsProvisional:false,isFavorite:false,isArchived:false,createdAt:now,updatedAt:now,revision:1,activeName:normalizedName(name)}
         additions.products.push(product)
       }
       record(s,n,product.id)

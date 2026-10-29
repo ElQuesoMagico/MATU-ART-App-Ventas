@@ -92,8 +92,8 @@ test('persistencia, edicion, activar/desactivar, archivo y reactivacion', async 
 })
 test('limite de activacion concurrente seguro', async () => {
   const repo = new PromotionRepository(`limit-${id()}`)
-  for (let i=0;i<11;i++) await repo.save(promo())
-  const results = await Promise.allSettled([repo.save(promo()),repo.save(promo())])
+  for (let i=0;i<11;i++) await repo.save(promo({name:`Promoción ${i}`}))
+  const results = await Promise.allSettled([repo.save(promo({name: "Límite A"})),repo.save(promo({name: "Límite B"}))])
   assert.equal(results.filter(r => r.status === 'fulfilled').length,1)
   assert.equal((await repo.snapshot()).filter(p => p.isActive).length,12)
 })

@@ -1,5 +1,5 @@
 import type { ImportKind, ImportSource } from '../../types/imports.ts'
-const columns:Record<ImportKind,string[]>={catalog:['Nombres','Ips','Familias','Precios'],families:['Nombre'],ips:['Nombre'],sales:['Evento','Fecha','Hora','Producto','Categoria','Cantidad','Precio_Total','Metodo_Pago']}
+export const importColumns:Record<ImportKind,string[]>={catalog:['Nombres','Ips','Familias','Precios'],families:['Nombre'],ips:['Nombre'],sales:['Evento','Fecha','Hora','Producto','Categoria','Cantidad','Precio_Total','Metodo_Pago']}
 /** RFC4180 quoting; also accepts semicolon CSV and tab-separated original tables. */
 export function parseTable(input:string):Record<string,string>[] {
   const text=input.replace(/^\uFEFF/,'')
@@ -26,9 +26,10 @@ export function parseTable(input:string):Record<string,string>[] {
 }
 export async function readImport(kind:ImportKind,name:string,bytes:Uint8Array):Promise<ImportSource> {
   if(bytes.length>5*1024*1024)throw new Error('Máximo 5 MB por archivo CSV/TSV.')
-  const text=new TextDecoder('utf-8',{fatal:true}).decode(bytes),rows=parseTable(text)
+  const rows = name.toLowerCase().endsWith('.xlsx') ? await (await import('./workbook.ts')).readWorkbook(bytes) : parseTable(new TextDecoder('utf-8',{fatal:true}).decode(bytes))
   if(!rows.length)throw new Error('No hay filas de datos.')
-  if(columns[kind].some(c=>!Object.hasOwn(rows[0],c))||Object.keys(rows[0]).length!==columns[kind].length)throw new Error(`Columnas esperadas: ${columns[kind].join(', ')}.`)
+  const expected = importColumns[kind]
+  if(expected.some(c=>!Object.hasOwn(rows[0],c))||Object.keys(rows[0]).some(c => !expected.includes(c) && !(kind === 'catalog' && c === 'Categoria')))throw new Error(`Columnas esperadas: ${expected.join(', ')}.${kind === 'catalog' ? ' Categoria es opcional para archivos anteriores.' : ''}`)
   // Hash the original UTF-8 bytes including BOM/newlines, never the filename.
   const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new Uint8Array(bytes).buffer)),b=>b.toString(16).padStart(2,'0')).join('')
   return {kind,name,hash,rows}

@@ -1573,3 +1573,14 @@ y navegación al POS en navegador. No se crearon ventas ni se importaron datos.
 La nube sigue deshabilitada. No se verificaron Android físico ni offline remoto.
 Publicaciones futuras: ejecutar manualmente Actions > Publicar MATU ART en GitHub
 Pages. Mantener Settings > Pages > Source en GitHub Actions, no Deploy from a branch.
+
+## Ampliación local 8.2 — 27-10-2026
+
+Implementados Crear nuevo, administración con formularios separados, eliminación
+controlada y reasignación de categorías; XLSX y plantillas CSV/XLSX en importación.
+Detalle de archivos, reglas, pruebas y límites: [Administración local 8.2](docs/catalog-administration-8.2.md).
+IndexedDB sigue v10; no se borraron datos del usuario. Build/lint correctos, 270
+pruebas aprobadas. Revisión de escritorio, 390×844 y 425×876; sin Android físico.
+La nube queda pendiente por confirmación expresa del usuario: conservar Worker/D1,
+Apps Script y Sheets; retomar configuración externa después, sin pagos autorizados.
+No hay tombstones ni sincronización activada. Cambios locales aún no publicados en Pages.

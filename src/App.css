@@ -489,3 +489,19 @@ main[data-page='inicio'] .page-heading { margin-bottom: 8px; }
 .recent-sales .sale-event { border-left: 3px solid var(--rose); padding-left: 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .recent-sales .sale-event > span:first-child { flex-basis: 100%; font-weight: 600; }
 @media(max-width:599px) { .home-pos-poster .event-poster-copy { border-right: 0; border-bottom: 1px dashed var(--accent); padding-right: 0; padding-bottom: 18px; } }
+
+/* Catalogue administration: compact actions, independent of the product form. */
+.create-entity-menu { position: relative; }
+.create-entity-options { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; min-width: 190px; padding: 6px; border: 1px solid var(--accent); border-radius: 10px; background: var(--surface); box-shadow: var(--paper-shadow); }
+.create-entity-options button { display: block; width: 100%; min-height: 46px; padding: 10px 16px; text-align: left; border: 0; border-radius: 6px; background: transparent; color: var(--ink); }
+.create-entity-options button:hover, .create-entity-options button:focus-visible { background: var(--rose); }
+.product-status-filter { display: flex; flex-wrap: wrap; gap: 6px; }
+.product-status-filter button { min-height: 44px; }
+.category-list article { flex-wrap: wrap; gap: 10px; }
+.category-list article > div { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .category-list article > div { flex: 1 0 100%; }
+  .category-list article .text-button { min-height: 44px; padding: 8px 10px; }
+}
+.template-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.template-actions .text-button { min-height: 44px; }
