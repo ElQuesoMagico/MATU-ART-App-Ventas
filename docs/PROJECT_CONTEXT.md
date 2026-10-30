@@ -537,3 +537,12 @@ pruebas aprobadas. Revisión de escritorio, 390×844 y 425×876; sin Android fí
 La nube queda pendiente por confirmación expresa del usuario: conservar Worker/D1,
 Apps Script y Sheets; retomar configuración externa después, sin pagos autorizados.
 No hay tombstones ni sincronización activada. Cambios locales aún no publicados en Pages.
+
+## Publicación en GitHub Pages — 29-10-2026
+
+La ampliación local 8.2 quedó publicada desde el commit `864ad1021ec769ced5a0e8ac449f3e9d664951bd`.
+[Workflow 40990392160](https://github.com/ElQuesoMagico/MATU-ART-App-Ventas/actions/runs/40990392160): build y deploy finalizados correctamente, incluyendo lint y pruebas del workflow.
+Aplicación: https://elquesomagico.github.io/MATU-ART-App-Ventas/
+Verificación real en navegador: Inventario carga y Crear nuevo muestra Producto, Categoría, Familia, IP y Promoción. No se crearon registros de prueba en producción.
+La PWA mostró inicialmente la versión anterior; cerrar y reabrir la pestaña activó la actualización, sin borrar IndexedDB. Si persiste la versión anterior, cerrar todas las pestañas de MATU ART y volver a abrir.
+La nube y la sincronización siguen pendientes y deshabilitadas. Esta comprobación no verifica Android físico ni funcionamiento offline remoto.

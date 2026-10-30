@@ -113,3 +113,12 @@ control de 12 activas). README y PROJECT_CONTEXT enlazan esta ampliación.
 Evidencia local excluida de Git: `artifacts/admin-*`. Estos cambios no se publicaron
 todavía en Pages; el servidor de vista previa anterior en 5192 puede seguir mostrando
 la compilación anterior. El despliegue de Pages continúa siendo manual.
+
+## Publicación en GitHub Pages — 29-10-2026
+
+La ampliación local 8.2 quedó publicada desde el commit `864ad1021ec769ced5a0e8ac449f3e9d664951bd`.
+[Workflow 40990392160](https://github.com/ElQuesoMagico/MATU-ART-App-Ventas/actions/runs/40990392160): build y deploy finalizados correctamente, incluyendo lint y pruebas del workflow.
+Aplicación: https://elquesomagico.github.io/MATU-ART-App-Ventas/
+Verificación real en navegador: Inventario carga y Crear nuevo muestra Producto, Categoría, Familia, IP y Promoción. No se crearon registros de prueba en producción.
+La PWA mostró inicialmente la versión anterior; cerrar y reabrir la pestaña activó la actualización, sin borrar IndexedDB. Si persiste la versión anterior, cerrar todas las pestañas de MATU ART y volver a abrir.
+La nube y la sincronización siguen pendientes y deshabilitadas. Esta comprobación no verifica Android físico ni funcionamiento offline remoto.
