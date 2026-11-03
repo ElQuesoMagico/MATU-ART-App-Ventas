@@ -29,10 +29,15 @@ jobs:
           else
             echo "MATU_BASE_PATH=/$repo/" >> "$GITHUB_ENV"
           fi
-      - name: Compilar aplicación local
-        # Deliberately no cross-site cookie API: deployment decision still pending.
+      - name: Compilar aplicación
+        # Public web configuration only. Empty variables keep cloud disabled.
         env:
           VITE_CLOUD_API_URL: ''
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_WORKSPACE_ID: ${{ vars.VITE_FIREBASE_WORKSPACE_ID }}
         run: npm run build:pages
       - uses: actions/upload-pages-artifact@v3
         with:

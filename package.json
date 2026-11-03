@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:pages": "node scripts/build-pages.mjs",
+    "build:worker": "node scripts/build-worker.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test:firebase": "firebase emulators:exec --only auth,firestore --project demo-matu-art \"node --test tests/firebase/*.test.mjs\""
   },
   "dependencies": {
     "exceljs": "^4.4.0",
     "fflate": "^0.8.3",
+    "firebase": "^13.2.0",
     "idb": "^8.0.4",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
@@ -22,12 +25,14 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.6.1",
     "fake-indexeddb": "^6.2.5",
+    "firebase-tools": "^15.34.2",
     "oxlint": "^1.81.0",
     "postcss": "^8.5.29",
     "tailwindcss": "^4.3.3",
@@ -37,6 +42,7 @@
   "overrides": {
     "exceljs": {
       "uuid": "^11.1.1"
-    }
+    },
+    "@grpc/grpc-js": "^1.14.7"
   }
 }

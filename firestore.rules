@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function activeMember(workspaceId) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid))
+        && get(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)).data.enabled == true
+        && get(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)).data.role in ['administrator', 'manager', 'seller'];
+    }
+
+    // Hito B: read only one's enabled membership and its workspace.
+    // Memberships are provisioned by the owner in the Firebase console.
+    match /workspaces/{workspaceId} {
+      allow get: if activeMember(workspaceId);
+      allow list, write: if false;
+      match /members/{uid} {
+        allow get: if request.auth != null && request.auth.uid == uid && activeMember(workspaceId);
+        allow list, write: if false;
+      }
+    }
+    // No commercial reads or writes, including by administrators, in this milestone.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

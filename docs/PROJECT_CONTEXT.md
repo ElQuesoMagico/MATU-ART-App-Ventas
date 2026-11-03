@@ -1,9 +1,38 @@
 # MATU ART — Contexto persistente del proyecto
 
-Actualizado: **23 de octubre de 2026**, America/Santiago.
-Etapa 8.2 en curso; frontend GitHub Pages preparado localmente. DB v10 intacta.
-Sin cloud desplegada ni sincronización habilitada. Ver actualización 8.2 al final
-y docs/cloud-8.2.md; las secciones anteriores conservan contexto histórico.
+Actualizado: **3 de noviembre de 2026**, America/Santiago.
+Decisión vigente: GitHub Pages + Firebase Auth email/password + Firestore Standard
+en Spark, sin facturación. Hito A auditado en [firebase-spark-audit.md](firebase-spark-audit.md).
+Pages responde HTTP 200; IndexedDB v10, 16 almacenes intactos. Herramientas de prueba
+Firebase instaladas en desarrollo; reglas de membresía preparadas y probadas en
+emulador. SDK integrado en el modal Conexión a la nube: login/logout y lectura
+servidor de membresía/workspace. Captura del usuario confirma acceso real administrador;
+sin sincronización comercial todavía.
+El usuario confirmó workspace `byhkbCSyvenq9SDAjoRm`, admin y vendedor creados.
+Ver [firebase-setup.md](firebase-setup.md) para IDs y siguiente paso manual:
+el usuario confirmó reglas publicadas y mostró acceso real como Administrador.
+Intercambió roles intencionalmente: EfuGpacNLgMqX0dh9oQJ9fb6cir2 es administrator;
+mOcpmuG9Hzajjd5q0jH9g5Rl6A83 es seller. No revertir. El primer rechazo se debió
+a members en raíz, en vez de dentro del workspace. Segunda captura del usuario
+confirma acceso real como Vendedor (03-11-2026). Ambas cuentas verificadas por
+evidencia del usuario; sin escrituras comerciales. El usuario confirmó persistencia
+tras recargar la misma pestaña y verificar de nuevo el acceso vendedor sin contraseña.
+El usuario confirmó también cierre de sesión, formulario de acceso tras recarga
+e inventario local disponible. Verificaciones reales básicas de Auth completadas
+por el usuario; no confundir con sincronización ni pruebas de sesión expirada.
+Pendiente configurar variables públicas Firebase en GitHub Actions y publicar
+el frontend cuando corresponda; la versión local es la verificada.
+Hito B: 274 pruebas aplicación, 9 emuladores, lint/build Pages correctos. Auth usa
+sessionStorage, Firestore memoria; no cambios IndexedDB. `.env.local` contiene solo
+configuración pública Firebase aportada. GitHub Actions preparado para variables
+de repositorio; no publicación. UI Cloudflare conservada en LegacyCloudConnection.
+Cloudflare/D1/GAS se conservan pero dejan de ser objetivo operativo. No continuar
+Workers Paid/despliegue Worker. El subdominio eqmm no afecta a la nueva arquitectura.
+D1 sí fue inicializada y GAS desplegado (solo rechazo anónimo probado); no borrarlos.
+Seguridad: NO GO para ventas cloud automáticas con todo el motor de combos actual;
+Rules no ejecuta ese optimizador. B/C pueden prepararse aislados; no habilitar D sin
+protocolo verificable o revisión/restricción explícitamente aceptada por el usuario.
+Sin cambios funcionales/migraciones/publicación en Hito A. Historia conservada abajo.
 
 ## 1. Cómo utilizar este documento después de compactar
 
@@ -65,7 +94,7 @@ externo ni biblioteca pesada de gráficos. Versiones exactas en `package-lock.js
 | `src/components/` | Modal, Checkout, SaleDetail, listas, TicketFrame y componentes reutilizables. Subdirectorios catalog, analytics, data, etc. |
 | `src/hooks/` | CatalogProvider/context, useCart, useStorageAction, useAnalytics. |
 | `src/types/catalog.ts`, `sales.ts`, `promotions.ts`, `events.ts`, `expenses.ts`, `discounts.ts` | Modelos persistentes/comerciales. `types/index.ts` también conserva tipos demo antiguos: no usarlos como modelo real. |
-| `src/services/catalogDatabase.ts` | Apertura idb, esquema v9 y migraciones acumulativas. |
+| `src/services/catalogDatabase.ts` | Apertura idb, esquema v10 y migraciones acumulativas. |
 | `src/services/*Repository.ts` | Validaciones y transacciones de catálogo, clasificaciones, ventas, promociones, eventos y gastos. |
 | `src/services/*Rules.ts`, `catalogValidation.ts`, `productPricing.ts`, `promotionConditions.ts`, `movementReversal.ts` | Funciones puras y reglas de negocio, separadas de UI. |
 | `src/services/analytics.ts`, `expenseRules.ts` | Agregaciones históricas y cálculos financieros compartidos con exportaciones/PDF. |
@@ -86,7 +115,7 @@ de archivos son hilos locales del navegador: **no son Cloudflare Workers**.
 
 ## 4. Persistencia y migraciones
 
-**Nombre de DB: `clown-ufo-catalog`. Versión: 9.** No cambiar el nombre por MATU ART.
+**Nombre de DB: `clown-ufo-catalog`. Versión: 10.** No cambiar el nombre por MATU ART.
 IndexedDB es la fuente operativa, sin localStorage como base de ventas.
 UUID estables generados con `crypto.randomUUID()`; asociaciones por ID, no por nombre.
 Datos separados por origen/perfil/navegador: `localhost`, `127.0.0.1`, 5173 y 5174
@@ -103,10 +132,11 @@ no se deben tratar como la misma base. No mover ni borrar bases del usuario para
 | 7 | Marcador `combos-packs-v1` en metadata, sin recrear productos. |
 | 8 | managedEvents: eventos reales independientes de events legacy. |
 | 9 | expenses, expenseCategories, expenseChanges; categorías de gastos iniciales, sin gastos ficticios. |
+| 10 | importRecords, índice único by-source para idempotencia de importación local. |
 
-Los **15 almacenes** actuales son products, categories, families, ips, movements,
+Los **16 almacenes** actuales son products, categories, families, ips, movements,
 costChanges, sales, payments, metadata, events, managedEvents, promotions, expenses,
-expenseCategories y expenseChanges. `events` legacy no se elimina ni se convierte
+expenseCategories, expenseChanges e importRecords. `events` legacy no se elimina ni se convierte
 automáticamente en eventos gestionables. v9 incluye índice único del evento activo.
 No hubo migración estructural local en 7.3 ni 8.1. Cuentas/sesiones están en D1
 independiente (migración SQL 0001); no hay outbox ni cola de sincronización.
@@ -566,3 +596,51 @@ pulsar Actualizar aplicación y regresar automáticamente a Inventario con Crear
 e Importación masiva. No se escribieron ni borraron registros de usuario. No se
 verificó un dispositivo Android físico ni una base con datos reales durante este flujo.
 URL de recuperación: https://elquesomagico.github.io/MATU-ART-App-Ventas/actualizar.html
+
+## Preparación externa cloud — continuación 02-11-2026
+
+El usuario confirmó hoja y proyecto Apps Script, manifiesto de solo lectura,
+SPREADSHEET_ID y GATEWAY_KEYS guardados por él. No se recibió el secreto.
+URL GAS incorporada a backend/wrangler.jsonc. GET sin autenticar devolvió
+UNAUTHORIZED y POST vacío REQUEST_REJECTED: aún no prueba autenticada de Sheets.
+El usuario proporcionó UUID D1 ead6215e-93dc-458e-8f48-d9abccfe9771, configurado
+para matu-art-auth; existencia y esquema remoto pendientes de verificar.
+Siguiente paso: autorización local de Wrangler. No migraciones remotas ni despliegue,
+no compras; APP_ORIGIN sigue de ejemplo hasta resolver dominio/proxy y cookies.
+Workers Paid, CPU scrypt, conexión autenticada y sincronización siguen pendientes.
+
+## D1 remoto verificado e inicializado — 02-11-2026 (America/Santiago)
+
+Wrangler autorizado por el usuario. d1 info confirmó matu-art-auth y su UUID;
+consulta sqlite_master mostró únicamente _cf_KV antes de aplicar migraciones.
+Se aplicaron 0001_auth.sql y 0002_catalog_operations.sql correctamente; consulta
+posterior confirmó users, sessions, attempts, catalog_operations y tabla de migraciones.
+Sin cuentas creadas, sin datos comerciales enviados y sin cambios a IndexedDB.
+Pendientes: decidir origen productivo seguro (dominio/proxy con Pages o frontend
+junto a API en Worker), Workers Paid/medición CPU, secretos Worker, administrador,
+prueba autenticada GAS/Sheets y sincronización de catálogo. No Worker desplegado.
+
+## Decisión vigente: frontend y API en Workers — 02-11-2026
+
+Reemplaza la decisión de hosting Pages para producción futura: GitHub mantiene
+código y Pages existente; nuevo despliegue previsto workers.dev mismo origen.
+Preparados ASSETS, /api/*, build:worker raíz y routing tests (272 pasan); no
+publicado todavía. D1 existente conservada, sin cambios a scrypt o IndexedDB.
+Leer cloud-worker-hosting.md para migración explícita por respaldo y pendientes.
+Falta subdominio de cuenta para APP_ORIGIN, aprobación Paid/CPU, secreto Worker,
+administrador y prueba real autenticada GAS/Sheets. No habilitar sync todavía.
+
+## Origen Worker confirmado — 03-11-2026
+
+Usuario proporcionó 4rielsoto.workers.dev. APP_ORIGIN configurado explícitamente
+como https://matu-art-api.4rielsoto.workers.dev. Sustituye el placeholder anterior;
+no se ha publicado ni se ha confirmado la URL remota. Cuenta D1 ya verificada.
+Workers Paid sigue sin autorización. No cambiar scrypt para encajar en Free.
+
+### Verificación Hito A Firebase (03-11-2026)
+
+Lint y build:pages correctos; 272 pruebas aprobadas, 0 fallidas/omitidas. HTTP Pages
+200, bundle index-Cb6KOVTQ.js. Solo documentación actualizada; infraestructura anterior
+conservada. No Rules ejecutables, SDK, emuladores ni Firebase real. Próximo paso manual:
+crear proyecto Spark sin facturación, sin servicios extra; después B Auth/Rules.
+No prometer motor POS completo seguro en Spark: leer dictamen antes de habilitar D.

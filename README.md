@@ -10,12 +10,21 @@ ventas históricas. IndexedDB utiliza la versión 9: la migración desde v8 aña
 inventario, promociones y eventos; no hay conexión con Google Sheets.
 Los informes de cada etapa y sus verificaciones están al final del documento.
 
-**Estado actual: Etapa 8.2 en curso, sin despliegue cloud.** IndexedDB v10 e
-importador 8.1.1 disponibles. Frontend preparado para GitHub Pages; la conexión
-entre github.io y workers.dev no se habilita con cookies de terceros. Falta decidir
-dominio/proxy y Workers Paid, además del despliegue y sincronización completa.
-Ver [estado 8.2](docs/cloud-8.2.md), [GitHub Pages](docs/github-pages.md) y
-[PROJECT_CONTEXT](docs/PROJECT_CONTEXT.md). Se conservan los informes históricos.
+**Estado vigente — 03-11-2026: Etapa 8.2, Hito B Firebase Spark en verificación.** Hosting oficial
+GitHub Pages (publicación HTTP verificada), Firebase Auth/Firestore como objetivo,
+IndexedDB v10 con 16 almacenes como operación local. Reglas Firebase de lectura
+de membresía probadas localmente y publicación confirmada por el usuario.
+Autenticación UI Firebase implementada localmente; captura del usuario confirma
+acceso real como administrador y vendedor. El usuario confirmó persistencia de
+sesión tras recarga y cierre de sesión con inventario local conservado.
+Publicación del frontend con Firebase pendiente.
+Ver [configuración Firebase](docs/firebase-setup.md).
+Cloudflare/D1/GAS quedan conservados como infraestructura anterior,
+sin continuar despliegue ni contratación. No se eliminó ningún recurso.
+Ver [auditoría, esquema y bloqueo de seguridad del POS](docs/firebase-spark-audit.md)
+y [PROJECT_CONTEXT](docs/PROJECT_CONTEXT.md). Hito D no aprobado para promociones/
+combos completos enviados por un cliente no confiable; se requiere una restricción
+explícita/protocolo demostrable. Los informes anteriores se conservan como historia.
 
 ## Desarrollo
 
@@ -97,7 +106,7 @@ El historial de inventario permanece separado, filtrable por producto y tipo.
 
 ## Base y migraciones
 
-La base `clown-ufo-catalog` está en versión 8:
+La base `clown-ufo-catalog` está en versión 10. Evolución acumulativa:
 
 | Versión | Cambio aditivo |
 | --- | --- |
@@ -109,6 +118,8 @@ La base `clown-ufo-catalog` está en versión 8:
 | 6 | `promotions`, vacío; no reescribe registros existentes |
 | 7 | Marcador de combos/packs; campos opcionales compatibles |
 | 8 | `managedEvents` vacío, índice único de evento activo; `events` legacy conservado |
+| 9 | `expenses`, `expenseCategories`, `expenseChanges` |
+| 10 | `importRecords` y su índice único de procedencia |
 
 No se eliminan ni reinician datos previos. La versión 4 añade asociaciones a los productos sin modificar sus demás campos. Se conservan IDs, imágenes,
 categorías, movimientos y auditoría de costos. No se insertan productos ni eventos
@@ -1613,3 +1624,22 @@ pulsar Actualizar aplicación y regresar automáticamente a Inventario con Crear
 e Importación masiva. No se escribieron ni borraron registros de usuario. No se
 verificó un dispositivo Android físico ni una base con datos reales durante este flujo.
 URL de recuperación: https://elquesomagico.github.io/MATU-ART-App-Ventas/actualizar.html
+
+## Frontend y API juntos en Workers — preparación 02-11-2026
+
+El usuario eligió workers.dev, conservando GitHub como repositorio. Se configuró
+ASSETS y /api/* en el mismo origen, build:worker con base / y API /api, y pruebas
+de routing. Scrypt, D1 e IndexedDB sin modificaciones. 272 pruebas, lint, build
+Worker y TypeScript backend correctos. APP_ORIGIN aún es placeholder: falta
+subdominio de cuenta antes de publicar. Sin servicios de pago autorizados.
+Procedimiento de respaldo y restauración explícita: docs/cloud-worker-hosting.md.
+No hay traslado automático, conexión autenticada Sheets ni sincronización real.
+
+## Hito A Firebase — 03-11-2026
+
+Auditoría completa documentada en docs/firebase-spark-audit.md: modelo propuesto,
+frontera de seguridad, roles, sincronización, presupuesto Spark y requisitos de
+respaldo/importación. No integración Firebase todavía. Pages disponible por HTTP.
+Lint y build:pages correctos; 272 pruebas aprobadas. No emuladores ni pruebas Firebase
+reales. Ninguna migración, publicación o envío de datos comerciales. D bloqueado
+para ventas complejas automáticas no verificables; B/C sujetos a reglas probadas.

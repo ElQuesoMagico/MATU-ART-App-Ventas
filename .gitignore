@@ -31,6 +31,7 @@ dist-ssr
 .dev.vars.*
 !.dev.vars.example
 .wrangler
+.firebase/
 
 # Generated local Pages verification build; not source or deployment input.
 artifacts/pages-build/
