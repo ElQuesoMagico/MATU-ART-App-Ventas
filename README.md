@@ -1593,3 +1593,15 @@ Aplicación: https://elquesomagico.github.io/MATU-ART-App-Ventas/
 Verificación real en navegador: Inventario carga y Crear nuevo muestra Producto, Categoría, Familia, IP y Promoción. No se crearon registros de prueba en producción.
 La PWA mostró inicialmente la versión anterior; cerrar y reabrir la pestaña activó la actualización, sin borrar IndexedDB. Si persiste la versión anterior, cerrar todas las pestañas de MATU ART y volver a abrir.
 La nube y la sincronización siguen pendientes y deshabilitadas. Esta comprobación no verifica Android físico ni funcionamiento offline remoto.
+
+## Recuperación de actualización PWA — 02-11-2026
+
+La versión antigua podía permanecer en la caché mientras hubiese pestañas abiertas.
+Se agregó `public/actualizar.html`, accesible incluso desde el service worker anterior
+con conexión, para descargar y activar explícitamente la nueva versión. El usuario
+primero debe terminar ventas y formularios pendientes y cerrar las otras ventanas.
+No se borra IndexedDB ni se recarga automáticamente una operación abierta.
+`offlinePlugin.ts` acepta activación exclusivamente desde esa página; `src/App.tsx`
+muestra el aviso de actualización en todas las pantallas cuando está descargada.
+Pruebas: 271 aprobadas, lint correcto. La restauración del archivo afectado por falta
+de espacio se completó desde Git antes de implementar el cambio.

@@ -10,12 +10,14 @@ import { Events } from './screens/Events'
 import { Analytics } from './screens/Analytics'
 import { useState } from 'react'
 import { useCart } from './hooks/useCart'
+import { useOfflineStatus } from './services/offlineStatus'
 import './styles/themes.css'
 import './App.css'
 import './styles/tickets.css'
 export default function App() {
   const { page, navigate } = useNavigation()
   const cart = useCart()
+  const offlineStatus = useOfflineStatus()
   const [analyticsEventId, setAnalyticsEventId] = useState<string>()
   const openAnalytics = (eventId?: string) => { setAnalyticsEventId(eventId); navigate('estadisticas') }
   return <div className="app-shell" data-theme="cherry" data-mode="light">
@@ -24,6 +26,7 @@ export default function App() {
     <div className="workspace">
       <header className="topbar"><span className="atelier"><img className="topbar-logo" src={artisticAssets.brandLogo} alt="" /> MATU ART</span><span className="demo-tag" title="Catálogo, ventas y eventos guardados en este navegador."><span className="status-dot" />Datos locales</span></header>
       <main id="main" tabIndex={-1} data-page={page}>
+        {offlineStatus.startsWith('Actualización descargada') && <p className="local-note" role="status">Hay una nueva versión. Termina las ventas y guarda los formularios abiertos antes de <a href={`${import.meta.env.BASE_URL}actualizar.html`}>actualizar MATU ART</a>.</p>}
         {page === 'inicio' && <Home navigate={navigate} openAnalytics={openAnalytics} />}
         {page === 'estadisticas' && <Analytics navigate={navigate} initialEventId={analyticsEventId} />}
         {page === 'venta' && <PointOfSale cart={cart} />}

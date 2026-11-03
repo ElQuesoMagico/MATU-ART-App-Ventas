@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#FFF8EE">
+<title>Actualizar MATU ART</title>
+<style>
+body{margin:0;background:#fff8ee;color:#342631;font:17px/1.6 system-ui;padding:24px}main{max-width:560px;margin:8vh auto;border:2px solid #a83f58;border-radius:20px;padding:24px}h1{font-family:Georgia,serif}button,a{font:inherit}button{background:#a83f58;color:white;border:0;border-radius:12px;padding:14px 20px;cursor:pointer}button:disabled{opacity:.65}a{color:#a83f58}#status{overflow-wrap:anywhere}
+</style>
+<main>
+<h1>Actualizar MATU ART</h1>
+<p>Actualiza los archivos de la aplicación sin borrar productos, ventas ni otros datos guardados en este navegador.</p>
+<p><strong>Antes de continuar:</strong> termina cualquier venta o formulario pendiente y cierra las otras pestañas y ventanas instaladas de MATU ART. Los cambios sin guardar pueden perderse.</p>
+<button id="update" type="button">Actualizar aplicación</button>
+<p id="status" role="status" aria-live="polite"></p>
+<a href="./#inventario">Volver a Inventario</a>
+</main>
+<script>
+const button=document.getElementById('update'),status=document.getElementById('status');
+function waitForWorker(worker,states){
+ return new Promise((resolve,reject)=>{
+  const finish=(error)=>{clearTimeout(timer);worker.removeEventListener('statechange',check);error?reject(error):resolve();};
+  const check=()=>{if(states.includes(worker.state))finish();else if(worker.state==='redundant')finish(new Error('No se pudo descargar la actualización completa. Revisa conexión y espacio disponible.'));};
+  const timer=setTimeout(()=>finish(new Error('La actualización está tardando. Revisa tu conexión, cierra las otras ventanas de MATU ART y vuelve a intentar.')),120000);
+  worker.addEventListener('statechange',check);check();
+ });
+}
+button.addEventListener('click',async()=>{
+ button.disabled=true;status.textContent='Buscando y descargando la actualización…';
+ try{
+  if(!('serviceWorker' in navigator))throw new Error('Este navegador no admite la actualización PWA. Abre MATU ART en un navegador compatible.');
+  const registration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
+  await registration.update();
+  if(registration.installing)await waitForWorker(registration.installing,['installed','activated']);
+  if(registration.waiting){
+   const waiting=registration.waiting;
+   const activated=waitForWorker(waiting,['activated']);
+   waiting.postMessage({type:'MATU_ACTIVATE_UPDATE'});
+   await activated;
+  }
+  status.textContent='Actualización lista. Abriendo Inventario…';location.replace('./#inventario');
+ }catch(error){status.textContent=error instanceof Error?error.message:'No se pudo actualizar. Tus datos locales se conservan.';button.disabled=false;}
+});
+</script>
+</html>

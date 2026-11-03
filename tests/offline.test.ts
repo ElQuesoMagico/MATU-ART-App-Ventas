@@ -50,3 +50,20 @@ test('offline module requests reuse public precache despite Vary: Origin; naviga
   handlers.fetch({request:{url:'https://matu.test/api/auth/session',method:'GET',mode:'cors'},respondWith:()=>{intercepted=true}})
   assert.equal(intercepted,false,'authentication API must never use the shell cache or HTML fallback')
 })
+
+test('PWA activation requires explicit update-page message; install never forces activation',async()=>{
+ const handlers:Record<string,(event:unknown)=>void>={}
+ let skipped=0,wait:Promise<unknown>|undefined
+ runInNewContext(offlineWorkerSource(['index.html']),{
+  URL,self:{registration:{scope:'https://user.github.io/matu/'},skipWaiting:async()=>{skipped++},addEventListener:(name:string,handler:(event:unknown)=>void)=>{handlers[name]=handler}},
+  caches:{open:async()=>({addAll:async()=>{}})},
+ })
+ handlers.install({waitUntil:(promise:Promise<unknown>)=>{wait=promise}});await wait
+ assert.equal(skipped,0)
+ for(const source of [undefined,{url:'https://evil.test/actualizar.html'},{url:'https://user.github.io/matu/'}]){
+  handlers.message({data:{type:'MATU_ACTIVATE_UPDATE'},source,waitUntil:(promise:Promise<unknown>)=>{wait=promise}})
+ }
+ assert.equal(skipped,0)
+ handlers.message({data:{type:'MATU_ACTIVATE_UPDATE'},source:{url:'https://user.github.io/matu/actualizar.html'},waitUntil:(promise:Promise<unknown>)=>{wait=promise}});await wait
+ assert.equal(skipped,1)
+})
