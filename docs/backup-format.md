@@ -1,5 +1,14 @@
 # MATU ART: respaldo completo, formato 1
 
+Actualización Hito C (candidato local, 03-11-2026): IndexedDB v11 añade catalogSync.
+El formato sigue siendo 1; respaldos DB9/10 se adaptan añadiendo el almacén vacío
+después de verificar el checksum original. Los respaldos v11 incluyen la cola,
+baseline, conflictos y vínculo, sin credenciales. Se permite generar el respaldo
+de una base vinculada, pero se bloquea restaurarlo o reemplazar una base vinculada
+hasta disponer de revisión segura de operaciones pendientes. Desvincular sin
+pendientes permite restaurar respaldos sin vínculo. Véase `firebase-catalog-sync.md`.
+Los ejemplos originales siguientes se conservan como referencia histórica.
+
 El esquema ejecutable está en `src/services/data/backupValidation.ts`. Este documento
 define el contenedor y el protocolo; los tipos comerciales continúan en `src/types/`.
 

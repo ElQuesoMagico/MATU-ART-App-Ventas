@@ -168,7 +168,7 @@ test('persistencia tras cerrar conexiones/reabrir y operación con red deshabili
 test('migración v7→v8 no convierte eventos mínimos ni reescribe almacenes anteriores', async () => {
   const { name, catalog, sales, checkout } = await setup()
   const sale = await sales.confirm(checkout()); await catalog.close(); await sales.close()
-  const source = await openCatalogDatabase(name), stores = [...source.objectStoreNames].filter(s => !['managedEvents', 'expenses', 'expenseChanges', 'expenseCategories', 'importRecords'].includes(s))
+  const source = await openCatalogDatabase(name), stores = [...source.objectStoreNames].filter(s => !['managedEvents', 'expenses', 'expenseChanges', 'expenseCategories', 'importRecords', 'catalogSync'].includes(s))
   const data = new Map<string, unknown[]>(), schema = stores.map(store => {
     const tx = source.transaction(store as 'products'), objectStore = tx.objectStore(store as 'products')
     return { store, keyPath: objectStore.keyPath, indexes: [...objectStore.indexNames].map(index => { const i = objectStore.index(index as 'active-name'); return { name: index, keyPath: i.keyPath, unique: i.unique } }) }
@@ -184,7 +184,7 @@ test('migración v7→v8 no convierte eventos mínimos ni reescribe almacenes an
   try { await assert.rejects(openCatalogDatabase(legacyName)) } finally { IDBDatabase.prototype.createObjectStore = createStore }
   const unchanged = await openDB(legacyName, 7); assert.equal(unchanged.version, 7); assert.equal(unchanged.objectStoreNames.contains('managedEvents'), false); assert.deepEqual(await unchanged.get('sales', sale.id), historical); unchanged.close()
   for (let i = 0; i < 2; i++) {
-    const db = await openCatalogDatabase(legacyName); assert.equal(db.version, 10); assert.deepEqual(await db.getAll('managedEvents'), [])
+    const db = await openCatalogDatabase(legacyName); assert.equal(db.version, 11); assert.deepEqual(await db.getAll('managedEvents'), [])
     assert.deepEqual(await db.get('sales', sale.id), historical); assert.deepEqual(await db.get('events', oldEvent.id), oldEvent)
     for (const [store, rows] of data) if (!['sales', 'events'].includes(store)) assert.deepEqual(await db.getAll(store as 'products'), rows)
     db.close()

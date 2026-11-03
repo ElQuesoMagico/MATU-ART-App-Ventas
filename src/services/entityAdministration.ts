@@ -9,7 +9,7 @@ export const entityKinds = ['products', 'categories', 'families', 'ips', 'promot
 export type EntityKind = typeof entityKinds[number]
 export const entityLabels: Record<EntityKind, string> = { products: 'Producto', categories: 'Categoría', families: 'Familia', ips: 'IP', promotions: 'Promoción' }
 export interface DeletionReview { id: string; kind: EntityKind; name: string; token: string; blockers: string[]; allowed: boolean }
-const relationLabels: Record<StoreName,string> = { products:'Productos',categories:'Categorías',families:'Familias',ips:'IPs',movements:'Movimientos de inventario',costChanges:'Cambios de costo',sales:'Ventas históricas',payments:'Pagos',metadata:'Metadatos',events:'Eventos históricos',managedEvents:'Eventos',promotions:'Promociones y combos',expenses:'Gastos',expenseCategories:'Categorías de gastos',expenseChanges:'Auditoría de gastos',importRecords:'Procedencia de importaciones' }
+const relationLabels: Record<StoreName,string> = { catalogSync:'Estado de sincronización',products:'Productos',categories:'Categorías',families:'Familias',ips:'IPs',movements:'Movimientos de inventario',costChanges:'Cambios de costo',sales:'Ventas históricas',payments:'Pagos',metadata:'Metadatos',events:'Eventos históricos',managedEvents:'Eventos',promotions:'Promociones y combos',expenses:'Gastos',expenseCategories:'Categorías de gastos',expenseChanges:'Auditoría de gastos',importRecords:'Procedencia de importaciones' }
 
 // Conservative UUID inspection includes nested historical snapshots and future fields.
 // Root IDs are identities, not references (legacy categories/families share an ID).

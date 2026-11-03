@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { syncStateSchema } from '../firebase/catalogModel.ts'
 import type { DataSnapshot } from './snapshot.ts'
 import { canonical, stores } from './snapshot.ts'
 import { normalizedName } from '../catalogValidation.ts'
@@ -19,6 +20,7 @@ const combo = z.object({ id, name, price: money, applications: integer.positive(
 const movement = z.object({ ...base, productId: id, type: z.enum(['initial','restock','adjustment','count','sale','sale_void','manual_reversal']), quantityChange: integer, previousStock: integer, resultingStock: integer, requestedQuantity: integer, unitCost: optionalCost, reason: text.optional(), saleId: id.optional(), uncoveredQuantity: money.optional(), costBefore: costState.optional(), costAfter: costState.optional(), productRevisionAfter: integer.optional(), reversedById: id.optional(), reversesMovementId: id.optional() }).passthrough()
 const expense = z.object({ ...base, concept: name, amount: integer.positive(), categoryId: id, date: day, eventId: id.optional(), notes: text.optional(), updatedAt: timestamp, revision: integer.positive(), status: z.enum(['active','voided']) }).passthrough()
 export const dataSchema = z.object({
+  catalogSync: z.array(syncStateSchema).max(1),
   importRecords:z.array(z.object({id,sourceKey:name,sourceHash:z.string().regex(/^[a-f0-9]{64}$/),sourceName:name,kind:z.enum(['catalog','families','ips','sales','event']),row:integer.min(2),targetId:id,batchId:id,createdAt:timestamp,original:z.record(z.string(),z.string())}).strict()),
   products: z.array(z.object({ ...named, description: text.optional(), categoryIds: ids, categoryId: id.optional(), familyIds: ids.optional(), ipIds: ids.optional(), classificationPending: z.boolean().optional(), price: money, stock: integer, stockCountPending:z.boolean().optional(), lowStockThreshold: money, averageCost: optionalCost, estimatedUnitCost: optionalCost, lastKnownCost: optionalCost, averageCostIsProvisional: z.boolean(), revision: integer.positive(), isFavorite: z.boolean(), isArchived: z.boolean(), activeName: text.optional(), kind: z.enum(['product','pack']).optional(), packContents: z.array(z.object({productId: id, quantity: integer.positive()}).passthrough()).optional(), eventPrices: z.array(z.object({eventId:id,price:money}).passthrough()).optional(), image: z.instanceof(Blob).optional() }).passthrough()),
   categories: z.array(classification), families: z.array(classification), ips: z.array(classification),

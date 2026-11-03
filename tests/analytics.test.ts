@@ -140,7 +140,7 @@ test('persistencia, promociones, combos, descuento manual, precio especial, arch
   assert.equal(stats.metrics.revenue, 800n); assert.equal(stats.metrics.recordedCost, 400n); assert.equal(stats.metrics.grossProfit, 400n)
   assert.equal(rankProducts(stats.records)[0].name, 'Nombre histórico'); assert.equal(rankProducts(stats.records)[0].metrics.revenue, 800n)
   assert.deepEqual(persisted.sales[0], original)
-  const db = await openCatalogDatabase(dbName); assert.equal(db.version, CATALOG_DB_VERSION); assert.equal(db.version, 10); db.close()
+  const db = await openCatalogDatabase(dbName); assert.equal(db.version, CATALOG_DB_VERSION); assert.equal(db.version, 11); db.close()
   await sales.voidSale({ saleId: original.id, operationId: id(), reason: 'Prueba', returnStock: true })
   const after = await sales.snapshot(); assert.equal(buildAnalytics(after.sales, after.realEvents).metrics.revenue, 0n); assert.deepEqual(after.sales[0].appliedCombos, original.appliedCombos); assert.deepEqual(after.sales[0].payments, original.payments)
   await sales.close(); await catalog.close()

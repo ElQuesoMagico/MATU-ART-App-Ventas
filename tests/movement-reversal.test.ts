@@ -26,7 +26,7 @@ test('reposición: reversión atómica, vínculos, costos restaurados y persiste
   const reopened = new CatalogRepository(name)
   assert.deepEqual((await reopened.snapshot()).products[0], result)
   assert.deepEqual((await reopened.movementsFor(product.id)).find(m => m.id === reverse.id), reverse)
-  const db = await openCatalogDatabase(name); assert.equal(db.version, 10); db.close(); await reopened.close()
+  const db = await openCatalogDatabase(name); assert.equal(db.version, 11); db.close(); await reopened.close()
 })
 test('ajuste negativo y conteo se compensan por delta; no por saldo original', async () => {
   const { repo, product, current } = await setup()

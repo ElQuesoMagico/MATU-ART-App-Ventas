@@ -3,7 +3,8 @@
 Actualizado: **3 de noviembre de 2026**, America/Santiago.
 Decisión vigente: GitHub Pages + Firebase Auth email/password + Firestore Standard
 en Spark, sin facturación. Hito A auditado en [firebase-spark-audit.md](firebase-spark-audit.md).
-Pages responde HTTP 200; IndexedDB v10, 16 almacenes intactos. Herramientas de prueba
+Pages responde HTTP 200; versión publicada Auth con IndexedDB v10. Candidato local
+Hito C usa v11 (añade catalogSync, sin reescribir los otros 16 almacenes). Herramientas de prueba
 Firebase instaladas en desarrollo; reglas de membresía preparadas y probadas en
 emulador. SDK integrado en el modal Conexión a la nube: login/logout y lectura
 servidor de membresía/workspace. Captura del usuario confirma acceso real administrador;
@@ -20,12 +21,23 @@ tras recargar la misma pestaña y verificar de nuevo el acceso vendedor sin cont
 El usuario confirmó también cierre de sesión, formulario de acceso tras recarga
 e inventario local disponible. Verificaciones reales básicas de Auth completadas
 por el usuario; no confundir con sincronización ni pruebas de sesión expirada.
-Pendiente configurar variables públicas Firebase en GitHub Actions y publicar
-el frontend cuando corresponda; la versión local es la verificada.
+El usuario autorizó publicación Auth y continuar inmediatamente Hito C mediante
+adjunto 8db74d77-bea9-49f6-99f3-388e82828935. Se corrigió la variable faltante
+VITE_FIREBASE_AUTH_DOMAIN y publicó `f88605d`; Actions 41715544450 success, HTTP200
+y bundle público con configuración correcta verificados. No subir primera carga
+comercial sin confirmación ni sincronizar ventas/inventario.
 Hito B: 274 pruebas aplicación, 9 emuladores, lint/build Pages correctos. Auth usa
 sessionStorage, Firestore memoria; no cambios IndexedDB. `.env.local` contiene solo
 configuración pública Firebase aportada. GitHub Actions preparado para variables
-de repositorio; no publicación. UI Cloudflare conservada en LegacyCloudConnection.
+de repositorio configuradas; Hito B publicado. UI Cloudflare conservada en LegacyCloudConnection.
+Hito C implementado candidato local: preview/selección explícita, catálogo acotado,
+CAS, recibos idempotentes, cola durable y conflictos; conserva stock/costos/imágenes.
+Ver [firebase-catalog-sync.md](firebase-catalog-sync.md) para reglas, límites, pruebas
+y pendientes. No activar VITE_FIREBASE_CATALOG_ENABLED en producción todavía.
+`firestore.rules` B sigue vigente; `firestore.catalog.rules` C NO desplegado.
+No se enviaron productos ni ventas reales. Emuladores y 2 bases locales no equivalen
+a dos dispositivos físicos ni Firestore real para C. Recuperación de backups vinculados
+queda bloqueada hasta implementar revisión segura de la cola; no borrar pendientes.
 Cloudflare/D1/GAS se conservan pero dejan de ser objetivo operativo. No continuar
 Workers Paid/despliegue Worker. El subdominio eqmm no afecta a la nueva arquitectura.
 D1 sí fue inicializada y GAS desplegado (solo rechazo anónimo probado); no borrarlos.

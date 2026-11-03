@@ -28,9 +28,10 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     const blocked = () => setError('Otra pestaña impide actualizar la base local. Cierra las otras pestañas de MATU ART y vuelve a intentar.')
     window.addEventListener('focus', refresh)
     window.addEventListener('catalog-blocked', blocked)
+    window.addEventListener('catalog-cloud-updated', refresh)
     const channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('clown-ufo-catalog') : undefined
     if (channel) channel.onmessage = refresh
-    return () => { window.removeEventListener('focus', refresh); window.removeEventListener('catalog-blocked', blocked); channel?.close() }
+    return () => { window.removeEventListener('focus', refresh); window.removeEventListener('catalog-blocked', blocked); window.removeEventListener('catalog-cloud-updated', refresh); channel?.close() }
   }, [reload])
   return <CatalogContext.Provider value={{ ...snapshot, loading, error, reload }}>{children}</CatalogContext.Provider>
 }

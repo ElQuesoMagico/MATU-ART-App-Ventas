@@ -17,7 +17,10 @@ de membresía probadas localmente y publicación confirmada por el usuario.
 Autenticación UI Firebase implementada localmente; captura del usuario confirma
 acceso real como administrador y vendedor. El usuario confirmó persistencia de
 sesión tras recarga y cierre de sesión con inventario local conservado.
-Publicación del frontend con Firebase pendiente.
+Authentication publicado en GitHub Pages (commit `f88605d`, Actions correcto).
+Hito C de catálogo implementado como candidato local, aún no activado/publicado;
+IndexedDB local de desarrollo v11, producción publicada v10.
+Ver [estado, reglas, pruebas y límites del catálogo](docs/firebase-catalog-sync.md).
 Ver [configuración Firebase](docs/firebase-setup.md).
 Cloudflare/D1/GAS quedan conservados como infraestructura anterior,
 sin continuar despliegue ni contratación. No se eliminó ningún recurso.

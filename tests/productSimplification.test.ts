@@ -77,7 +77,7 @@ test('persistencia: costo único, promoción por evento, venta, historial y anul
  await promos.save({...saved,value:500},saved.updatedAt)
  await catalog.close();await sales.close()
  assert.deepEqual((await sales.snapshot()).sales[0],sale)
- const db=await openCatalogDatabase(name);assert.equal(db.version, 10);db.close()
+ const db=await openCatalogDatabase(name);assert.equal(db.version, 11);db.close()
  const reopened=(await promos.snapshot())[0];assert.deepEqual(reopened.eventIds,[event.id])
  await sales.voidSale({operationId:id(),saleId:sale.id,reason:'Prueba',returnStock:true})
  assert.equal((await catalog.snapshot()).products[0].stock,10)

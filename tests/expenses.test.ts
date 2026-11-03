@@ -139,7 +139,7 @@ test('migración v8→v9 preserva todos los registros, rollback y reapertura sin
   const product = await catalog.createProduct({ id: id(), name: 'Pack histórico', kind: 'pack', packContents: [], price: 1000, initialCost: 100, initialStock: 5, categoryIds: [], isFavorite: true, lowStockThreshold: 2, image: new Blob(['original'], { type: 'image/png' }) })
   const receipt = await sales.confirm({ operationId: id(), items: [{ productId: product.id, quantity: 1, unitPrice: 1000, expectedRevision: 1 }], payments: [{ method: 'cash', amount: 1000 }] })
   await catalog.close(); await sales.close()
-  const source = await openCatalogDatabase(name), stores = [...source.objectStoreNames].filter(store => !['expenses', 'expenseChanges', 'expenseCategories', 'importRecords'].includes(store))
+  const source = await openCatalogDatabase(name), stores = [...source.objectStoreNames].filter(store => !['expenses', 'expenseChanges', 'expenseCategories', 'importRecords', 'catalogSync'].includes(store))
   const snapshots = new Map<string, unknown[]>()
   const schema = stores.map(name => { const store = source.transaction(name).objectStore(name); return { name, keyPath: store.keyPath, indexes: [...store.indexNames].map(key => { const index = store.index(key as never); return { name: key, keyPath: index.keyPath, unique: index.unique } }) } })
   for (const store of stores) snapshots.set(store, await source.getAll(store)); source.close()
@@ -151,7 +151,7 @@ test('migración v8→v9 preserva todos los registros, rollback y reapertura sin
   try { await assert.rejects(openCatalogDatabase(legacyName)) } finally { IDBDatabase.prototype.createObjectStore = create }
   const untouched = await openDB(legacyName, 8); assert.deepEqual(await untouched.get('sales', receipt.id), receipt); assert.equal(untouched.objectStoreNames.contains('expenses'), false); untouched.close()
   for (let n = 0; n < 2; n++) {
-    const migrated = await openCatalogDatabase(legacyName); assert.equal(migrated.version, 10)
+    const migrated = await openCatalogDatabase(legacyName); assert.equal(migrated.version, 11)
     for (const [store, rows] of snapshots) assert.deepEqual(await migrated.getAll(store as 'products'), rows)
     assert.equal(await migrated.count('expenseCategories'), 7); assert.equal(await migrated.count('expenses'), 0); migrated.close()
   }

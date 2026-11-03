@@ -141,7 +141,7 @@ test('v8 permanece sin migración ni reescritura al abrir; excepciones persisten
   const db = await openCatalogDatabase(name), before = new Map<string, unknown[]>()
   for (const store of [...db.objectStoreNames]) before.set(store, await db.getAll(store as 'products')); db.close()
   for (let i = 0; i < 2; i++) {
-    const reopened = await openCatalogDatabase(name); assert.equal(reopened.version, 10)
+    const reopened = await openCatalogDatabase(name); assert.equal(reopened.version, 11)
     for (const [store, rows] of before) assert.deepEqual(await reopened.getAll(store as 'products'), rows)
     assert.deepEqual((await reopened.get('products', product.id))?.eventPrices, product.eventPrices); reopened.close()
   }

@@ -1,6 +1,6 @@
 import { openCatalogDatabase, type CatalogSchema } from '../catalogDatabase.ts'
 
-export const stores = ['products', 'categories', 'families', 'ips', 'movements', 'costChanges', 'sales', 'payments', 'metadata', 'events', 'managedEvents', 'promotions', 'expenses', 'expenseCategories', 'expenseChanges', 'importRecords'] as const
+export const stores = ['products', 'categories', 'families', 'ips', 'movements', 'costChanges', 'sales', 'payments', 'metadata', 'events', 'managedEvents', 'promotions', 'expenses', 'expenseCategories', 'expenseChanges', 'importRecords', 'catalogSync'] as const
 export type StoreName = typeof stores[number]
 export type DataSnapshot = { [K in StoreName]: CatalogSchema[K]['value'][] }
 export const emptySnapshot = (): DataSnapshot => Object.fromEntries(stores.map(name => [name, []])) as unknown as DataSnapshot
@@ -28,6 +28,7 @@ export function canonical(value: unknown): string {
 /** Catalog writes always change revision/timestamp when changing an image. */
 export function snapshotToken(data: DataSnapshot) { return canonical(data) }
 export function assertNoPendingOperations(data: DataSnapshot) {
+  if (data.catalogSync?.length) throw new Error('Este dispositivo está vinculado al catálogo cloud. La restauración requiere desvincularlo sin operaciones pendientes.')
   const recognized = new Set(['sale-number', 'event-price-revision', 'combos-packs-v1'])
   if (data.metadata.some(row => !recognized.has(row.key))) throw new Error('Hay metadatos u operaciones locales no reconocidos. La restauración se bloqueó para no perder operaciones pendientes.')
 }

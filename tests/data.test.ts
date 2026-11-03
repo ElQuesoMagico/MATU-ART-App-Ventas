@@ -61,7 +61,7 @@ test('archivo corrupto, checksum alterado, versiones y referencias inválidas se
  const f=await fixture(),text=await createBackup(f.data)
  await assert.rejects(parseBackup('{mal'));await assert.rejects(parseBackup(text.replace('MATU ART','Otra aplicación')),/incompatible/)
  await assert.rejects(parseBackup(text.replace('"formatVersion":1','"formatVersion":99')),/incompatible/)
- await assert.rejects(parseBackup(text.replace('"databaseVersion":10','"databaseVersion":99')),/incompatible/)
+ await assert.rejects(parseBackup(text.replace('"databaseVersion":11','"databaseVersion":99')),/incompatible/)
  await assert.rejects(parseBackup(text.replace('Mesa','Otra')),/SHA-256/)
  const bad=structuredClone(f.data);bad.movements[0].productId=id();assert.throws(()=>validateData(bad),/referencia/)
  const envelope=JSON.parse(text);envelope.data.movements[0].productId=id();const {sha256:_hash,...body}=envelope;envelope.sha256=await digest(canonical(body));await assert.rejects(parseBackup(JSON.stringify(envelope)),/referencia/)

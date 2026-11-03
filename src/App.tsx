@@ -8,7 +8,8 @@ import { History } from './screens/History'
 import { Promotions } from './screens/Promotions'
 import { Events } from './screens/Events'
 import { Analytics } from './screens/Analytics'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
+const CatalogSyncBootstrap = lazy(()=>import('./components/cloud/CatalogSyncBootstrap').then(m=>({default:m.CatalogSyncBootstrap})))
 import { useCart } from './hooks/useCart'
 import { useOfflineStatus } from './services/offlineStatus'
 import './styles/themes.css'
@@ -21,6 +22,7 @@ export default function App() {
   const [analyticsEventId, setAnalyticsEventId] = useState<string>()
   const openAnalytics = (eventId?: string) => { setAnalyticsEventId(eventId); navigate('estadisticas') }
   return <div className="app-shell" data-theme="cherry" data-mode="light">
+    {import.meta.env.VITE_FIREBASE_CATALOG_ENABLED==='true' && <Suspense fallback={null}><CatalogSyncBootstrap /></Suspense>}
     <a className="skip-link" href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }}>Saltar al contenido</a>
     <Navigation page={page} navigate={navigate} />
     <div className="workspace">

@@ -153,7 +153,7 @@ test('cloud: login/logout do not touch IndexedDB; sale and persistence still wor
     const sale=await sales.confirm({operationId:crypto.randomUUID(),items:[{productId:product.id,quantity:1,unitPrice:1000,expectedRevision:product.revision}],payments:[{method:'cash',amount:1000}]})
     await catalog.close();await sales.close()
     const db=await openCatalogDatabase(name)
-    assert.equal(db.version,10);assert.equal((await db.get('sales',sale.id))?.total,1000);assert.equal((await db.get('products',product.id))?.stock,6)
+    assert.equal(db.version,11);assert.equal((await db.get('sales',sale.id))?.total,1000);assert.equal((await db.get('products',product.id))?.stock,6)
     db.close()
   }finally{globalThis.fetch=previousFetch;await catalog.close();await sales.close()}
 })

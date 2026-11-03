@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function member(w) { return request.auth != null && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.enabled == true && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.role in ['administrator','manager','seller']; }
+  function editor(w) { return member(w) && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.role in ['administrator','manager']; }
+  function uuid(v) { return v is string && v.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'); }
+  function kind(k) { return k in ['categories','families','ips','products']; }
+  function ref(w,k,id) { return uuid(id) && exists(/databases/$(database)/documents/workspaces/$(w)/$(k)/$(id)); }
+  function refs(w,k,ids) { return ids is list && ids.size() <= 3 && ids.toSet().size()==ids.size() && (ids.size()<1||ref(w,k,ids[0])) && (ids.size()<2||ref(w,k,ids[1])) && (ids.size()<3||ref(w,k,ids[2])); }
+  function payload(w,k,id,p) {
+    return p is map && p.id == id && uuid(id) && p.entity == k && p.name is string && p.name.size()>0 && p.name.size()<=120 && !p.name.matches('.*[/].*')
+      && p.description is string && p.description.size()<=2000 && p.createdAt is string && p.createdAt.size()<=40
+      && (k=='products'
+        ? p.keys().hasOnly(['entity','id','name','description','createdAt','categoryId','familyIds','ipIds','price','isArchived','isFavorite','kind'])
+          && ref(w,'categories',p.categoryId) && refs(w,'families',p.familyIds) && refs(w,'ips',p.ipIds)
+          && p.price is int && p.price>=0 && p.price<=1000000000 && p.isArchived is bool && p.isFavorite is bool && p.kind in ['product','pack']
+        : p.keys().hasOnly(['entity','id','name','description','createdAt','isActive','order']) && p.isActive is bool && p.order is int && p.order>=0 && p.order<=1000000);
+  }
+  function validRecord(w,k,id) {
+    let d=request.resource.data;
+    let receipt=getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogOperations/$(d.operationId)).data;
+    let nameId=k+'_'+d.payload.name.lower();
+    return d.keys().hasOnly(['payload','revision','operationId','actorUid','confirmedAt']) && d.actorUid==request.auth.uid && d.confirmedAt==request.time
+      && d.revision is int && d.revision>0 && uuid(d.operationId) && payload(w,k,id,d.payload)
+      && receipt.actorUid==request.auth.uid && receipt.record=={'payload':d.payload,'revision':d.revision,'operationId':d.operationId}
+      && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.id==id && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.entity==k;
+  }
+  match /workspaces/{w} {
+    allow get: if member(w);
+    match /members/{uid} { allow get: if request.auth!=null && request.auth.uid==uid && member(w); }
+    match /{k}/{id} {
+      allow read: if kind(k) && member(w);
+      allow create: if kind(k) && editor(w) && request.resource.data.revision==1 && validRecord(w,k,id);
+      allow update: if kind(k) && editor(w) && request.resource.data.revision==resource.data.revision+1
+        && request.resource.data.payload.createdAt==resource.data.payload.createdAt
+        && (k!='products'||request.resource.data.payload.kind==resource.data.payload.kind) && validRecord(w,k,id);
+    }
+    match /catalogOperations/{op} {
+      allow get: if member(w);
+      allow create: if editor(w) && uuid(op) && request.resource.data.keys().hasOnly(['record','actorUid','deviceId','confirmedAt'])
+        && request.resource.data.actorUid==request.auth.uid && uuid(request.resource.data.deviceId) && request.resource.data.confirmedAt==request.time
+        && request.resource.data.record.operationId==op
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.operationId==op
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.payload==request.resource.data.record.payload
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.revision==request.resource.data.record.revision;
+    }
+    match /catalogNames/{nameId} {
+      allow get: if member(w);
+      allow create, update: if editor(w) && request.resource.data.keys().hasOnly(['entity','id'])
+        && (!exists(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)) || (resource.data.entity==request.resource.data.entity && resource.data.id==request.resource.data.id))
+        && nameId==getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.entity)/$(request.resource.data.id)).data.payload.entity+'_'+getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.entity)/$(request.resource.data.id)).data.payload.name.lower();
+      allow delete: if editor(w) && nameId!=getAfter(/databases/$(database)/documents/workspaces/$(w)/$(resource.data.entity)/$(resource.data.id)).data.payload.entity+'_'+getAfter(/databases/$(database)/documents/workspaces/$(w)/$(resource.data.entity)/$(resource.data.id)).data.payload.name.lower();
+    }
+  }
+ }
+}

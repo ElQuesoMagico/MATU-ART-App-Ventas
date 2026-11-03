@@ -25,7 +25,7 @@ test('menú ofrece los cinco tipos; eliminación confirmada persiste sin migraci
   await f.admin.remove(review, f.product.name)
   await assert.rejects(f.admin.remove(review, f.product.name), /ya no existe/)
   await f.products.close()
-  const db = await openCatalogDatabase(f.name); assert.equal(db.version, 10); assert.equal(await db.count('products'), 0); assert.equal(await db.count('categories'), 1); db.close()
+  const db = await openCatalogDatabase(f.name); assert.equal(db.version, 11); assert.equal(await db.count('products'), 0); assert.equal(await db.count('categories'), 1); db.close()
 })
 test('categoría utilizada bloquea eliminación; reasignación previa conserva UUID, costos, stock y familias', async () => {
   const f = await setup(), target = await f.repo.save('categories', item('Print'))

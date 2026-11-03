@@ -1,7 +1,8 @@
 import { initializeApp } from 'firebase/app'
-import { initializeAuth, browserSessionPersistence, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
-import { initializeFirestore, memoryLocalCache, doc, getDocFromServer } from 'firebase/firestore'
+import { initializeAuth, browserSessionPersistence, onAuthStateChanged, signInWithEmailAndPassword, signOut, connectAuthEmulator } from 'firebase/auth'
+import { initializeFirestore, memoryLocalCache, doc, getDocFromServer, connectFirestoreEmulator } from 'firebase/firestore'
 import { parseAccess } from './access'
+import { catalogRemote } from './catalogRemote'
 export interface FirebaseIdentity { uid: string; email: string | null }
 function initializeConnection() {
   const env = import.meta.env
@@ -14,7 +15,18 @@ function initializeConnection() {
   // SDK sessionStorage only; never persist tokens in the operational IndexedDB.
   const auth = initializeAuth(app, { persistence: browserSessionPersistence })
   const db = initializeFirestore(app, { localCache: memoryLocalCache() })
+  if(import.meta.env.DEV && env.VITE_FIREBASE_EMULATORS==='true'){
+    if(!options.projectId?.startsWith('demo-'))throw new Error('Los emuladores solo admiten proyectos demo-.')
+    connectAuthEmulator(auth,'http://127.0.0.1:9099',{disableWarnings:true})
+    connectFirestoreEmulator(db,'127.0.0.1',8080)
+  }
   return {
+    workspaceId,
+    catalogEnabled: env.VITE_FIREBASE_CATALOG_ENABLED === 'true',
+    catalog: () => {
+      if(env.VITE_FIREBASE_CATALOG_ENABLED !== 'true'||!auth.currentUser)throw new Error('Sincronización de catálogo no activada.')
+      return catalogRemote(db,workspaceId,auth.currentUser.uid)
+    },
     subscribe: (listener: (user: FirebaseIdentity | null) => void) => onAuthStateChanged(auth, user => listener(user ? { uid: user.uid, email: user.email } : null)),
     login: async (email: string, password: string) => { await signInWithEmailAndPassword(auth, email.trim(), password) },
     logout: () => signOut(auth),

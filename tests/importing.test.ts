@@ -96,8 +96,8 @@ test('imported historical void never returns stock; initial physical count estab
 })
 test('migration v9 to v10 preserves old rows and v9 backups have explicit additive adapter',async()=>{
   const name=dbName(),db=await openDB(name,9,{upgrade(db){db.createObjectStore('products',{keyPath:'id'})}});db.close()
-  const migrated=await openCatalogDatabase(name);assert.equal(migrated.version,10);assert.ok(migrated.objectStoreNames.contains('importRecords'));migrated.close()
-  const old=JSON.parse(await createBackup(await readData(dbName())));delete old.data.importRecords;delete old.counts.importRecords;old.databaseVersion=9
+  const migrated=await openCatalogDatabase(name);assert.equal(migrated.version,11);assert.ok(migrated.objectStoreNames.contains('importRecords'));migrated.close()
+  const old=JSON.parse(await createBackup(await readData(dbName())));delete old.data.importRecords;delete old.counts.importRecords;delete old.data.catalogSync;delete old.counts.catalogSync;old.databaseVersion=9
   const {sha256:_hash,...body}=old;old.sha256=await digest(canonical(body))
   assert.deepEqual((await parseBackup(JSON.stringify(old))).data.importRecords,[])
 })

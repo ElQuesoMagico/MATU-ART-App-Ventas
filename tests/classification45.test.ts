@@ -60,7 +60,7 @@ test('migracion v4 recupera por UUID, conserva familias posteriores y marca ambi
   old.close()
   for (let i=0;i<2;i++) {
     const db = await openCatalogDatabase(oldName)
-    assert.equal(db.version, 10)
+    assert.equal(db.version, 11)
     assert.deepEqual(await db.get('products', legacy.id), { ...legacy, categoryId: category.id, classificationPending: false })
     assert.deepEqual(await db.get('products', pending.id), { ...pending, categoryId: undefined, classificationPending: true })
     assert.deepEqual(await db.get('products', ambiguous.id), { ...ambiguous, categoryId: undefined, classificationPending: true })

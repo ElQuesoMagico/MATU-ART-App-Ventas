@@ -49,12 +49,13 @@ GitHub Actions toma estas variables del repositorio (`vars`); hay que configurar
 antes de publicar. Ausencia total deshabilita Firebase; configuración parcial muestra
 error. No se publican contraseñas, secretos de servidor ni cuentas de servicio.
 
-El usuario confirmó «variables listas» para las cinco variables de repositorio.
-No se verificaron todavía por API: `gh` no está disponible en PATH en esta sesión.
-El workflow local ya las utiliza, pero sus cambios aún no se han subido a GitHub.
-Antes de ejecutar Actions hay que subir el frontend y workflow nuevos. La petición
-de migración indicó «No publiques cambios de producción»; queda pendiente autorizar
-esta publicación concreta del acceso Firebase, sin sincronización comercial.
+El usuario confirmó «variables listas» y después autorizó publicar Auth y continuar
+Hito C. Se verificaron las variables mediante GitHub CLI portable oficial usando
+la credencial existente de Git sin imprimirla. Faltaba VITE_FIREBASE_AUTH_DOMAIN:
+se creó con matu-art.firebaseapp.com. Se conservó sin uso la variable mal nombrada.
+Se publicó `f88605d`, Actions 41715544450 success. HTTP200 y bundle público verificados
+con dominio/workspace correctos. No acceso comercial ni sincronización en esta publicación.
+Ver `firebase-catalog-sync.md` para el candidato C que permanece local y desactivado.
 
 El SDK conserva Auth en sessionStorage por pestaña, no localStorage/IndexedDB.
 Firestore usa caché de memoria, sin cola persistente adicional. Cerrar sesión no
