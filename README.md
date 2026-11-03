@@ -1605,3 +1605,11 @@ No se borra IndexedDB ni se recarga automáticamente una operación abierta.
 muestra el aviso de actualización en todas las pantallas cuando está descargada.
 Pruebas: 271 aprobadas, lint correcto. La restauración del archivo afectado por falta
 de espacio se completó desde Git antes de implementar el cambio.
+
+Publicación verificada: workflow 41555608160, commit 367a732, build y deploy correctos.
+Build Pages local correcto; advertencia existente de tamaño del módulo ExcelJS.
+Prueba real en navegador: abrir actualizar.html desde una aplicación ya controlada,
+pulsar Actualizar aplicación y regresar automáticamente a Inventario con Crear nuevo
+e Importación masiva. No se escribieron ni borraron registros de usuario. No se
+verificó un dispositivo Android físico ni una base con datos reales durante este flujo.
+URL de recuperación: https://elquesomagico.github.io/MATU-ART-App-Ventas/actualizar.html
