@@ -696,3 +696,19 @@ No se subieron ventas, pagos, movimientos, stock ni costos. Los UUID provienen
 del catálogo local importado. Sigue pendiente probar recepción y edición reales
 en un segundo dispositivo; no declarar Hito C completo por esta primera carga.
 Pages aún no publicado con Hito C. La sincronización local quedó vinculada/activa.
+
+## Publicación Hito C — 04-11-2026
+
+Autorizada expresamente por el usuario. Código 0fc8b2647c30081e4d5be32cf3645d5a998cf8fa
+publicado en main; Pages workflow 41827443422 terminó success.
+https://github.com/ElQuesoMagico/MATU-ART-App-Ventas/actions/runs/41827443422
+HTTP 200 verificado en https://elquesomagico.github.io/MATU-ART-App-Ventas/.
+Entry público index-n8oJ8hod.js incluye CatalogSyncBootstrap. Bundle público
+catalogRuntime-BqSEGtGH.js confirma VITE_FIREBASE_CATALOG_ENABLED=true,
+workspace byhkbCSyvenq9SDAjoRm y authDomain matu-art.firebaseapp.com.
+279 pruebas locales pasaron, lint/build:pages correctos; CI build/deploy success.
+No se cambió la base local ni se repitió la carga comercial. Segundo dispositivo:
+iniciar sesión, verificar acceso, comparar, seleccionar descarga cloud y confirmar.
+Pendiente prueba real de descarga/edición entre dos dispositivos; no usar importación
+maestra nuevamente para recrear UUID. Esta publicación sustituye notas anteriores
+que indicaban que Pages aún conservaba Hito B.

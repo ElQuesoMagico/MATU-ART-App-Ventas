@@ -1655,3 +1655,8 @@ respaldo/importación. No integración Firebase todavía. Pages disponible por H
 Lint y build:pages correctos; 272 pruebas aprobadas. No emuladores ni pruebas Firebase
 reales. Ninguna migración, publicación o envío de datos comerciales. D bloqueado
 para ventas complejas automáticas no verificables; B/C sujetos a reglas probadas.
+
+Publicación 04-11-2026: Hito C ya está en GitHub Pages, commit 0fc8b26, ejecución
+41827443422 exitosa. Se verificaron HTTP 200, recursos nuevos y flag de catálogo
+true en el bundle público. Falta probar recepción y edición real desde un segundo
+dispositivo. No importar el maestro otra vez: descargar el catálogo cloud existente.
