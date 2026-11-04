@@ -1,6 +1,22 @@
 # MATU ART — Contexto persistente del proyecto
 
-Actualizado: **3 de noviembre de 2026**, America/Santiago.
+Actualizado: **4 de noviembre de 2026**, America/Santiago.
+
+Hito C: interfaz habilitada solo en `.env.local` (5193), sin vinculación confirmada.
+Verificación directa mediante UI y Firebase real: administrador, catálogo remoto
+vacío, comparación de 2 categorías, 1 familia, 1 IP y 1 producto QA locales. Todos
+excluidos; 0 subidas/descargas. Búsqueda y cancelación comprobadas sin vincular.
+No hubo escrituras cloud ni importación de los 77 productos. Pasaron 279 pruebas
+locales y 10 casos de emuladores, lint y build. Falta prueba real entre dispositivos.
+El workflow acepta flag C con false por defecto; no se publicó este candidato.
+
+Última novedad: el usuario confirma publicación de las reglas de catálogo C.
+El usuario compartió el resultado de lectura real satisfactoria: 0 productos,
+0 categorías, 0 familias y 0 IPs. Evidencia proporcionada por el usuario;
+no verifica todavía escrituras, sincronización entre dispositivos ni permisos de escritura.
+El botón local «Comprobar lectura del catálogo»
+en Conexión a la nube permite hacerlo sin activar sincronización ni escribir datos.
+No se ha autorizado ni ejecutado una primera carga comercial. Pages conserva Hito B.
 Decisión vigente: GitHub Pages + Firebase Auth email/password + Firestore Standard
 en Spark, sin facturación. Hito A auditado en [firebase-spark-audit.md](firebase-spark-audit.md).
 Pages responde HTTP 200; versión publicada Auth con IndexedDB v10. Candidato local
@@ -656,3 +672,27 @@ Lint y build:pages correctos; 272 pruebas aprobadas, 0 fallidas/omitidas. HTTP P
 conservada. No Rules ejecutables, SDK, emuladores ni Firebase real. Próximo paso manual:
 crear proyecto Spark sin facturación, sin servicios extra; después B Auth/Rules.
 No prometer motor POS completo seguro en Spark: leer dictamen antes de habilitar D.
+
+## 04-11-2026: importación comercial local confirmada
+
+Tras confirmación explícita del usuario se ejecutó desde la UI local 5193 la
+importación de catalogo-maestro.tsv, familias.csv e ips.csv: 77 productos,
+7 categorías, 5 familias y 40 IPs únicas. Resultado UI: 0 registros históricos,
+sin movimientos de stock, 0 filas pendientes de importación. Nuevos productos
+pendientes de conteo físico; registros QA conservados. Respaldo previo descargado
+en C:/Users/4riel/Downloads/MATU-ART-antes-importacion.json. No se confirmó carga
+cloud en esta operación; preparar selección excluyendo QA antes de solicitarla.
+
+## 04-11-2026: primera carga comercial REAL confirmada
+
+El usuario confirmó explícitamente subir la selección y activar sincronización.
+Desde la UI local 5193 se confirmó vinculación con 129 subidas, 0 descargas y
+5 exclusiones QA (QA Destino, QA Categoría, QA Familia, QA IP, QA Producto).
+La cola avanzó y terminó en 0 pendientes / 0 conflictos. Última confirmación
+mostrada: 04-11-2026 00:39:53 America/Santiago. Una nueva lectura de servidor a
+las 00:40:04 confirmó 77 productos, 7 categorías, 5 familias y 40 IPs.
+Esta es evidencia de escritura y lectura REAL con la cuenta administradora.
+No se subieron ventas, pagos, movimientos, stock ni costos. Los UUID provienen
+del catálogo local importado. Sigue pendiente probar recepción y edición reales
+en un segundo dispositivo; no declarar Hito C completo por esta primera carga.
+Pages aún no publicado con Hito C. La sincronización local quedó vinculada/activa.

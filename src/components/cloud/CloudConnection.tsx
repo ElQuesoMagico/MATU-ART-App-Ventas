@@ -39,6 +39,15 @@ export function CloudConnection({ onClose }: { onClose: () => void }) {
       setAccess(result); setMessage('Acceso verificado con Firestore.')
     }
   }
+  async function inspectCatalog() {
+    const current = revision.current
+    const result = await client!.verify()
+    const counts = await client!.inspectCatalog()
+    if (mounted.current && current === revision.current && navigator.onLine) {
+      setAccess(result)
+      setMessage(`Lectura del catálogo verificada con Firestore: ${counts.products} productos, ${counts.categories} categorías, ${counts.families} familias y ${counts.ips} IPs. Esta comprobación no subió ni modificó datos.`)
+    }
+  }
   return <Modal title="Conexión a la nube" onClose={onClose} busy={busy}>
     <div className="data-manager cloud-connection">
       <p className="local-note">{client?.catalogEnabled?'Ventas, stock y costos locales. Consulta el estado del catálogo más abajo.':'Datos locales · La sincronización todavía no está habilitada.'}</p>
@@ -48,6 +57,7 @@ export function CloudConnection({ onClose }: { onClose: () => void }) {
         <p>Cuenta: <strong>{user.email ?? user.uid}</strong></p>
         {access ? <p>{access.workspaceName} · {{ administrator: 'Administrador', manager: 'Encargado', seller: 'Vendedor' }[access.role]}<br /><small>Última verificación: {new Date(access.verifiedAt).toLocaleTimeString('es-CL')}</small></p> : <p>Acceso al espacio pendiente de verificación.</p>}
         <button type="button" className="button primary" disabled={busy || !online} onClick={() => void run(verify)}>Verificar acceso</button>
+        <button type="button" className="button secondary" disabled={busy || !online} onClick={() => void run(inspectCatalog)}>Comprobar lectura del catálogo</button>
         <button type="button" className="button secondary" disabled={busy} onClick={() => void run(async () => { revision.current++; await client.logout(); if (mounted.current) setMessage('Sesión cerrada. Tus datos locales se conservan.') })}>Cerrar sesión</button>
         {access&&<CatalogSyncPanel uid={user.uid} role={access.role} />}
       </> : <form onSubmit={event => { event.preventDefault(); void run(async () => { await client.login(email, password); if (mounted.current) setMessage('Sesión iniciada. Pulsa Verificar acceso para comprobar tu membresía.') }) }}>

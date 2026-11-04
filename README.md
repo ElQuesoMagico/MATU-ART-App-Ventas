@@ -1,5 +1,14 @@
 # MATU ART
 
+Actualización Hito C (04-11-2026): comparación inicial y sincronización de catálogo
+disponibles en desarrollo local. Selección excluida por defecto, filtros por entidad
+y nombre, inclusión explícita de dependencias, resolución de conflictos y cola
+persistente. No se sincronizan ventas, stock ni costos. Pages aún conserva Hito B.
+Ver [procedimiento, límites y evidencias](docs/firebase-catalog-sync.md).
+Verificación actual: build y lint correctos, 279 pruebas locales y 10 casos de
+emuladores aprobados. Lectura y comparación reales con Firestore vacío verificadas;
+no se ejecutaron cargas comerciales ni pruebas de escritura real entre dispositivos.
+
 Punto de venta e inventario local para un emprendimiento artístico. React 19,
 TypeScript estricto, Vite 8 e IndexedDB mediante `idb`. Se conserva la interfaz
 circense, sus ilustraciones, tickets, navegación y tema interno Cherry Circus.

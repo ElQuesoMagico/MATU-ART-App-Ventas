@@ -2,6 +2,29 @@
 
 ## Publicación y datos reales
 
+Actualización: el usuario compartió una lectura real satisfactoria de Firestore,
+con 0 registros en productos, categorías, familias e IPs. Queda verificado por
+evidencia del usuario el acceso de lectura, no el flujo de escritura ni la
+sincronización entre dispositivos. Se corrigió el aviso obsoleto de reglas
+pendientes; la sincronización sigue desactivada por configuración.
+
+El 03-11-2026 el usuario confirmó que publicó `firestore.catalog.rules`.
+Esta confirmación no equivale todavía a una lectura real verificada del catálogo.
+El modal local incluye «Comprobar lectura del catálogo»: renueva la sesión,
+verifica membresía y lee las cuatro colecciones desde Firestore, mostrando sus
+cantidades. No vincula IndexedDB, no inicia escuchas ni crea operaciones pendientes.
+Puede utilizarse con VITE_FIREBASE_CATALOG_ENABLED desactivado. Si alguna lectura
+falla o cambia la sesión, no muestra un resultado satisfactorio.
+La configuración por defecto de firebase.json sigue apuntando a las reglas B;
+no ejecutar un despliegue de reglas por defecto que sustituya las reglas C publicadas.
+
+Comprobación posterior del diagnóstico: `npm run lint` y `npm run build` pasan;
+`npm test` ejecutó 278 pruebas, todas aprobadas (registro local:
+`artifacts/catalog-read-check-tests.log`). Build mantiene aviso de chunks grandes.
+Servidor local 5193 responde HTTP 200. No había pestañas con sesión disponibles en
+el navegador controlable: la lectura real queda pendiente de la acción del usuario.
+Estas pruebas no equivalen a verificar las reglas recién publicadas en producción.
+
 Authentication Hito B publicado con autorización expresa: commit `f88605d`,
 GitHub Actions https://github.com/ElQuesoMagico/MATU-ART-App-Ventas/actions/runs/41715544450
 (success). HTTP 200 verificado; entry `index-BJ7CYDgW.js`, Firebase chunk
@@ -91,8 +114,10 @@ ni recalcular su checksum manualmente para sortear esta protección.
 
 ## Seguridad y activación pendiente
 
-`firestore.rules` conserva Hito B, que es el último archivo publicado por el usuario.
-`firestore.catalog.rules` es el candidato de Hito C, probado en emulador, NO desplegado.
+`firestore.rules` conserva Hito B por compatibilidad histórica.
+El usuario confirmó la publicación manual de `firestore.catalog.rules`; el 04-11
+se verificó desde la UI local acceso administrador y lectura real de las cuatro
+colecciones vacías. No se verificaron escrituras comerciales reales.
 Miembros habilitados: lectura catálogo. Administrator/manager: escritura CAS acotada.
 Seller: sin escritura catálogo. Ningún cliente escribe roles. Se deniegan borrados,
 stock, costos y campos no permitidos; ventas/pagos/movimientos siguen denegados.
@@ -101,15 +126,14 @@ servidor. Se probaron tres familias + tres IPs + categoría dentro del presupues
 de accesos de Rules. El límite se valida antes de subir; nunca se recortan listas.
 
 Antes de activar para usuarios:
-1. Publicar conscientemente `firestore.catalog.rules` en Firestore Console (sin
-   cambiar membresías ni activar reglas abiertas).
+1. Reglas C publicadas por el usuario; no sobrescribirlas con las reglas B.
 2. Verificar lecturas reales con ambas cuentas, rechazos de vendedor y workspace
    vacío. No crear fixtures en producción ni subir el catálogo sin confirmación.
 3. Revisar limitaciones, completar validación móvil y recuperación de respaldos
    vinculados antes de considerar Hito C finalizado para operación general.
-4. Configurar VITE_FIREBASE_CATALOG_ENABLED=true solo cuando corresponda, actualizar
-   el workflow para incluirla y publicar el candidato revisado. Actualmente no se
-   pasa esa variable en Actions y el frontend publicado solo tiene Authentication.
+4. La configuración local 5193 ya tiene VITE_FIREBASE_CATALOG_ENABLED=true.
+   El workflow acepta la variable de repositorio, con false por defecto; no se ha
+   activado esa variable remota ni publicado el candidato. Pages sigue en Hito B.
 5. Primera carga: selección real explícita y confirmación del usuario.
 
 ## Pruebas y límites
@@ -140,3 +164,47 @@ Antes de activar para usuarios:
 Módulos: `catalogModel`, `catalogLocal`, `catalogRemote`, `catalogRuntime`,
 `CatalogSyncPanel`, `CatalogSyncBootstrap`; integración en client Firebase, App y
 CatalogProvider; migración y adaptadores de respaldo; pruebas catálogo y Rules.
+
+## Continuación 04-11-2026 — entrega local
+
+- Comparación con búsqueda y filtro de entidad; conteos locales/remotos separados.
+- Acción explícita para incluir dependencias de los productos seleccionados sin
+  seleccionar otros productos ni familias de prueba. Los filtros conservan selecciones.
+- Detalle de versiones locales/remotas en conflictos; protección síncrona de doble clic.
+- 279 pruebas de aplicación y 10 casos de Emulator Suite aprobados en esta ejecución.
+  Registros: artifacts/catalog-link-tests.log, catalog-link-emulators.log y
+  catalog-link-build.log. Lint y build correctos; aviso habitual de chunks grandes.
+- UI real 5193: admin verificado, 2 categorías/1 familia/1 IP/1 producto QA locales,
+  0 registros remotos. Cinco excluidos, cero subidas/descargas, búsqueda y cancelación.
+  No se confirmó vinculación ni se escribió en Firestore. No se usaron dos dispositivos
+  reales ni se verificaron resoluciones móviles específicas en esta ejecución.
+
+Preparación de los datos reales:
+1. Crear respaldo JSON local antes de importar.
+2. Inventario → Importación masiva · Administración. Seleccionar únicamente catálogo
+   maestro, familias e IPs de docs/import-sources; dejar ventas históricas sin archivo.
+3. Generar y revisar vista previa; corregir clasificaciones pendientes y confirmar
+   la importación local solo cuando corresponda. No se modifican los archivos fuente.
+4. Conexión a la nube → Verificar acceso → Vinculación inicial · Comparar.
+5. Seleccionar los registros comerciales para subir; mantener QA excluidos. Usar
+   Incluir clasificaciones de productos seleccionados y revisar todos los conteos.
+6. Solo el usuario confirma la vinculación/carga. En el segundo dispositivo, comparar
+   y seleccionar descarga cloud, revisar y confirmar; no importar otra copia con UUID nuevos.
+
+Atomicidad: cada registro cloud, revisión, recibo y reserva de nombre se confirman en
+una transacción Firestore. Las clasificaciones se confirman antes de productos;
+Rules valida referencias. La primera carga completa NO es una sola transacción:
+si se interrumpe, puede haber clasificaciones confirmadas y productos pendientes,
+que se reintentan con el mismo operationId. Las aplicaciones locales de catálogos
+recibidos y el estado de sincronización sí comparten una transacción IndexedDB.
+No se promete rollback global de una carga de múltiples entidades.
+
+## Primera carga real — 04-11-2026
+
+Con confirmación explícita del usuario se ejecutaron 129 subidas desde localhost5193:
+77 productos, 7 categorías, 5 familias, 40 IPs. Cinco registros QA excluidos.
+Cola final 0 pendientes y 0 conflictos; confirmación 00:39:53 America/Santiago.
+Nueva lectura real de Firestore a las 00:40:04 confirmó los cuatro conteos.
+No se escribieron datos transaccionales ni inventario/costos. La vinculación quedó
+activa. Esto reemplaza el estado anterior «sin escrituras reales» para la primera
+carga, pero no demuestra todavía sincronización real entre dos dispositivos.

@@ -23,6 +23,17 @@ function initializeConnection() {
   return {
     workspaceId,
     catalogEnabled: env.VITE_FIREBASE_CATALOG_ENABLED === 'true',
+    inspectCatalog: async () => {
+      const user = auth.currentUser
+      if (!user) throw new Error('Inicia sesión para consultar el catálogo.')
+      await user.getIdToken(true)
+      // Read-only diagnostic: no local repository, linking, listener or queue.
+      const records = await catalogRemote(db, workspaceId, user.uid).read()
+      if (auth.currentUser !== user) throw new Error('La sesión cambió. Vuelve a consultar el catálogo.')
+      const counts = { categories: 0, families: 0, ips: 0, products: 0 }
+      for (const record of Object.values(records)) counts[record.payload.entity]++
+      return counts
+    },
     catalog: () => {
       if(env.VITE_FIREBASE_CATALOG_ENABLED !== 'true'||!auth.currentUser)throw new Error('Sincronización de catálogo no activada.')
       return catalogRemote(db,workspaceId,auth.currentUser.uid)

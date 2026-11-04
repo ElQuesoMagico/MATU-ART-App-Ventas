@@ -17,6 +17,16 @@ export async function localView(name?: string): Promise<LocalView> {
   } finally { db.close() }
 }
 export interface Choice { key: string; action:'upload'|'download'|'exclude' }
+/** Preview only: selecting dependencies never writes or links either database. */
+export function includeUploadDependencies(local:LocalView,remote:Record<string,RemoteRecord>,choices:Choice[]):Choice[] {
+  const required=new Set<string>()
+  for(const choice of choices)if(choice.action==='upload'){
+    const payload=local.records[choice.key]
+    if(payload)for(const ref of references(payload))if(!remote[ref])required.add(ref)
+  }
+  for(const ref of required)if(!local.records[ref])throw new Error(`Falta clasificación local: ${ref}. Corrige el producto antes de vincular.`)
+  return choices.map(choice=>required.has(choice.key)?{...choice,action:'upload'}:choice)
+}
 export function preview(local: LocalView, remote: Record<string,RemoteRecord>) {
   return [...new Set([...Object.keys(local.records),...Object.keys(remote),...Object.keys(local.invalid)])].sort().map(key=>{
     const l=local.records[key],r=remote[key]?.payload

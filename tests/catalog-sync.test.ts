@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
 import {openCatalogDatabase} from '../src/services/catalogDatabase.ts'
-import {localView,preview,linkCatalog,reconcile,flush,resolveConflict,unlinkCatalog} from '../src/services/firebase/catalogLocal.ts'
+import {includeUploadDependencies,localView,preview,linkCatalog,reconcile,flush,resolveConflict,unlinkCatalog} from '../src/services/firebase/catalogLocal.ts'
 import {project,keyOf,mergeProduct} from '../src/services/firebase/catalogModel.ts'
 import type {RemoteRecord,Pending} from '../src/services/firebase/catalogModel.ts'
 import type {CatalogProduct} from '../src/types/catalog.ts'
@@ -11,6 +11,25 @@ import {createBackup,parseBackup,prepareRestore,digest} from '../src/services/da
 import {canonical} from '../src/services/data/snapshot.ts'
 import {openDB} from 'idb'
 const now=new Date().toISOString()
+test('preview dependency selection preserves excluded fixtures and never links or writes',async()=>{
+ const name=`preview-dependencies-${crypto.randomUUID()}`,db=await openCatalogDatabase(name)
+ const category={id:crypto.randomUUID(),name:'Real category',isActive:true,order:0,createdAt:now,updatedAt:now}
+ const fixture={...category,id:crypto.randomUUID(),name:'Excluded test family'}
+ const product={id:crypto.randomUUID(),name:'Real product',categoryId:category.id,categoryIds:[category.id],familyIds:[],ipIds:[],price:600,stock:9,lowStockThreshold:2,isArchived:false,isFavorite:false,createdAt:now,updatedAt:now} as CatalogProduct
+ await db.put('categories',category);await db.put('families',fixture);await db.put('products',product);db.close()
+ const local=await localView(name)
+ const choices=Object.keys(local.records).map(key=>({key,action:key.startsWith('products/')?'upload' as const:'exclude' as const}))
+ const selected=includeUploadDependencies(local,{},choices)
+ assert.equal(selected.find(c=>c.key===`categories/${category.id}`)?.action,'upload')
+ assert.equal(selected.find(c=>c.key===`families/${fixture.id}`)?.action,'exclude')
+ assert.equal(choices.find(c=>c.key===`categories/${category.id}`)?.action,'exclude')
+ assert.equal((await localView(name)).token,local.token)
+ await assert.rejects(linkCatalog(local,{},choices,'workspace','admin',true,name),/clasificaciones/)
+ assert.equal((await localView(name)).state,undefined)
+ await linkCatalog(local,{},selected,'workspace','admin',true,name)
+ assert.equal(Object.keys((await localView(name)).state!.pending).length,2)
+ assert.equal((await readData(name)).products[0].stock,9)
+})
 test('two local devices: explicit selection, queued edits, restart, conflict and stock isolation',async()=>{
  const a=`test-sync-a-${crypto.randomUUID()}`,b=`test-sync-b-${crypto.randomUUID()}`
  const category={id:crypto.randomUUID(),name:'Sticker',isActive:true,order:0,createdAt:now,updatedAt:now}

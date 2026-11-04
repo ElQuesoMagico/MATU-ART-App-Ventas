@@ -1,30 +1,34 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { firebaseConnection } from '../../services/firebase/client'
-import { linkCatalog, localView, preview, resolveConflict, unlinkCatalog } from '../../services/firebase/catalogLocal'
+import { includeUploadDependencies, linkCatalog, localView, preview, resolveConflict, unlinkCatalog } from '../../services/firebase/catalogLocal'
 import type { Choice, LocalView } from '../../services/firebase/catalogLocal'
 import type { Payload, RemoteRecord } from '../../services/firebase/catalogModel'
 import type { FirebaseRole } from '../../services/firebase/access'
 import { catalogStatus, startCatalog, stopCatalog } from '../../services/firebase/catalogRuntime'
 
 const priceText=(p?:Payload)=>p?.entity==='products'?`${p.price.toLocaleString('es-CL')} CLP`:'—'
+const entityLabels={categories:'Categorías',families:'Familias',ips:'IPs',products:'Productos'}
 export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
   const [view,setView]=useState<LocalView>(),[remote,setRemote]=useState<Record<string,RemoteRecord>>()
   const [review,setReview]=useState<LocalView>()
   const [choices,setChoices]=useState<Choice[]>([]),[confirmed,setConfirmed]=useState(false)
+  const [entity,setEntity]=useState('all'),[search,setSearch]=useState('')
+  const lock=useRef(false)
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[status,setStatus]=useState(catalogStatus())
   const client=firebaseConnection()!,canWrite=role!=='seller'
   const enabled=client.catalogEnabled
   useEffect(()=>{let active=true;const refresh=()=>{void localView().then(v=>{if(active){setView(v);setStatus(catalogStatus())}}).catch(e=>{if(active)setError(String(e))})};refresh();const timer=setInterval(refresh,3000);return()=>{active=false;clearInterval(timer)}},[])
-  async function run(action:()=>Promise<void>){if(busy)return;setBusy(true);setError('');try{await action();setView(await localView())}catch(e){setError(e instanceof Error?e.message:'No se pudo completar.')}finally{setBusy(false)}}
+  async function run(action:()=>Promise<void>){if(lock.current)return;lock.current=true;setBusy(true);setError('');try{await action();setView(await localView())}catch(e){setError(e instanceof Error?e.message:'No se pudo completar.')}finally{lock.current=false;setBusy(false)}}
   async function compare(){const local=await localView(),cloud=await client.catalog().read();setView(local);setReview(local);setRemote(cloud);setConfirmed(false);setChoices(preview(local,cloud).map(row=>({key:row.key,action:'exclude'})))}
   const rows=review&&remote?preview(review,remote):[]
   return <section className="catalog-sync-panel">
     <h3>Catálogo compartido</h3>
-    {!enabled?<p>Sincronización no activada. Falta publicar y verificar las reglas del catálogo.</p>:<>
+    {!enabled?<p>Sincronización desactivada en esta versión. Puedes comprobar la lectura del catálogo sin subir ni modificar datos.</p>:<>
       <p>{view?.state?'Dispositivo vinculado':'Sin vinculación inicial'} · {Object.keys(view?.state?.pending??{}).length} pendientes · {Object.keys(view?.state?.conflicts??{}).length} conflictos</p>
       <p>Última sincronización confirmada: {view?.state?.lastConfirmed?new Date(view.state.lastConfirmed).toLocaleString('es-CL'):'Ninguna'}</p>
       <p className="local-note">Solo atributos del catálogo. Stock, costos, imágenes, eventos y ventas permanecen locales. Los productos recibidos requieren conteo físico.</p>
       {!view?.state&&<button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(compare)}>Vinculación inicial · Comparar</button>}
+      {!view?.state&&<p className="local-note">Prepara el catálogo real desde Inventario → Importación masiva · Administración antes de vincular. Los datos de prueba pueden permanecer locales: déjalos excluidos. No se carga automáticamente el catálogo original de 77 productos.</p>}
       {view?.state&&<button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{await startCatalog(uid,role)})}>Sincronizar catálogo</button>}
       {view?.state&&<button type="button" className="button secondary" disabled={busy} onClick={()=>void run(async()=>{
         if(!window.confirm('¿Desvincular este dispositivo? Se conservan los registros locales y cloud. Se bloqueará si hay cambios pendientes.'))return
@@ -34,8 +38,12 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
         <p>Selecciona qué subir o descargar. Por defecto todos los registros quedan excluidos. Coincidencias por nombre con UUID distinto requieren corregir el nombre; no se fusionan identidades históricas.</p>
         <p>{rows.filter(r=>r.status==='local-only'||r.status==='remote-only').length} nuevos · {rows.filter(r=>r.status==='equal').length} coincidentes · {rows.filter(r=>['conflict','name-conflict','invalid'].includes(r.status)).length} conflictos · {choices.filter(c=>c.action==='exclude').length} excluidos</p>
         <p>Cambios propuestos: {choices.filter(c=>c.action==='upload').length} subidas · {choices.filter(c=>c.action==='download').length} descargas.</p>
+        <dl>{Object.entries(entityLabels).map(([kind,label])=><div key={kind}><dt>{label}</dt><dd>{Object.keys(review.records).filter(key=>key.startsWith(`${kind}/`)).length} locales · {Object.keys(remote).filter(key=>key.startsWith(`${kind}/`)).length} remotos</dd></div>)}</dl>
+        <label>Tipo de registro<select value={entity} onChange={e=>setEntity(e.target.value)}><option value="all">Todos</option>{Object.entries(entityLabels).map(([kind,label])=><option key={kind} value={kind}>{label}</option>)}</select></label>
+        <label>Buscar en la comparación<input type="search" value={search} onChange={e=>setSearch(e.target.value)} /></label>
+        {canWrite&&<button type="button" className="button secondary" disabled={busy} onClick={()=>void run(async()=>{setChoices(includeUploadDependencies(review,remote,choices));setConfirmed(false)})}>Incluir clasificaciones de productos seleccionados</button>}
         <button type="button" className="button secondary" onClick={()=>{setChoices(rows.map(r=>({key:r.key,action:remote[r.key]?'download':'exclude'})));setConfirmed(false)}}>Seleccionar descarga cloud</button>
-        <div style={{maxHeight:'45dvh',overflowY:'auto'}}>{rows.map(row=><div key={row.key} className="local-note">
+        <div style={{maxHeight:'45dvh',overflowY:'auto',overflowWrap:'anywhere'}}>{rows.filter(row=>(entity==='all'||row.key.startsWith(`${entity}/`))&&row.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())).map(row=><div key={row.key} className="local-note">
           <strong>{row.name}</strong><p>{row.key.split('/')[0]} · {{'local-only':'Solo local','remote-only':'Solo cloud',equal:'Coincidente',conflict:'Diferencias',invalid:'Revisar datos','name-conflict':'Nombre con otro UUID'}[row.status]}</p>
           <p>Precio local: {priceText(review.records[row.key])}</p>
           <p>Precio cloud: {priceText(remote[row.key]?.payload)}</p>
@@ -62,6 +70,7 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
         <button type="button" className="button secondary" disabled={busy} onClick={()=>{setRemote(undefined);setChoices([]);setConfirmed(false)}}>Cancelar sin cambios</button>
       </>}
       {Object.entries(view?.state?.conflicts??{}).map(([key,message])=><div key={key} className="storage-error"><p>{view?.records[key]?.name??key}: {message}</p>
+        <details><summary>Comparar versiones del conflicto</summary><p>Local</p><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{JSON.stringify(view?.records[key]??null,null,2)}</pre><p>Cloud · revisión {status.remote?.[key]?.revision??'sin lectura actual'}</p><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{JSON.stringify(status.remote?.[key]?.payload??null,null,2)}</pre></details>
         {(['remote','local','exclude'] as const).filter(action=>action!=='local'||canWrite).map(action=><button key={action} type="button" className="button secondary" disabled={busy} onClick={()=>void run(async()=>{
           if(!window.confirm(action==='exclude'?'¿Excluir este registro de la sincronización conservando sus datos locales?':`¿Resolver el conflicto usando la versión ${action==='local'?'local':'cloud'}?`))return
           const current=await client.catalog().read();await resolveConflict(key,action,current,canWrite);await startCatalog(uid,role)

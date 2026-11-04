@@ -38,6 +38,7 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_WORKSPACE_ID: ${{ vars.VITE_FIREBASE_WORKSPACE_ID }}
+          VITE_FIREBASE_CATALOG_ENABLED: ${{ vars.VITE_FIREBASE_CATALOG_ENABLED || 'false' }}
         run: npm run build:pages
       - uses: actions/upload-pages-artifact@v3
         with:
