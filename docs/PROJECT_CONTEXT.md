@@ -712,3 +712,23 @@ iniciar sesión, verificar acceso, comparar, seleccionar descarga cloud y confir
 Pendiente prueba real de descarga/edición entre dos dispositivos; no usar importación
 maestra nuevamente para recrear UUID. Esta publicación sustituye notas anteriores
 que indicaban que Pages aún conservaba Hito B.
+
+## 04-11-2026: recepción real en segundo dispositivo confirmada por el usuario
+
+Después de publicar Pages y seguir la vinculación/descarga, el usuario informó:
+«funciono, se sincronizo todo bien». Se registra como confirmación del usuario
+sobre recepción real del catálogo en el segundo dispositivo; no como observación
+automatizada de ese dispositivo. Primera carga real y lectura en el dispositivo
+original ya verificadas por el agente. No se realizaron nuevas escrituras en esta
+actualización documental. Siguen pendientes pruebas reales de edición en ambos
+sentidos, conflicto simultáneo y desconexión/reconexión; los casos equivalentes
+locales/emulados sí se ejecutaron. No se habilita sincronización transaccional.
+
+04-11-2026 seguimiento tiempo real: cambios locales disparan el envío por evento,
+listeners deduplicados, recuperación de errores de sesión/listeners y estado visible.
+279 pruebas app + 11 emuladores pasan; lint/build Pages pasan. Detalle en
+firebase-catalog-sync.md. Producto real autorizado Sticker Bon burguer creado
+localmente ($600, Stickers/Series/The Walten Files, costo desconocido, stock 0).
+Usuario debe iniciar sesión en localhost5193: pestaña actualmente sin sesión;
+no asumir que ya se subió el producto. Pendiente confirmar recepción sin botones
+por el usuario en su segundo dispositivo. No se alteró el producto Bon original.

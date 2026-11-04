@@ -12,7 +12,35 @@ const product={...base,id:productId,name:'Producto real solo emulador',entity:'p
 const device=crypto.randomUUID()
 before(async()=>{
  env=await initializeTestEnvironment({projectId:'demo-matu-art-catalog',firestore:{host:'127.0.0.1',port:8080,rules:await readFile(new URL('../../firestore.catalog.rules',import.meta.url),'utf8')}})
+ await env.clearFirestore()
  await env.withSecurityRulesDisabled(async c=>{for(const [uid,role]of [['a','administrator'],['b','manager'],['s','seller']])await setDoc(doc(c.firestore(),`workspaces/${workspace}/members/${uid}`),{role,enabled:true})})
+})
+
+test('live listeners receive edits, archive, reactivation and reconnect without manual reads',async()=>{
+ const a=env.authenticatedContext('a').firestore(),b=env.authenticatedContext('b').firestore()
+ const A=catalogRemote(a,workspace,'a'),B=catalogRemote(b,workspace,'b')
+ const payload={...category,id:crypto.randomUUID(),name:'Realtime reconnect category'}
+ const key=`categories/${payload.id}`
+ let latest={},listenerError,deliveries=0
+ const stop=B.watch(records=>{latest=records;deliveries++},cause=>{listenerError=cause})
+ async function until(predicate){const end=Date.now()+10000;while(!predicate()){if(listenerError)throw listenerError;if(Date.now()>end)throw new Error('Listener timeout');await new Promise(resolve=>setTimeout(resolve,25))}}
+ try{
+   await A.commit({id:crypto.randomUUID(),payload,expectedRevision:0},device)
+   await until(()=>latest[key]?.revision===1)
+   await A.commit({id:crypto.randomUUID(),payload:{...payload,description:'edited remotely'},expectedRevision:1},device)
+   await until(()=>latest[key]?.payload.description==='edited remotely')
+   await b.disableNetwork()
+   await A.commit({id:crypto.randomUUID(),payload:{...payload,isActive:false},expectedRevision:2},device)
+   assert.equal(latest[key].revision,2)
+   await b.enableNetwork()
+   await until(()=>latest[key]?.revision===3)
+   assert.equal(latest[key].payload.isActive,false)
+   await A.commit({id:crypto.randomUUID(),payload:{...payload,isActive:true},expectedRevision:3},device)
+   await until(()=>latest[key]?.revision===4)
+   const settled=deliveries
+   await new Promise(resolve=>setTimeout(resolve,200))
+   assert.equal(deliveries,settled,'No repeated deliveries when nothing changes')
+ }finally{stop();await Promise.all([a.terminate(),b.terminate()])}
 })
 after(async()=>env?.cleanup())
 test('catalog rules: two writers, reader, CAS, idempotence, archive and protected fields',async()=>{

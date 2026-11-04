@@ -25,6 +25,7 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
     <h3>Catálogo compartido</h3>
     {!enabled?<p>Sincronización desactivada en esta versión. Puedes comprobar la lectura del catálogo sin subir ni modificar datos.</p>:<>
       <p>{view?.state?'Dispositivo vinculado':'Sin vinculación inicial'} · {Object.keys(view?.state?.pending??{}).length} pendientes · {Object.keys(view?.state?.conflicts??{}).length} conflictos</p>
+      {view?.state&&<p className="local-note">{!navigator.onLine?'Sin conexión · Los cambios se conservan localmente.':status.automatic?'Sincronización automática activa · Los cambios se reciben sin pulsar botones.':'Sincronización automática en espera de sesión o conexión.'} {Object.keys(view.state.baseline).length} registros confirmados.</p>}
       <p>Última sincronización confirmada: {view?.state?.lastConfirmed?new Date(view.state.lastConfirmed).toLocaleString('es-CL'):'Ninguna'}</p>
       <p className="local-note">Solo atributos del catálogo. Stock, costos, imágenes, eventos y ventas permanecen locales. Los productos recibidos requieren conteo físico.</p>
       {!view?.state&&<button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(compare)}>Vinculación inicial · Comparar</button>}

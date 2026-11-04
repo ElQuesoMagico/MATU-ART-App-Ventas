@@ -1660,3 +1660,9 @@ Publicación 04-11-2026: Hito C ya está en GitHub Pages, commit 0fc8b26, ejecuc
 41827443422 exitosa. Se verificaron HTTP 200, recursos nuevos y flag de catálogo
 true en el bundle público. Falta probar recepción y edición real desde un segundo
 dispositivo. No importar el maestro otra vez: descargar el catálogo cloud existente.
+
+Sincronización automática: al guardar atributos del catálogo se despierta el envío;
+onSnapshot recibe cambios y actualiza IndexedDB. Se conservan alternativa manual,
+reintentos, revisiones y conflictos. Requiere dispositivo vinculado, sesión válida
+y aplicación abierta. No sincroniza stock, costos ni ventas. Pruebas actuales:
+279 locales y 11 emuladas aprobadas; ver docs/firebase-catalog-sync.md para límites.

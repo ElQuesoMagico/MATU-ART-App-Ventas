@@ -1,23 +1,29 @@
 import { useEffect } from 'react'
 import { firebaseConnection } from '../../services/firebase/client'
-import { startCatalog, stopCatalog, startOfflineCatalog } from '../../services/firebase/catalogRuntime'
+import { startCatalog, stopCatalog, startOfflineCatalog, reportCatalogError } from '../../services/firebase/catalogRuntime'
+import { firebaseMessage } from '../../services/firebase/access'
 export function CatalogSyncBootstrap(){
   useEffect(()=>{
-    let valid=true,sequence=0
+    let valid=true,sequence=0,verifying=false,retry=false
     let client
     try{client=firebaseConnection()}catch{return}
     if(!client?.catalogEnabled)return
     let identity:string|undefined
     const connect=()=>{
-      const current=++sequence;stopCatalog()
-      if(!identity)return
+      if(verifying)return
+      const current=++sequence
+      if(!identity){stopCatalog();return}
       const uid=identity
       if(!navigator.onLine){startOfflineCatalog(uid);return}
-      void client.verify().then(access=>{if(valid&&current===sequence)return startCatalog(uid,access.role)}).catch(()=>{if(valid&&current===sequence)stopCatalog()})
+      verifying=true
+      void client.verify().then(access=>{if(valid&&current===sequence){retry=false;return startCatalog(uid,access.role)}}).catch(cause=>{
+        if(valid&&current===sequence){stopCatalog();reportCatalogError(firebaseMessage(cause));retry=true}
+      }).finally(()=>{verifying=false})
     }
-    const unsubscribe=client.subscribe(user=>{identity=user?.uid;connect()})
+    const unsubscribe=client.subscribe(user=>{sequence++;identity=user?.uid;stopCatalog();verifying=false;connect()})
     window.addEventListener('online',connect)
-    return ()=>{valid=false;unsubscribe();window.removeEventListener('online',connect);stopCatalog()}
+    const timer=window.setInterval(()=>{if(retry&&navigator.onLine)connect()},30000)
+    return ()=>{valid=false;clearInterval(timer);unsubscribe();window.removeEventListener('online',connect);stopCatalog()}
   },[])
   return null
 }

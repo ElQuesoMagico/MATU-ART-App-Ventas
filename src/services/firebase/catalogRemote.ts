@@ -7,14 +7,19 @@ export function catalogRemote(db:Firestore,workspaceId:string,uid:string){
   return {
     watch(update:(records:Record<string,RemoteRecord>)=>void,error:(error:Error)=>void){
       const buckets=new Map<string,Record<string,RemoteRecord>>()
+      let previous=''
       const subscriptions=kinds.map(kind=>onSnapshot(query(collection(db,`${root}/${kind}`),limit(2001)),{includeMetadataChanges:true},snapshot=>{
         if(snapshot.metadata.fromCache||snapshot.metadata.hasPendingWrites)return
         try {
           if(snapshot.size>2000)throw new Error('Más de 2.000 registros por tipo: se requiere paginación.')
           const records:Record<string,RemoteRecord>={}
-          for(const row of snapshot.docs){const v=row.data(),p=payloadSchema.parse(v.payload);if(p.entity!==kind||p.id!==row.id)throw new Error('Registro cloud inválido.');records[keyOf(p)]={payload:p,revision:v.revision,operationId:v.operationId}}
+          for(const row of snapshot.docs){const v=row.data(),p=payloadSchema.parse(v.payload);if(p.entity!==kind||p.id!==row.id||!Number.isSafeInteger(v.revision)||v.revision<1)throw new Error('Registro cloud inválido.');records[keyOf(p)]={payload:p,revision:v.revision,operationId:v.operationId}}
           buckets.set(kind,records)
-          if(buckets.size===kinds.length)update(Object.assign({},...buckets.values()))
+          if(buckets.size===kinds.length){
+            const combined:Record<string,RemoteRecord>=Object.assign({},...buckets.values())
+            const fingerprint=stable(combined)
+            if(fingerprint!==previous){previous=fingerprint;update(combined)}
+          }
         }catch(cause){error(cause instanceof Error?cause:new Error('Catálogo inválido.'))}
       },error))
       return ()=>subscriptions.forEach(stop=>stop())

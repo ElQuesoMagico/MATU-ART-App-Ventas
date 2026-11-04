@@ -208,3 +208,37 @@ Nueva lectura real de Firestore a las 00:40:04 confirmó los cuatro conteos.
 No se escribieron datos transaccionales ni inventario/costos. La vinculación quedó
 activa. Esto reemplaza el estado anterior «sin escrituras reales» para la primera
 carga, pero no demuestra todavía sincronización real entre dos dispositivos.
+
+04-11-2026: el usuario confirmó recepción correcta del catálogo en el segundo
+dispositivo tras la publicación de Pages. Evidencia reportada por el usuario;
+pendientes las pruebas reales de edición bidireccional, conflictos y reconexión.
+
+## Tiempo real — 04-11-2026
+
+- onSnapshot ya existía. Se mantiene un listener por colección (cuatro por pestaña
+  vinculada), sin consultas periódicas a Firestore. La comparación de 5 segundos
+  es local y no genera lecturas remotas. Nuevos eventos catalog-updated despiertan
+  el envío inmediatamente después de un commit local; BroadcastChannel cubre otras
+  pestañas. Actualizaciones cloud usan un evento diferente y no generan eco.
+- Reiniciar manualmente con misma identidad/rol reutiliza listeners. Huellas del
+  snapshot evitan procesar entregas idénticas. Errores terminales reabren listeners
+  con espera creciente hasta 60 segundos; fallos al verificar sesión reintentan
+  cada 30 segundos. Confirmaciones CAS/idempotencia y Rules se mantienen.
+- Interfaz muestra automático activo/en espera/offline y cantidad de registros
+  confirmados junto a pendientes, conflictos y errores. Sin sesión válida no se
+  concede acceso remoto. El SDK reconecta listeners al recuperar red; no se promete
+  sincronización con la app cerrada o suspendida por Android.
+- Límites: cuatro listeners por pestaña, no hay elección de líder entre pestañas.
+  Abrir muchas pestañas multiplica lecturas iniciales; mantener una por dispositivo.
+  El límite de 2000 registros/tipo y 3 familias/3 IPs no cambió. Archivo/reactivación
+  sincronizan atributos; nunca stock, costos, ventas ni pagos.
+- Pruebas: lint y build Pages correctos; 279 pruebas de app aprobadas. 11 pruebas
+  de Auth/Rules/listeners aprobadas en emuladores (realtime-verified-emulators.log),
+  incluyendo desconectar/reconectar el cliente B, editar, archivar y reactivar.
+  Las primeras ejecuciones quedaron colgadas al cerrar el cliente de prueba; se
+  corrigió el cierre usando la API compat del entorno Rules y se repitió la suite.
+- Prueba real en curso: usuario autorizó CREAR (no renombrar Bon) Sticker Bon
+  burguer, $600, Stickers, Series, The Walten Files. Guardado mediante formulario
+  local, costo desconocido y stock 0 (el formulario no marca pendiente de conteo).
+  No se pulsó Sincronizar. Se observó sesión local cerrada; requiere login del
+  usuario antes de verificar envío. No afirmar recepción automática todavía.

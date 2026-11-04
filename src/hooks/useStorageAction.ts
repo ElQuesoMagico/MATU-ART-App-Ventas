@@ -11,6 +11,7 @@ export function useStorageAction() {
     lock.current = true; setSaving(true); setError('')
     try {
       const result = await operation()
+      window.dispatchEvent(new Event('catalog-updated'))
       // Un aviso entre pestañas no debe convertir un commit exitoso en un error.
       try { if (typeof BroadcastChannel !== 'undefined') { const channel = new BroadcastChannel('clown-ufo-catalog'); channel.postMessage('changed'); channel.close() } } catch { /* Refresco por foco disponible. */ }
       await reload()

@@ -53,6 +53,8 @@ test('two local devices: explicit selection, queued edits, restart, conflict and
  assert.equal((await localView(b)).state!.pending[`products/${product.id}`].id,queued)
  await flush(transport,b);await reconcile(remote,true,a)
  const after=(await readData(a)).products[0];assert.equal(after.price,900);assert.equal(after.stock,7);assert.equal(after.averageCost,100);assert.equal(after.estimatedUnitCost,150)
+ await reconcile(remote,true,a)
+ assert.equal(Object.keys((await localView(a)).state!.pending).length,0,'Remote application must not echo a write back')
  const da=await openCatalogDatabase(a);await da.put('products',{...after,price:1000});da.close()
  remote[`products/${product.id}`]={payload:{...project('products',after),name:'Cloud edited'},revision:3,operationId:crypto.randomUUID()}
  await reconcile(remote,true,a);assert.ok((await localView(a)).state!.conflicts[`products/${product.id}`])
