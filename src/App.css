@@ -505,3 +505,7 @@ main[data-page='inicio'] .page-heading { margin-bottom: 8px; }
 }
 .template-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .template-actions .text-button { min-height: 44px; }
+
+.account-access { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; min-width: 0; max-width: 58%; }
+.account-button { min-height: 44px; }
+.account-status { font-size: 11px; text-align: right; overflow-wrap: anywhere; line-height: 1.4; }

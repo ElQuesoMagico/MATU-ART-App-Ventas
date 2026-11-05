@@ -242,3 +242,24 @@ pendientes las pruebas reales de edición bidireccional, conflictos y reconexió
   local, costo desconocido y stock 0 (el formulario no marca pendiente de conteo).
   No se pulsó Sincronizar. Se observó sesión local cerrada; requiere login del
   usuario antes de verificar envío. No afirmar recepción automática todavía.
+
+### Publicación verificada
+
+- Commit `d15522e949d8822920603f52ed705e6e5bb5bb52` publicado en Pages;
+  GitHub Actions run `41886782628` terminó correctamente.
+- Se verificó HTTP 200 y el recurso público `catalogRuntime-RkBPtv15.js` con
+  `catalog-updated`; la configuración pública habilita el catálogo Firebase.
+- En la comprobación posterior la página local seguía mostrando el formulario
+  de inicio de sesión. El envío del producto nuevo y su recepción automática en
+  el segundo dispositivo siguen pendientes de verificar; no se recreó el producto.
+
+### Verificación real después del inicio de sesión
+
+04-11-2026: usuario inició sesión administradora. La UI mostró automático activo,
+131 registros confirmados, 0 pendientes y 0 conflictos, última confirmación
+19:48:14 Chile. Se utilizó únicamente Comprobar lectura del catálogo, que devolvió
+79 productos, 7 categorías, 5 familias y 40 IPs. No se pulsó Sincronizar catálogo.
+El conteo incluye otro producto adicional cuyo origen no se investigó; no atribuir
+ambos incrementos a esta prueba. Pendiente confirmar recepción automática de
+Sticker Bon burguer en el segundo dispositivo, inicialmente reportado como ausente
+antes de completar esta comprobación.

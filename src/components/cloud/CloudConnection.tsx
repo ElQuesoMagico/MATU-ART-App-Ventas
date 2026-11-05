@@ -6,7 +6,7 @@ import { firebaseMessage } from '../../services/firebase/access'
 import type { VerifiedAccess } from '../../services/firebase/access'
 import { CatalogSyncPanel } from './CatalogSyncPanel'
 
-export function CloudConnection({ onClose }: { onClose: () => void }) {
+export function CloudConnection({ onClose, offerLocal = false }: { onClose: () => void; offerLocal?: boolean }) {
   const [configuration] = useState(() => {
     try { return { client: firebaseConnection(), error: '' } }
     catch (error) { return { client: null, error: firebaseMessage(error) } }
@@ -26,6 +26,15 @@ export function CloudConnection({ onClose }: { onClose: () => void }) {
     window.addEventListener('online', update); window.addEventListener('offline', update)
     return () => { mounted.current = false; invalidate(); unsubscribe?.(); window.removeEventListener('online', update); window.removeEventListener('offline', update) }
   }, [client])
+  useEffect(() => {
+    if (!client || !user || !online) return
+    let active = true
+    const current = revision.current
+    void client.verify().then(result => {
+      if (active && current === revision.current) { setAccess(result); setError(''); setMessage('Acceso verificado con Firestore.') }
+    }).catch(cause => { if (active && current === revision.current) setError(firebaseMessage(cause)) })
+    return () => { active = false }
+  }, [client, user, online])
   async function run(action: () => Promise<void>) {
     if (lock.current) return
     lock.current = true; setBusy(true); setError(''); setMessage(''); setAccess(undefined)
@@ -48,7 +57,7 @@ export function CloudConnection({ onClose }: { onClose: () => void }) {
       setMessage(`Lectura del catálogo verificada con Firestore: ${counts.products} productos, ${counts.categories} categorías, ${counts.families} familias y ${counts.ips} IPs. Esta comprobación no subió ni modificó datos.`)
     }
   }
-  return <Modal title="Conexión a la nube" onClose={onClose} busy={busy}>
+  return <Modal title={user ? 'Mi cuenta' : 'Iniciar sesión'} onClose={onClose} busy={busy}>
     <div className="data-manager cloud-connection">
       <p className="local-note">{client?.catalogEnabled?'Ventas, stock y costos locales. Consulta el estado del catálogo más abajo.':'Datos locales · La sincronización todavía no está habilitada.'}</p>
       {!client && !error && <p>Firebase no está configurado. Puedes seguir trabajando con tus datos locales.</p>}
@@ -65,6 +74,7 @@ export function CloudConnection({ onClose }: { onClose: () => void }) {
         <label>Contraseña<input type="password" autoComplete="current-password" value={password} required disabled={busy || !online} onChange={event => setPassword(event.target.value)} /></label>
         <button type="submit" className="button primary" disabled={busy || !online}>Iniciar sesión</button>
       </form>)}
+      {offerLocal && !user && <><p className="local-note">Inicia sesión para compartir el catálogo entre dispositivos. Sin sesión, los cambios permanecen en este navegador.</p><button type="button" className="button secondary" disabled={busy} onClick={onClose}>Continuar sin conexión a la nube</button></>}
       {busy && <p role="status">Conectando…</p>}{message && <p role="status">{message}</p>}{error && <p className="storage-error" role="alert">{error}</p>}
     </div>
   </Modal>

@@ -732,3 +732,19 @@ localmente ($600, Stickers/Series/The Walten Files, costo desconocido, stock 0).
 Usuario debe iniciar sesión en localhost5193: pestaña actualmente sin sesión;
 no asumir que ya se subió el producto. Pendiente confirmar recepción sin botones
 por el usuario en su segundo dispositivo. No se alteró el producto Bon original.
+
+04-11-2026, seguimiento posterior al login: se observó sesión administradora,
+sincronización automática activa, 131 registros confirmados, 0 pendientes y
+0 conflictos, última confirmación a las 19:48:14 (Chile). Lectura real de Firestore
+desde el botón de comprobación: 79 productos, 7 categorías, 5 familias, 40 IPs.
+No se pulsó Sincronizar catálogo. Esto reemplaza el bloqueo por falta de sesión
+descrito arriba; la recepción automática en el segundo dispositivo sigue pendiente
+de confirmación del usuario. No atribuir el segundo producto adicional a esta prueba.
+
+04-11-2026 acceso visible (cambio local aún no publicado): AccountAccess en cabecera,
+aviso inicial online sin sesión, opción explícita de continuar localmente, estado de
+catálogo persistente. Mi cuenta verifica membresía al abrir. Mantiene Auth de sesión,
+Rules e IndexedDB. Lint/build/279 pruebas existentes pasan. Verificados manualmente
+aviso sin sesión, continuación local y rol real automático; móvil físico/offline
+no repetidos. Ver README. El usuario identificó falta de sesión en el dispositivo
+receptor: no dar por finalizada aún la prueba real de recepción automática.

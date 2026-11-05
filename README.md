@@ -1666,3 +1666,20 @@ onSnapshot recibe cambios y actualiza IndexedDB. Se conservan alternativa manual
 reintentos, revisiones y conflictos. Requiere dispositivo vinculado, sesión válida
 y aplicación abierta. No sincroniza stock, costos ni ventas. Pruebas actuales:
 279 locales y 11 emuladas aprobadas; ver docs/firebase-catalog-sync.md para límites.
+
+### Acceso visible a la cuenta (04-11-2026)
+
+La cabecera incorpora Iniciar sesión / Mi cuenta y el estado del catálogo. Al abrir
+la aplicación con conexión y sin sesión se ofrece el acceso, con opción explícita
+Continuar sin conexión a la nube. Cerrar el aviso mantiene el modo local durante
+esa apertura; una recarga vuelve a ofrecer acceso. La cuenta verifica membresía al
+abrirse. No cambia permisos, persistencia de credenciales, IndexedDB ni reglas de
+ventas. Archivos: src/components/cloud/AccountAccess.tsx, CloudConnection.tsx,
+src/App.tsx y src/App.css.
+
+Verificado localmente: aviso en pestaña sin sesión, continuación local con indicador,
+apertura desde cabecera y rol administrador comprobado automáticamente con Firestore.
+Lint, build y 279 pruebas existentes aprobadas. No se añadieron pruebas automatizadas
+de UI; móvil físico y caída de Internet no comprobados en este ajuste. Cambio todavía
+no publicado en Pages. Continúa pendiente la confirmación de recepción automática
+de Sticker Bon burguer en el segundo dispositivo.
