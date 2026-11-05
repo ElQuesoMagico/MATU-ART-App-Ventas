@@ -772,3 +772,22 @@ de precache completo, consulta cada minuto visible/online/foco, recarga diferida
 sin carrito ni formularios. Sin cambios IndexedDB. Cachés viejas conservadas para
 pestañas trabajando; limpieza coordinada pendiente. La primera transición desde
 el código anterior puede requerir recarga normal. Ver README para límites.
+
+05-11-2026 prueba real con cuenta administradora temporal del usuario, sin guardar
+credenciales en el proyecto: login y membresía correctos en Pages. Lectura real
+82 productos, 8 categorías, 5 familias, 40 IPs. La pestaña nueva comparte IndexedDB
+con las otras del mismo navegador/origen: NO es un dispositivo limpio. Estado local:
+3 pendientes, 2 conflictos (Series y The Walten Files), 1 confirmado. Runtime bloquea
+por ownerUid de otra cuenta; no se cambió vinculación ni se enviaron datos. UUID local
+Series c0a0a8c8-a80d-410e-b637-93eb595efc6e; IP da68bcde-7694-41ce-812c-b5c89848a65c.
+Falta resolución explícita de identidades y prueba de sync completa; lectura exitosa
+no equivale a sincronización. No registrar contraseñas temporales en documentación.
+
+05-11-2026 flujo de reparación implementado: catálogoRepair (catalogRepair.ts) y
+panel con vista previa, respaldo declarado y confirmaciones explícitas. Adopción
+solo administrador/mismo workspace verificado online, sin borrar cola. Equivalencia
+solo clasificaciones, archiva+renombra fuente preservando UUID; reasigna asociaciones
+actuales de productos, no históricos ni promociones. Bloquea vista obsoleta y
+conflictos remotos. Datos comerciales aún SIN reparar; no ejecutar sin respaldo y
+revisión de afectados. Pruebas fake-indexeddb cubren permisos, workspace, pendiente
+estable, preservación costos/stock, transacción y rechazo de preview obsoleto.

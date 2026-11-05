@@ -5,12 +5,15 @@ import type { Choice, LocalView } from '../../services/firebase/catalogLocal'
 import type { Payload, RemoteRecord } from '../../services/firebase/catalogModel'
 import type { FirebaseRole } from '../../services/firebase/access'
 import { catalogStatus, startCatalog, stopCatalog } from '../../services/firebase/catalogRuntime'
+import { adoptCatalogAccount, assertRepairPreview, classificationRepairs, repairClassification } from '../../services/firebase/catalogRepair'
 
 const priceText=(p?:Payload)=>p?.entity==='products'?`${p.price.toLocaleString('es-CL')} CLP`:'—'
 const entityLabels={categories:'Categorías',families:'Familias',ips:'IPs',products:'Productos'}
 export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
   const [view,setView]=useState<LocalView>(),[remote,setRemote]=useState<Record<string,RemoteRecord>>()
   const [review,setReview]=useState<LocalView>()
+  const [repair,setRepair]=useState<{local:LocalView;remote:Record<string,RemoteRecord>}>()
+  const [backupConfirmed,setBackupConfirmed]=useState(false)
   const [choices,setChoices]=useState<Choice[]>([]),[confirmed,setConfirmed]=useState(false)
   const [entity,setEntity]=useState('all'),[search,setSearch]=useState('')
   const lock=useRef(false)
@@ -28,6 +31,34 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
       {view?.state&&<p className="local-note">{!navigator.onLine?'Sin conexión · Los cambios se conservan localmente.':status.automatic?'Sincronización automática activa · Los cambios se reciben sin pulsar botones.':'Sincronización automática en espera de sesión o conexión.'} {Object.keys(view.state.baseline).length} registros confirmados.</p>}
       <p>Última sincronización confirmada: {view?.state?.lastConfirmed?new Date(view.state.lastConfirmed).toLocaleString('es-CL'):'Ninguna'}</p>
       <p className="local-note">Solo atributos del catálogo. Stock, costos, imágenes, eventos y ventas permanecen locales. Los productos recibidos requieren conteo físico.</p>
+      {view?.state&&role==='administrator'&&<>
+        <button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{const cloud=await client.catalog().read();setRepair({local:await localView(),remote:cloud});setBackupConfirmed(false)})}>Revisar reparación de vinculación</button>
+        {repair&&<div className="storage-error">
+          <h4>Vista previa de reparación</h4>
+          <p>Espacio: {client.workspaceId}. Cuenta vinculada: {repair.local.state?.ownerUid}. Cuenta actual: {uid}.</p>
+          <p>Antes de confirmar, guarda un respaldo completo desde Datos y respaldos. No se borran productos, stock, costos ni históricos.</p>
+          <label><input type="checkbox" checked={backupConfirmed} onChange={e=>setBackupConfirmed(e.target.checked)}/>Tengo un respaldo de estos datos locales.</label>
+          {repair.local.state?.ownerUid!==uid&&<button type="button" className="button secondary" disabled={busy||!backupConfirmed} onClick={()=>void run(async()=>{
+            if(!window.confirm('¿Vincular este catálogo a la cuenta administradora actual dentro del mismo espacio? Se conservan pendientes, exclusiones y conflictos; los pendientes autorizados podrán enviarse.'))return
+            const access=await client.verify();const cloud=await client.catalog().read()
+            await navigator.locks.request('matu-catalog-sync',async()=>{await assertRepairPreview(repair.local,repair.remote,cloud);await adoptCatalogAccount(repair.local,client.workspaceId,uid,access.role)})
+            setRepair(undefined);await startCatalog(uid,access.role)
+          })}>Confirmar cambio de cuenta vinculada</button>}
+          {classificationRepairs(repair.local,repair.remote).map(item=><div key={item.key}>
+            <strong>{item.name}</strong><p>Local: {item.key}<br/>Compartida: {item.target}</p>
+            <p>Productos que cambiarán de asociación: {item.products.map(p=>p.name).join(', ')||'Ninguno'}.</p>
+            <p>La clasificación local se conservará archivada con el sufijo [local UUID]. Se usará la clasificación compartida en estos productos. Las referencias históricas y reglas de promociones existentes conservan sus UUID.</p>
+            <button type="button" className="button secondary" disabled={busy||!backupConfirmed||repair.local.state?.ownerUid!==uid} onClick={()=>void run(async()=>{
+              if(!window.confirm(`¿Usar la clasificación compartida para ${item.products.length} productos de «${item.name}» y archivar la clasificación local conservando su UUID?`))return
+              const access=await client.verify();const cloud=await client.catalog().read()
+              await navigator.locks.request('matu-catalog-sync',async()=>{await assertRepairPreview(repair.local,repair.remote,cloud);await repairClassification(repair.local,cloud,item.key,item.target,uid,client.workspaceId,access.role)})
+              setRepair(undefined);await startCatalog(uid,access.role)
+            })}>Confirmar asociación compartida</button>
+          </div>)}
+          {!classificationRepairs(repair.local,repair.remote).length&&<p>No hay clasificaciones locales equivalentes con otro UUID remoto.</p>}
+          <button type="button" className="button secondary" disabled={busy} onClick={()=>setRepair(undefined)}>Cerrar vista previa</button>
+        </div>}
+      </>}
       {!view?.state&&<button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(compare)}>Vinculación inicial · Comparar</button>}
       {!view?.state&&<p className="local-note">Prepara el catálogo real desde Inventario → Importación masiva · Administración antes de vincular. Los datos de prueba pueden permanecer locales: déjalos excluidos. No se carga automáticamente el catálogo original de 77 productos.</p>}
       {view?.state&&<button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{await startCatalog(uid,role)})}>Sincronizar catálogo</button>}

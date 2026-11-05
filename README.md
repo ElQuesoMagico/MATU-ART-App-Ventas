@@ -1711,3 +1711,25 @@ precache completo y rechazo por fallo de descarga. No se ha comprobado aún la
 transición entre dos versiones en un Android físico. Archivos: offlinePlugin.ts,
 src/services/offlineStatus.ts, src/App.tsx, scripts/build-worker.mjs,
 tests/offline.test.ts; eliminado public/actualizar.html.
+
+### Reparación explícita del catálogo — 05-11-2026
+
+Mi cuenta → Revisar reparación de vinculación muestra cuenta/espacio y coincidencias
+de clasificación por nombre normalizado y UUID distinto. Requiere confirmar que se
+ha guardado un respaldo. Solo una membresía administradora verificada en Firestore
+puede cambiar la cuenta local dentro del mismo workspace. Conserva dispositivo,
+pendientes, IDs de operación, exclusiones y conflictos; no cambia Security Rules.
+
+Para cada coincidencia se muestran ambos UUID y productos afectados. Confirmar
+archiva y renombra la clasificación antigua con sufijo [local UUID], conserva ese
+UUID y añade la clasificación remota. Reasigna las asociaciones actuales de los
+productos y prepara nuevas operaciones, preservando UUID, stock, costos e imágenes.
+No fusiona productos ni altera ventas/movimientos/promociones históricas. Las reglas
+de promociones que apuntaban al UUID antiguo permanecen intactas y deben revisarse
+por separado si se quiere aplicar la clasificación compartida. No hay migración DB.
+
+La transacción local compara la vista previa; cambios concurrentes, productos
+inválidos o versiones remotas concurrentes bloquean la reparación. No es una
+transacción distribuida: cambios remotos posteriores se detectan mediante CAS en
+el envío normal. No se ejecutó todavía esta reparación sobre datos comerciales.
+Archivos: catalogRepair.ts, CatalogSyncPanel.tsx, tests/catalog-repair.test.ts.
