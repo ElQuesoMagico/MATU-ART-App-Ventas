@@ -21,7 +21,7 @@ test('GitHub Pages scope isolates caches and does not intercept other projects o
   caches:{keys:async()=>['matu-art-shell-%2Fmatu%2F-old','matu-art-shell-%2Fother%2F-old'],delete:async(key:string)=>{removed.push(key)},open:async()=>({match:async()=>'<html>MATU ART</html>'})},fetch:async()=>{throw new Error('offline')},
  })
  handlers.activate({waitUntil:(promise:Promise<unknown>)=>{wait=promise}});await wait
- assert.deepEqual(removed,['matu-art-shell-%2Fmatu%2F-old'])
+ assert.deepEqual(removed,[], 'Keep old assets available to open forms')
  for(const url of ['https://user.github.io/other/','https://worker.workers.dev/api/session','https://user.github.io/api/status','https://user.github.io/matu/api/auth/session']){
   handlers.fetch({request:{url,method:'GET',mode:'navigate'},respondWith:()=>{intercepted=true}})
   assert.equal(intercepted,false)
@@ -51,19 +51,18 @@ test('offline module requests reuse public precache despite Vary: Origin; naviga
   assert.equal(intercepted,false,'authentication API must never use the shell cache or HTML fallback')
 })
 
-test('PWA activation requires explicit update-page message; install never forces activation',async()=>{
+test('PWA activates automatically only after complete precache',async()=>{
  const handlers:Record<string,(event:unknown)=>void>={}
- let skipped=0,wait:Promise<unknown>|undefined
+ let skipped=0,wait:Promise<unknown>|undefined,fail=false
  runInNewContext(offlineWorkerSource(['index.html']),{
   URL,self:{registration:{scope:'https://user.github.io/matu/'},skipWaiting:async()=>{skipped++},addEventListener:(name:string,handler:(event:unknown)=>void)=>{handlers[name]=handler}},
-  caches:{open:async()=>({addAll:async()=>{}})},
+  caches:{open:async()=>({addAll:async()=>{if(fail)throw new Error('quota')}})},
  })
  handlers.install({waitUntil:(promise:Promise<unknown>)=>{wait=promise}});await wait
- assert.equal(skipped,0)
- for(const source of [undefined,{url:'https://evil.test/actualizar.html'},{url:'https://user.github.io/matu/'}]){
-  handlers.message({data:{type:'MATU_ACTIVATE_UPDATE'},source,waitUntil:(promise:Promise<unknown>)=>{wait=promise}})
- }
- assert.equal(skipped,0)
- handlers.message({data:{type:'MATU_ACTIVATE_UPDATE'},source:{url:'https://user.github.io/matu/actualizar.html'},waitUntil:(promise:Promise<unknown>)=>{wait=promise}});await wait
  assert.equal(skipped,1)
+ assert.equal(handlers.message,undefined)
+ fail=true
+ handlers.install({waitUntil:(promise:Promise<unknown>)=>{wait=promise}})
+ await assert.rejects(wait!,/quota/)
+ assert.equal(skipped,1,'Never activate an incomplete download')
 })

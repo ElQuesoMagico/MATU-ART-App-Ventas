@@ -1689,3 +1689,25 @@ d46474bae26f99778da9dbdd2e0cad68087aa974, Actions 41943025107 exitoso
 (lint, pruebas, build y deploy). Verificación HTTP 200 y recurso público
 AccountAccess-C2mWW_tv.js con el acceso y estado sin sesión. Sustituye la nota
 anterior de publicación pendiente. La prueba real del dispositivo receptor sigue pendiente.
+
+### Actualización automática PWA — 05-11-2026
+
+Se elimina public/actualizar.html y su enlace en App. El service worker se activa
+tras descargar completamente los recursos, sin un paso manual. La app consulta
+actualizaciones cada 60 segundos mientras está visible, al recuperar red y al
+volver a la pestaña. La recarga automática espera a que no haya carrito, borrador
+de pago, descuento general, formulario, diálogo o campo enfocado. IndexedDB no se
+modifica. El despliegue de GitHub Pages sigue tardando lo que requiera Actions/CDN.
+
+Transición: una pestaña con el código antiguo puede necesitar una recarga normal
+para adoptar este comportamiento; no borrar datos del navegador. Se conservan las
+cachés antiguas de recursos para no romper módulos diferidos de pestañas que aún
+están trabajando. Limitación: ocupan espacio hasta que el navegador las evacúe;
+la limpieza coordinada entre versiones queda pendiente. Si falla la descarga,
+no se activa una versión incompleta.
+
+Verificación: lint, build y 280 pruebas locales pasan, incluyendo activación tras
+precache completo y rechazo por fallo de descarga. No se ha comprobado aún la
+transición entre dos versiones en un Android físico. Archivos: offlinePlugin.ts,
+src/services/offlineStatus.ts, src/App.tsx, scripts/build-worker.mjs,
+tests/offline.test.ts; eliminado public/actualizar.html.

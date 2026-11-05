@@ -12,10 +12,9 @@ export function offlineWorkerSource(paths:string[]):string {
     return `const SCOPE=new URL(self.registration.scope).pathname;
 const PREFIX='matu-art-shell-'+encodeURIComponent(SCOPE)+'-';
 const CACHE=PREFIX+'${version}'; const FILES=${JSON.stringify(paths)};
-self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES))));
-self.addEventListener('message',event=>{if(event.data?.type==='MATU_ACTIVATE_UPDATE'&&event.source?.url===new URL('actualizar.html',self.registration.scope).href)event.waitUntil(self.skipWaiting())});
-self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith(PREFIX)&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(event.request.method!=='GET'||url.origin!==self.location.origin||!url.pathname.startsWith(SCOPE)||url.pathname==='/api'||url.pathname.startsWith('/api/')||url.pathname.startsWith(SCOPE+'api/'))return;event.respondWith(caches.open(CACHE).then(async cache=>{const cached=await cache.match(event.request,{ignoreVary:true});if(cached)return cached;if(event.request.mode==='navigate'){try{return await fetch(event.request)}catch{return await cache.match('index.html')}}return fetch(event.request)}))});
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
+self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(event.request.method!=='GET'||url.origin!==self.location.origin||!url.pathname.startsWith(SCOPE)||url.pathname==='/api'||url.pathname.startsWith('/api/')||url.pathname.startsWith(SCOPE+'api/'))return;event.respondWith(caches.open(CACHE).then(async cache=>{const cached=await cache.match(event.request,{ignoreVary:true});if(cached)return cached;if(url.pathname.startsWith(SCOPE+'assets/')){for(const key of (await caches.keys()).filter(key=>key.startsWith(PREFIX)&&key!==CACHE)){const previous=await (await caches.open(key)).match(event.request,{ignoreVary:true});if(previous)return previous;}}if(event.request.mode==='navigate'){try{return await fetch(event.request)}catch{return await cache.match('index.html')}}return fetch(event.request)}))});
 `
 }
 export function offlinePlugin():Plugin {

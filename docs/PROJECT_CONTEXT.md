@@ -765,3 +765,10 @@ UUID ni se modificaron datos comerciales. UI oculta Usar cloud cuando no existe
 esa identidad remota. Prueba de regresión con fake-indexeddb añadida. Pendiente
 identificar dispositivo/origen afectado y resolver explícitamente sus asociaciones;
 corrección todavía no publicada. Hito C permanece abierto.
+
+05-11-2026: usuario pide eliminar actualizar.html y actualizaciones automáticas.
+Implementado y probado localmente (280 pruebas, build/lint): skipWaiting después
+de precache completo, consulta cada minuto visible/online/foco, recarga diferida
+sin carrito ni formularios. Sin cambios IndexedDB. Cachés viejas conservadas para
+pestañas trabajando; limpieza coordinada pendiente. La primera transición desde
+el código anterior puede requerir recarga normal. Ver README para límites.

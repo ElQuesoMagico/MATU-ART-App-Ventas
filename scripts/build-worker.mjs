@@ -16,5 +16,5 @@ for (const [,url] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
 }
 const manifest = JSON.parse(readFileSync(resolve(root, 'manifest.webmanifest'), 'utf8'))
 if (manifest.scope !== './' || manifest.start_url !== './#inicio') throw new Error('Scope PWA incorrecto')
-if (!existsSync(resolve(root, 'sw.js')) || !existsSync(resolve(root, 'actualizar.html'))) throw new Error('Faltan recursos PWA')
+if (!existsSync(resolve(root, 'sw.js'))) throw new Error('Faltan recursos PWA')
 console.log('Worker: frontend en / y API en /api. Compilación preparada; no desplegada.')
