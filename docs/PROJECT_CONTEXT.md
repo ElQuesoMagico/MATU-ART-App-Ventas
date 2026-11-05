@@ -791,3 +791,13 @@ actuales de productos, no históricos ni promociones. Bloquea vista obsoleta y
 conflictos remotos. Datos comerciales aún SIN reparar; no ejecutar sin respaldo y
 revisión de afectados. Pruebas fake-indexeddb cubren permisos, workspace, pendiente
 estable, preservación costos/stock, transacción y rechazo de preview obsoleto.
+
+05-11-2026 nueva prueba real reportada: usuario administrador en teléfono renombró
+Ame chan a Sticker Ame chan y archivó/reactivó Abeja Minecraft; PC administrador
+no recibió cambios ni tras recarga, sin conflictos visibles. NO dar Hito C cerrado.
+Causa aún sin verificar. Se añade diagnóstico de solo lectura por nombre/UUID con
+valores local/nube, revisión base/remota, exclusión/pendiente/conflicto. Cabecera
+muestra cantidad de excluidos antes oculta. No se levantan exclusiones ni se cambian
+productos sin revisión explícita. La pestaña de diagnóstico del agente conserva
+una base distinta de la del usuario (1 producto y conflictos antiguos); no usarla
+como prueba del estado de su teléfono/Firefox.

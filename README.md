@@ -1733,3 +1733,10 @@ inválidos o versiones remotas concurrentes bloquean la reparación. No es una
 transacción distribuida: cambios remotos posteriores se detectan mediante CAS en
 el envío normal. No se ejecutó todavía esta reparación sobre datos comerciales.
 Archivos: catalogRepair.ts, CatalogSyncPanel.tsx, tests/catalog-repair.test.ts.
+
+Diagnóstico de catálogo: Mi cuenta → Diagnosticar productos · solo lectura compara
+registros persistidos con una lectura Firestore solicitada explícitamente. Buscar
+nombre o UUID muestra nombres, estado archivado, revisiones y exclusiones. No genera
+escrituras ni consultas periódicas nuevas. La cabecera indica registros excluidos;
+conexión no implica que todo el catálogo esté incluido. El incidente Ame chan/Abeja
+Minecraft sigue pendiente de diagnóstico en los dispositivos afectados.

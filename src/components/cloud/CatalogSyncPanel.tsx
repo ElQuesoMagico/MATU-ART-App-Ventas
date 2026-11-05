@@ -6,6 +6,7 @@ import type { Payload, RemoteRecord } from '../../services/firebase/catalogModel
 import type { FirebaseRole } from '../../services/firebase/access'
 import { catalogStatus, startCatalog, stopCatalog } from '../../services/firebase/catalogRuntime'
 import { adoptCatalogAccount, assertRepairPreview, classificationRepairs, repairClassification } from '../../services/firebase/catalogRepair'
+import { catalogDiagnostics } from '../../services/firebase/catalogDiagnostics'
 
 const priceText=(p?:Payload)=>p?.entity==='products'?`${p.price.toLocaleString('es-CL')} CLP`:'—'
 const entityLabels={categories:'Categorías',families:'Familias',ips:'IPs',products:'Productos'}
@@ -14,6 +15,8 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
   const [review,setReview]=useState<LocalView>()
   const [repair,setRepair]=useState<{local:LocalView;remote:Record<string,RemoteRecord>}>()
   const [backupConfirmed,setBackupConfirmed]=useState(false)
+  const [diagnosis,setDiagnosis]=useState<ReturnType<typeof catalogDiagnostics>>()
+  const [diagnosisSearch,setDiagnosisSearch]=useState('')
   const [choices,setChoices]=useState<Choice[]>([]),[confirmed,setConfirmed]=useState(false)
   const [entity,setEntity]=useState('all'),[search,setSearch]=useState('')
   const lock=useRef(false)
@@ -31,6 +34,21 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
       {view?.state&&<p className="local-note">{!navigator.onLine?'Sin conexión · Los cambios se conservan localmente.':status.automatic?'Sincronización automática activa · Los cambios se reciben sin pulsar botones.':'Sincronización automática en espera de sesión o conexión.'} {Object.keys(view.state.baseline).length} registros confirmados.</p>}
       <p>Última sincronización confirmada: {view?.state?.lastConfirmed?new Date(view.state.lastConfirmed).toLocaleString('es-CL'):'Ninguna'}</p>
       <p className="local-note">Solo atributos del catálogo. Stock, costos, imágenes, eventos y ventas permanecen locales. Los productos recibidos requieren conteo físico.</p>
+      {view?.state&&<p>{view.state.excluded.length} registros excluidos: sus cambios no se envían ni se reciben en este dispositivo.</p>}
+      <button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{const cloud=await client.catalog().read();setDiagnosis(catalogDiagnostics(await localView(),cloud))})}>Diagnosticar productos · solo lectura</button>
+      {diagnosis&&<section>
+        <p>Comparación con Firestore al pulsar Diagnosticar. No modifica datos. Busca el mismo producto en ambos dispositivos y compara su UUID.</p>
+        <label>Buscar nombre o UUID<input type="search" value={diagnosisSearch} onChange={e=>setDiagnosisSearch(e.target.value)}/></label>
+        <div style={{maxHeight:'45dvh',overflowY:'auto',overflowWrap:'anywhere'}}>
+          {diagnosis.filter(row=>[row.key,row.local?.name,row.remote?.name].some(value=>value?.toLocaleLowerCase().includes(diagnosisSearch.trim().toLocaleLowerCase()))).map(row=><div key={row.key} className="panel">
+            <strong>{row.local?.name??row.remote?.name??row.key}</strong><p>{row.status}</p><small>{row.key}</small>
+            <p>Local: {row.local?.name??'No existe'} · {'isArchived' in (row.local??{})?(row.local?.entity==='products'&&row.local.isArchived?'Archivado':'Activo'):'—'}</p>
+            <p>Nube: {row.remote?.name??'No existe'} · {row.remote?.entity==='products'?(row.remote.isArchived?'Archivado':'Activo'):'—'}</p>
+            <p>Revisión confirmada aquí: {row.localRevision??'Ninguna'} · Revisión nube: {row.remoteRevision??'Ninguna'}</p>
+          </div>)}
+        </div>
+        <button type="button" className="button secondary" onClick={()=>setDiagnosis(undefined)}>Cerrar diagnóstico</button>
+      </section>}
       {view?.state&&role==='administrator'&&<>
         <button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{const cloud=await client.catalog().read();setRepair({local:await localView(),remote:cloud});setBackupConfirmed(false)})}>Revisar reparación de vinculación</button>
         {repair&&<div className="storage-error">

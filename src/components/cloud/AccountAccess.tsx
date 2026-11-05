@@ -31,7 +31,7 @@ export function AccountAccess() {
           const runtime = catalogStatus()
           const pending = Object.keys(state?.pending ?? {}).length
           const conflicts = Object.keys(state?.conflicts ?? {}).length
-          text = runtime.error ? 'Error de conexión · Revisar' : conflicts ? `${conflicts} conflictos · Revisar` : pending ? `${pending} cambios pendientes` : runtime.automatic && runtime.remote ? 'Catálogo conectado' : state ? 'Verificando conexión del catálogo' : text
+          text = runtime.error ? 'Error de conexión · Revisar' : conflicts ? `${conflicts} conflictos · Revisar` : pending ? `${pending} cambios pendientes` : runtime.automatic && runtime.remote ? (state?.excluded.length ? `Conectado · ${state.excluded.length} excluidos` : 'Catálogo conectado') : state ? 'Verificando conexión del catálogo' : text
         } catch { text = 'No se pudo consultar el estado local' }
       }
       if (active) setStatus(text)
