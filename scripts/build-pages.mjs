@@ -30,7 +30,7 @@ let precached = []
 const handlers = {}
 runInNewContext(readFileSync(resolve(root, 'sw.js'), 'utf8'), {
   URL,
-  self: { registration: { scope: `https://pages.invalid${base}` }, addEventListener: (name, handler) => { handlers[name] = handler } },
+  self: { registration: { scope: `https://pages.invalid${base}` }, skipWaiting: async () => {}, addEventListener: (name, handler) => { handlers[name] = handler } },
   caches: { open: async () => ({ addAll: async paths => { precached = paths } }) },
 })
 let installed
