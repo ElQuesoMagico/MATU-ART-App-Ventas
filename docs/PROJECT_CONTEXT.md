@@ -748,3 +748,9 @@ Rules e IndexedDB. Lint/build/279 pruebas existentes pasan. Verificados manualme
 aviso sin sesión, continuación local y rol real automático; móvil físico/offline
 no repetidos. Ver README. El usuario identificó falta de sesión en el dispositivo
 receptor: no dar por finalizada aún la prueba real de recepción automática.
+
+Publicación del acceso visible completada: d46474b, run 41943025107 exitoso;
+Pages devuelve AccountAccess-C2mWW_tv.js. Usuario debe actualizar la PWA en el
+segundo dispositivo mediante actualizar.html (sin borrar IndexedDB), iniciar sesión
+y comprobar Sticker Bon burguer sin botón Sincronizar. No declarar Hito C cerrado
+antes de verificar recepción y los casos reales pendientes.

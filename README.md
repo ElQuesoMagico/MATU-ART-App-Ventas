@@ -1683,3 +1683,9 @@ Lint, build y 279 pruebas existentes aprobadas. No se añadieron pruebas automat
 de UI; móvil físico y caída de Internet no comprobados en este ajuste. Cambio todavía
 no publicado en Pages. Continúa pendiente la confirmación de recepción automática
 de Sticker Bon burguer en el segundo dispositivo.
+
+Publicación posterior: el acceso visible quedó desplegado en Pages con el commit
+d46474bae26f99778da9dbdd2e0cad68087aa974, Actions 41943025107 exitoso
+(lint, pruebas, build y deploy). Verificación HTTP 200 y recurso público
+AccountAccess-C2mWW_tv.js con el acceso y estado sin sesión. Sustituye la nota
+anterior de publicación pendiente. La prueba real del dispositivo receptor sigue pendiente.
