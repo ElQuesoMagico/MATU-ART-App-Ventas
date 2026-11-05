@@ -754,3 +754,14 @@ Pages devuelve AccountAccess-C2mWW_tv.js. Usuario debe actualizar la PWA en el
 segundo dispositivo mediante actualizar.html (sin borrar IndexedDB), iniciar sesión
 y comprobar Sticker Bon burguer sin botón Sincronizar. No declarar Hito C cerrado
 antes de verificar recepción y los casos reales pendientes.
+
+Incidente posterior: capturas del usuario muestran dispositivo vinculado con 0
+confirmados, 3 pendientes, conflicto de nombre The Walten Files (UUID distinto)
+y descarga bloqueada de Sticker bon Borgir por clasificación ausente. No confundir
+este producto con Sticker Bon burguer ni afirmar que se sincronizó a partir de la
+captura. Se corrigió localmente reconcile para persistir diagnósticos y descargar
+registros independientes aunque una referencia esté bloqueada. No se fusionaron
+UUID ni se modificaron datos comerciales. UI oculta Usar cloud cuando no existe
+esa identidad remota. Prueba de regresión con fake-indexeddb añadida. Pendiente
+identificar dispositivo/origen afectado y resolver explícitamente sus asociaciones;
+corrección todavía no publicada. Hito C permanece abierto.

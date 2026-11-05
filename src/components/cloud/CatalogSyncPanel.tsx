@@ -71,8 +71,9 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
         <button type="button" className="button secondary" disabled={busy} onClick={()=>{setRemote(undefined);setChoices([]);setConfirmed(false)}}>Cancelar sin cambios</button>
       </>}
       {Object.entries(view?.state?.conflicts??{}).map(([key,message])=><div key={key} className="storage-error"><p>{view?.records[key]?.name??key}: {message}</p>
+        {!status.remote?.[key] && <p>No existe una versión cloud con este UUID. Si el nombre ya existe en la nube, «Usar local» no resuelve la coincidencia: revisa ambas identidades antes de volver a enviar. No crees otra clasificación con el mismo nombre.</p>}
         <details><summary>Comparar versiones del conflicto</summary><p>Local</p><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{JSON.stringify(view?.records[key]??null,null,2)}</pre><p>Cloud · revisión {status.remote?.[key]?.revision??'sin lectura actual'}</p><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{JSON.stringify(status.remote?.[key]?.payload??null,null,2)}</pre></details>
-        {(['remote','local','exclude'] as const).filter(action=>action!=='local'||canWrite).map(action=><button key={action} type="button" className="button secondary" disabled={busy} onClick={()=>void run(async()=>{
+        {(['remote','local','exclude'] as const).filter(action=>action==='local'?canWrite&&!!view?.records[key]:action==='remote'?!!status.remote?.[key]:true).map(action=><button key={action} type="button" className="button secondary" disabled={busy} onClick={()=>void run(async()=>{
           if(!window.confirm(action==='exclude'?'¿Excluir este registro de la sincronización conservando sus datos locales?':`¿Resolver el conflicto usando la versión ${action==='local'?'local':'cloud'}?`))return
           const current=await client.catalog().read();await resolveConflict(key,action,current,canWrite);await startCatalog(uid,role)
         })}>{{remote:'Usar cloud',local:'Usar local',exclude:'Excluir'}[action]}</button>)}

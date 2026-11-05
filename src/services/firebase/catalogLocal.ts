@@ -107,8 +107,19 @@ export async function reconcile(remote:Record<string,RemoteRecord>,canWrite:bool
     }
     else if(b&&!l)state.conflicts[key]='Registro eliminado localmente. La nube no interpreta eliminaciones: restaura o excluye explícitamente.'
   }
-  if(incoming.length)state.lastConfirmed=new Date().toISOString()
-  if(stable(state)!==stable(local.state)||incoming.length)await applyLocal(local,state,incoming,name)
+  // A blocked classification must not roll back unrelated downloads or their diagnostics.
+  const available = new Set([...Object.keys(local.records), ...incoming.filter(p=>p.entity!=='products').map(keyOf)])
+  const accepted = incoming.filter(p => {
+    const missing = references(p).filter(ref=>!available.has(ref))
+    if (!missing.length) return true
+    const key = keyOf(p)
+    state.conflicts[key] = `Faltan clasificaciones locales: ${missing.map(ref=>remote[ref]?.payload.name??ref).join(', ')}. Resuelve sus coincidencias de UUID antes de descargar este producto.`
+    if(local.state!.baseline[key]) state.baseline[key]=local.state!.baseline[key]
+    else delete state.baseline[key]
+    return false
+  })
+  if(accepted.length)state.lastConfirmed=new Date().toISOString()
+  if(stable(state)!==stable(local.state)||accepted.length)await applyLocal(local,state,accepted,name)
 }
 export async function flush(transport:CatalogTransport,name?:string){
   for(const kind of kinds){const first=await localView(name);if(!first.state)return

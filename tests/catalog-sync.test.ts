@@ -103,3 +103,23 @@ test('migration v10 adds only catalogSync; old backups retain all entities',asyn
  const {sha256:_old,...body}=envelope;envelope.sha256=await digest(canonical(body))
  const restored=await parseBackup(JSON.stringify(envelope));assert.deepEqual(restored.data.catalogSync,[]);assert.deepEqual(restored.data.expenseCategories,data.expenseCategories)
 })
+
+test('blocked classification does not roll back unrelated downloads or conflict diagnostics',async()=>{
+ const name=`blocked-reference-${crypto.randomUUID()}`,db=await openCatalogDatabase(name)
+ const localIp={id:crypto.randomUUID(),name:'The Walten Files',isActive:true,order:0,createdAt:now,updatedAt:now}
+ await db.put('ips',localIp);db.close()
+ const local=await localView(name)
+ await linkCatalog(local,{},[{key:`ips/${localIp.id}`,action:'exclude'}],'workspace','admin',true,name)
+ const category={entity:'categories' as const,id:crypto.randomUUID(),name:'Stickers',description:'',isActive:true,order:0,createdAt:now}
+ const ip={...category,entity:'ips' as const,id:crypto.randomUUID(),name:localIp.name}
+ const product={entity:'products' as const,id:crypto.randomUUID(),name:'Blocked sticker',description:'',createdAt:now,categoryId:category.id,familyIds:[],ipIds:[ip.id],price:600,isArchived:false,isFavorite:false,kind:'product' as const}
+ const remote=Object.fromEntries([category,ip,product].map(payload=>[keyOf(payload),{payload,revision:1,operationId:crypto.randomUUID()}]))
+ await reconcile(remote,true,name)
+ const after=await localView(name)
+ assert.ok(after.records[keyOf(category)])
+ assert.equal(after.records[keyOf(product)],undefined)
+ assert.ok(after.state!.conflicts[keyOf(ip)])
+ assert.match(after.state!.conflicts[keyOf(product)],/The Walten Files/)
+ assert.equal(after.state!.baseline[keyOf(product)],undefined)
+ assert.equal(after.records[`ips/${localIp.id}`].id,localIp.id)
+})
