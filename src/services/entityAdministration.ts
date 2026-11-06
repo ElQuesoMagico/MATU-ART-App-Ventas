@@ -25,6 +25,7 @@ export function reviewDeletion(data: DataSnapshot, kind: EntityKind, id: string)
   const item = data[kind].find(row => row.id === id)
   if (!item) throw new CatalogError('El registro ya no existe.')
   const blockers: string[] = []
+  if(kind!=='promotions'&&data.catalogSync?.length)blockers.push('Catálogo vinculado: usa Archivar. La eliminación definitiva compartida está bloqueada para evitar que un dispositivo offline recree el registro; no se propagan borrados físicos.')
   try { assertNoPendingOperations(data) } catch { blockers.push('Estado de sincronización o metadatos no reconocidos: solo se permite archivar.') }
   for (const key of stores) {
     const count = data[key].filter(row => {

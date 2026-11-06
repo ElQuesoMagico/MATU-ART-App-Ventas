@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { firebaseConnection } from '../../services/firebase/client'
-import { includeUploadDependencies, linkCatalog, localView, preview, resolveConflict, unlinkCatalog } from '../../services/firebase/catalogLocal'
+import { initialChoices, includeUploadDependencies, linkCatalog, localView, preview, resolveConflict, unlinkCatalog } from '../../services/firebase/catalogLocal'
 import type { Choice, LocalView } from '../../services/firebase/catalogLocal'
 import type { Payload, RemoteRecord } from '../../services/firebase/catalogModel'
 import type { FirebaseRole } from '../../services/firebase/access'
 import { catalogStatus, startCatalog, stopCatalog } from '../../services/firebase/catalogRuntime'
 import { adoptCatalogAccount, assertRepairPreview, classificationRepairs, repairClassification } from '../../services/firebase/catalogRepair'
+import { CatalogInclusionReview } from './CatalogInclusionReview'
 import { catalogDiagnostics } from '../../services/firebase/catalogDiagnostics'
 import { includeCatalogRecord, inclusionPreview } from '../../services/firebase/catalogInclusion'
 import type { InclusionChoice, InclusionEntry } from '../../services/firebase/catalogInclusion'
@@ -29,7 +30,7 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
   const enabled=client.catalogEnabled
   useEffect(()=>{let active=true;const refresh=()=>{void localView().then(v=>{if(active){setView(v);setStatus(catalogStatus())}}).catch(e=>{if(active)setError(String(e))})};refresh();const timer=setInterval(refresh,3000);return()=>{active=false;clearInterval(timer)}},[])
   async function run(action:()=>Promise<void>){if(lock.current)return;lock.current=true;setBusy(true);setError('');try{await action();setView(await localView())}catch(e){setError(e instanceof Error?e.message:'No se pudo completar.')}finally{lock.current=false;setBusy(false)}}
-  async function compare(){const local=await localView(),cloud=await client.catalog().read();setView(local);setReview(local);setRemote(cloud);setConfirmed(false);setChoices(preview(local,cloud).map(row=>({key:row.key,action:'exclude'})))}
+  async function compare(){const local=await localView(),cloud=await client.catalog().read();setView(local);setReview(local);setRemote(cloud);setConfirmed(false);setChoices(initialChoices(local,cloud))}
   const rows=review&&remote?preview(review,remote):[]
   return <section className="catalog-sync-panel">
     <h3>Catálogo compartido</h3>
@@ -38,7 +39,8 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
       {view?.state&&<p className="local-note">{!navigator.onLine?'Sin conexión · Los cambios se conservan localmente.':status.automatic?'Sincronización automática activa · Los cambios se reciben sin pulsar botones.':'Sincronización automática en espera de sesión o conexión.'} {Object.keys(view.state.baseline).length} registros confirmados.</p>}
       <p>Última sincronización confirmada: {view?.state?.lastConfirmed?new Date(view.state.lastConfirmed).toLocaleString('es-CL'):'Ninguna'}</p>
       <p className="local-note">Solo atributos del catálogo. Stock, costos, imágenes, eventos y ventas permanecen locales. Los productos recibidos requieren conteo físico.</p>
-      {view?.state&&<p>{view.state.excluded.length} registros excluidos: sus cambios no se envían ni se reciben en este dispositivo.</p>}
+      {view?.state&&<p>{view.state.excluded.length} registros no incorporados durante la vinculación: sus cambios no se envían ni se reciben en este dispositivo.</p>}
+      {view?.state&&<CatalogInclusionReview uid={uid} role={role}/>}
       <button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{const cloud=await client.catalog().read();setDiagnosis(catalogDiagnostics(await localView(),cloud))})}>Diagnosticar productos · solo lectura</button>
       {diagnosis&&<section>
         <p>Comparación con Firestore al pulsar Diagnosticar. No modifica datos. Busca el mismo producto en ambos dispositivos y compara su UUID.</p>
@@ -115,7 +117,7 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
         stopCatalog();await navigator.locks.request('matu-catalog-sync',()=>unlinkCatalog())
       })}>Desvincular sin borrar datos</button>}
       {!view?.state&&remote&&review&&<>
-        <p>Selecciona qué subir o descargar. Por defecto todos los registros quedan excluidos. Coincidencias por nombre con UUID distinto requieren corregir el nombre; no se fusionan identidades históricas.</p>
+        <p>Selecciona qué subir o descargar. Las coincidencias exactas por UUID y los registros solo remotos se proponen para descargar. Los datos locales antiguos o con diferencias requieren una decisión explícita. Coincidencias por nombre con UUID distinto requieren corregir el nombre; no se fusionan identidades históricas.</p>
         <p>{rows.filter(r=>r.status==='local-only'||r.status==='remote-only').length} nuevos · {rows.filter(r=>r.status==='equal').length} coincidentes · {rows.filter(r=>['conflict','name-conflict','invalid'].includes(r.status)).length} conflictos · {choices.filter(c=>c.action==='exclude').length} excluidos</p>
         <p>Cambios propuestos: {choices.filter(c=>c.action==='upload').length} subidas · {choices.filter(c=>c.action==='download').length} descargas.</p>
         <dl>{Object.entries(entityLabels).map(([kind,label])=><div key={kind}><dt>{label}</dt><dd>{Object.keys(review.records).filter(key=>key.startsWith(`${kind}/`)).length} locales · {Object.keys(remote).filter(key=>key.startsWith(`${kind}/`)).length} remotos</dd></div>)}</dl>

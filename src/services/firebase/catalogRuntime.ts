@@ -1,5 +1,5 @@
 import { firebaseConnection } from './client'
-import { flush, localView, reconcile } from './catalogLocal'
+import { flush, localView, reconcile, linkEmptyCatalog } from './catalogLocal'
 import type { RemoteRecord } from './catalogModel'
 import type { FirebaseRole } from './access'
 let stop: (()=>void)|undefined, generation=0
@@ -26,9 +26,19 @@ export async function startCatalog(uid:string,role:FirebaseRole){
   if(identity===`${uid}:${role}`&&wake){wake();return}
   stopCatalog()
   const epoch=generation
-  const client=firebaseConnection(),view=await localView()
+  const client=firebaseConnection()
+  let view=await localView()
   if(generation!==epoch)return
-  if(!client?.catalogEnabled||!view.state)return
+  if(!client?.catalogEnabled)return
+  if(!view.state&&!Object.keys(view.records).length&&!Object.keys(view.invalid).length){
+    const snapshot=await client.catalog().read()
+    await navigator.locks.request('matu-catalog-sync',async()=>{
+      if(generation===epoch)await linkEmptyCatalog(snapshot,client.workspaceId,uid,role!=='seller')
+    })
+    if(generation!==epoch)return
+    view=await localView()
+  }
+  if(!view.state)return
   if(view.state.workspaceId!==client.workspaceId||view.state.ownerUid!==uid){error='Este dispositivo está vinculado con otra cuenta o espacio. No se enviaron cambios.';return}
   const transport=client.catalog(),canWrite=role!=='seller'
   identity=`${uid}:${role}`

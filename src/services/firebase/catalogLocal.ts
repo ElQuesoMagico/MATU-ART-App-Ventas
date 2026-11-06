@@ -17,6 +17,16 @@ export async function localView(name?: string): Promise<LocalView> {
   } finally { db.close() }
 }
 export interface Choice { key: string; action:'upload'|'download'|'exclude' }
+/** Only a genuinely empty catalog can join without reviewing pre-existing local data. */
+export async function linkEmptyCatalog(remote:Record<string,RemoteRecord>,workspaceId:string,uid:string,canWrite:boolean,name?:string) {
+  const local=await localView(name)
+  if(local.state||Object.keys(local.records).length||Object.keys(local.invalid).length)return false
+  await linkCatalog(local,remote,Object.keys(remote).map(key=>({key,action:'download'})),workspaceId,uid,canWrite,name)
+  return true
+}
+export function initialChoices(local:LocalView,remote:Record<string,RemoteRecord>):Choice[] {
+  return preview(local,remote).map(row=>({key:row.key,action:row.status==='equal'||row.status==='remote-only'?'download':'exclude'}))
+}
 /** Preview only: selecting dependencies never writes or links either database. */
 export function includeUploadDependencies(local:LocalView,remote:Record<string,RemoteRecord>,choices:Choice[]):Choice[] {
   const required=new Set<string>()
