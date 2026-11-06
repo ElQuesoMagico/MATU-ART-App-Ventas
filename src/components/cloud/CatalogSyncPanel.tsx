@@ -7,6 +7,7 @@ import type { FirebaseRole } from '../../services/firebase/access'
 import { catalogStatus, startCatalog, stopCatalog } from '../../services/firebase/catalogRuntime'
 import { adoptCatalogAccount, assertRepairPreview, classificationRepairs, repairClassification } from '../../services/firebase/catalogRepair'
 import { CatalogInclusionReview } from './CatalogInclusionReview'
+import { reviewError } from '../../services/firebase/catalogReview'
 import { catalogDiagnostics } from '../../services/firebase/catalogDiagnostics'
 import { includeCatalogRecord, inclusionPreview } from '../../services/firebase/catalogInclusion'
 import type { InclusionChoice, InclusionEntry } from '../../services/firebase/catalogInclusion'
@@ -41,6 +42,7 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
       <p className="local-note">Solo atributos del catálogo. Stock, costos, imágenes, eventos y ventas permanecen locales. Los productos recibidos requieren conteo físico.</p>
       {view?.state&&<p>{view.state.excluded.length} registros no incorporados durante la vinculación: sus cambios no se envían ni se reciben en este dispositivo.</p>}
       {view?.state&&<CatalogInclusionReview uid={uid} role={role}/>}
+      <details className="pending-technical" open={!view?.state}><summary>{view?.state?'Información técnica':'Revisar datos de este dispositivo'}</summary>
       <button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{const cloud=await client.catalog().read();setDiagnosis(catalogDiagnostics(await localView(),cloud))})}>Diagnosticar productos · solo lectura</button>
       {diagnosis&&<section>
         <p>Comparación con Firestore al pulsar Diagnosticar. No modifica datos. Busca el mismo producto en ambos dispositivos y compara su UUID.</p>
@@ -163,8 +165,9 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
         if(!window.confirm('¿Excluir este cambio de futuros envíos? Los datos locales se conservarán. Si el servidor ya lo confirmó, no se borrará allí.'))return
         await resolveConflict(key,'exclude',{},canWrite)
       })}>Excluir de sincronización</button></p>)}</details>}
+      </details>
       {status.busy&&<p role="status">Comprobando catálogo…</p>}
-      {(error||status.error)&&<p role="alert" className="storage-error">{error||status.error}</p>}
+      {(error||status.error)&&<><p role="alert" className="storage-error">{reviewError(new Error(error||status.error))}</p><details className="pending-technical"><summary>Información técnica del problema</summary><p>{error||status.error}</p></details></>}
     </>}
   </section>
 }
