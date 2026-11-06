@@ -801,3 +801,15 @@ muestra cantidad de excluidos antes oculta. No se levantan exclusiones ni se cam
 productos sin revisión explícita. La pestaña de diagnóstico del agente conserva
 una base distinta de la del usuario (1 producto y conflictos antiguos); no usarla
 como prueba del estado de su teléfono/Firefox.
+
+05-11-2026 lectura real mediante diagnóstico publicado (7953e97, run 42125668296
+exitoso): Firestore mantiene Ame chan UUID 92f7eca0-56f3-4765-8bbc-c3d126bedd71,
+nombre Ame chan, activo, revisión 1; Abeja Minecraft UUID
+fdeed916-f0d7-4c33-a548-2f8a69016e32 activo revisión 1. Ediciones reportadas no
+llegaron a esos UUID remotos. La base del agente muestra 131 excluidos; esto NO
+prueba exclusión en el teléfono. Solicitar diagnóstico de ambos productos en el
+TELÉFONO origen para distinguir exclusión, UUID diferente o cambios sin cola.
+No se cambiaron productos ni exclusiones reales. Lint/build/284 pruebas pasan.
+
+## Continuación: inclusión explícita (2026-11-06)
+Implementada en CatalogSyncPanel/catalogInclusion: desde diagnóstico, registros excluidos pueden incluirse conservando local o usando nube, con vista previa y confirmación, dependencias y validación de revisiones. No se incluye todo automáticamente ni se modifica stock/costos. Confirmación transaccional local; envío mediante cola/CAS existente. Sin migración ni cambio de reglas. Pruebas usan fake-indexeddb/transporte simulado; pendiente prueba real teléfono-PC. No se han realizado inclusiones comerciales por el agente. El Hito C sigue pendiente de esa comprobación real.

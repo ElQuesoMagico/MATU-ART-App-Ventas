@@ -1740,3 +1740,11 @@ nombre o UUID muestra nombres, estado archivado, revisiones y exclusiones. No ge
 escrituras ni consultas periódicas nuevas. La cabecera indica registros excluidos;
 conexión no implica que todo el catálogo esté incluido. El incidente Ame chan/Abeja
 Minecraft sigue pendiente de diagnóstico en los dispositivos afectados.
+
+### Inclusión explícita de registros excluidos — 2026-11-06
+
+En Mi cuenta → Diagnosticar productos, cada registro excluido permite «Incluir en sincronización · Conservar local» o «Usar nube». La vista previa muestra ambas versiones, los atributos y las clasificaciones necesarias; requiere confirmación explícita. Conservar local prepara una operación con revisión esperada e identificador estable para el envío habitual. Usar nube conserva stock, costos, imágenes e históricos locales. Los demás excluidos permanecen excluidos.
+
+La confirmación revalida acceso, espacio, cuenta, lectura remota y estado local bajo el bloqueo del sincronizador. Se rechazan nombres con otro UUID, dependencias ausentes o divergentes y pendientes/conflictos relacionados. Vendedor solo puede recibir. No cambia IndexedDB v11 ni las Security Rules. La inclusión requiere conexión; los cambios posteriores mantienen la cola offline existente.
+
+Archivos: `catalogInclusion.ts`, `CatalogSyncPanel.tsx`, `catalog-inclusion.test.ts`. Build Pages y lint aprobados. Pruebas automatizadas cubren inclusión, conservación de costos/stock/UUID, exclusiones independientes, permisos, dependencias, comparación obsoleta y envío/recepción con transporte simulado. No se incluyeron registros comerciales ni se verificó esta acción en dos dispositivos físicos; queda repetir el caso Ame chan en el teléfono y PC después de publicar.

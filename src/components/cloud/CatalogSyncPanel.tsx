@@ -7,6 +7,8 @@ import type { FirebaseRole } from '../../services/firebase/access'
 import { catalogStatus, startCatalog, stopCatalog } from '../../services/firebase/catalogRuntime'
 import { adoptCatalogAccount, assertRepairPreview, classificationRepairs, repairClassification } from '../../services/firebase/catalogRepair'
 import { catalogDiagnostics } from '../../services/firebase/catalogDiagnostics'
+import { includeCatalogRecord, inclusionPreview } from '../../services/firebase/catalogInclusion'
+import type { InclusionChoice, InclusionEntry } from '../../services/firebase/catalogInclusion'
 
 const priceText=(p?:Payload)=>p?.entity==='products'?`${p.price.toLocaleString('es-CL')} CLP`:'—'
 const entityLabels={categories:'Categorías',families:'Familias',ips:'IPs',products:'Productos'}
@@ -17,6 +19,8 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
   const [backupConfirmed,setBackupConfirmed]=useState(false)
   const [diagnosis,setDiagnosis]=useState<ReturnType<typeof catalogDiagnostics>>()
   const [diagnosisSearch,setDiagnosisSearch]=useState('')
+  const [inclusion,setInclusion]=useState<{local:LocalView;remote:Record<string,RemoteRecord>;key:string;choice:InclusionChoice;entries:InclusionEntry[]}>()
+  const [inclusionConfirmed,setInclusionConfirmed]=useState(false)
   const [choices,setChoices]=useState<Choice[]>([]),[confirmed,setConfirmed]=useState(false)
   const [entity,setEntity]=useState('all'),[search,setSearch]=useState('')
   const lock=useRef(false)
@@ -45,9 +49,35 @@ export function CatalogSyncPanel({uid,role}:{uid:string;role:FirebaseRole}){
             <p>Local: {row.local?.name??'No existe'} · {'isArchived' in (row.local??{})?(row.local?.entity==='products'&&row.local.isArchived?'Archivado':'Activo'):'—'}</p>
             <p>Nube: {row.remote?.name??'No existe'} · {row.remote?.entity==='products'?(row.remote.isArchived?'Archivado':'Activo'):'—'}</p>
             <p>Revisión confirmada aquí: {row.localRevision??'Ninguna'} · Revisión nube: {row.remoteRevision??'Ninguna'}</p>
+            {row.excluded&&<>{(['local','remote'] as const).filter(choice=>choice==='local'?canWrite&&!!row.local:!!row.remote).map(choice=><button key={choice} type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{
+              const cloud=await client.catalog().read(),local=await localView()
+              setInclusion(undefined);setInclusionConfirmed(false)
+              setInclusion({local,remote:cloud,key:row.key,choice,entries:inclusionPreview(local,cloud,row.key,choice)})
+            })}>Incluir en sincronización · {choice==='local'?'Conservar local':'Usar nube'}</button>)}</>}
           </div>)}
         </div>
         <button type="button" className="button secondary" onClick={()=>setDiagnosis(undefined)}>Cerrar diagnóstico</button>
+      </section>}
+      {inclusion&&<section className="panel" style={{overflowWrap:'anywhere'}} aria-label="Confirmar inclusión en sincronización">
+        <h4>Incluir en sincronización</h4>
+        <p>{inclusion.choice==='local'?'Se enviará la versión local seleccionada.':'Se recibirán los atributos del catálogo de la nube.'} Stock, costos e históricos permanecen locales. Los demás registros excluidos no cambian.</p>
+        <p>Local: {inclusion.local.records[inclusion.key]?.name??'No existe'} · {priceText(inclusion.local.records[inclusion.key])}</p>
+        <p>Nube: {inclusion.remote[inclusion.key]?.payload.name??'No existe'} · {priceText(inclusion.remote[inclusion.key]?.payload)}</p>
+        <details><summary>Comparar todos los atributos</summary><p>Local</p><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(inclusion.local.records[inclusion.key]??null,null,2)}</pre><p>Nube</p><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(inclusion.remote[inclusion.key]?.payload??null,null,2)}</pre></details>
+        <p>Registros y clasificaciones que se incluirán:</p>
+        <ul>{inclusion.entries.map(entry=><li key={entry.key}>{entry.payload.name} · {{upload:'Enviar local',download:'Recibir nube',match:'Vincular coincidencia'}[entry.action]}</li>)}</ul>
+        <label><input type="checkbox" checked={inclusionConfirmed} onChange={e=>setInclusionConfirmed(e.target.checked)}/>Confirmo esta versión y las clasificaciones indicadas.</label>
+        <button type="button" className="button primary" disabled={busy||!inclusionConfirmed||!navigator.onLine} onClick={()=>void run(async()=>{
+          const access=await client.verify(),cloud=await client.catalog().read()
+          await navigator.locks.request('matu-catalog-sync',async()=>{
+            await assertRepairPreview(inclusion.local,inclusion.remote,cloud)
+            await includeCatalogRecord(inclusion.local,cloud,inclusion.key,inclusion.choice,uid,client.workspaceId,access.role)
+          })
+          setInclusion(undefined);setInclusionConfirmed(false)
+          setDiagnosis(catalogDiagnostics(await localView(),cloud))
+          await startCatalog(uid,access.role)
+        })}>Confirmar inclusión</button>
+        <button type="button" className="button secondary" disabled={busy} onClick={()=>setInclusion(undefined)}>Cancelar sin cambios</button>
       </section>}
       {view?.state&&role==='administrator'&&<>
         <button type="button" className="button secondary" disabled={busy||!navigator.onLine} onClick={()=>void run(async()=>{const cloud=await client.catalog().read();setRepair({local:await localView(),remote:cloud});setBackupConfirmed(false)})}>Revisar reparación de vinculación</button>
