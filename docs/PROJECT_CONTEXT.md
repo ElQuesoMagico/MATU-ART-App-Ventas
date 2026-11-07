@@ -824,3 +824,5 @@ Nuevo flujo Detectar/Revisar/Confirmar/Resultado en CatalogInclusionReview. Dife
 Validado: lint, build Pages, 300 pruebas locales. Navegador fixture aislado a 390x844,425x876,1280x900, cancelación/confirmación/error/reconexión simulada, cero overflow. Ninguna escritura comercial real. Se conserva autorización de publicar GitHub Pages; no afirmar nueva prueba física entre dispositivos.
 
 Corrección UX posterior: Seleccionar ya no exige existencia local; acepta registros solo remotos seguros. Detecta parecidos tanto locales como remotos y deja los ambiguos para revisión individual. Pruebas en catalog-review.test.ts; no se incorporaron datos comerciales.
+
+UX pendiente: añadido Seleccionar todos (todas las páginas del filtro, solo filas seguras) y Quitar selección. Seleccionar no guarda ni confirma nada; conserva el resumen y confirmación existentes.

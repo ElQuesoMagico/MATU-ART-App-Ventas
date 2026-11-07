@@ -40,6 +40,10 @@ export function reviewDifferences(here:Payload|undefined,there:Payload|undefined
   return (a!==undefined||b!==undefined)&&(stable(a)!==stable(b)||!here||!there)
  }).map(([field,label])=>({field,label,here:display(here,field,'here'),there:display(there,field,'there')}))
 }
+/** All matching pages, not just the visible page. Selection does not choose versions or write data. */
+export function selectAllReviewRows(rows:ReturnType<typeof reviewRows>,selected:string[]=[]){
+ return [...new Set([...selected,...rows.filter(row=>row.safe).map(row=>row.key)])]
+}
 export function bulkReviewChoices(rows:ReturnType<typeof reviewRows>,selected:string[],current:Record<string,InclusionChoice>){
  const result={...current}
  for(const row of rows)if(selected.includes(row.key)&&row.safe)result[row.key]=row.there?'remote':'local'

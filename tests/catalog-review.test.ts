@@ -1,6 +1,6 @@
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
-import {reviewRows,reviewDifferences,bulkReviewChoices,reviewError,reviewOutcome} from '../src/services/firebase/catalogReview.ts'
+import {reviewRows,reviewDifferences,bulkReviewChoices,reviewError,reviewOutcome,selectAllReviewRows} from '../src/services/firebase/catalogReview.ts'
 import type {LocalView} from '../src/services/firebase/catalogLocal.ts'
 import type {Payload,RemoteRecord,SyncState} from '../src/services/firebase/catalogModel.ts'
 const cat:Payload={entity:'categories',id:crypto.randomUUID(),name:'Stickers',description:'',order:0,isActive:true,createdAt:new Date().toISOString()}
@@ -53,6 +53,18 @@ test('remote-only category and product are selectable and prepare downloads',()=
  const rows=reviewRows(s.local,s.remote)
  assert.ok(rows.every(row=>row.safe))
  assert.deepEqual(bulkReviewChoices(rows,[ref,key],{}),{[ref]:'remote',[key]:'remote'})
+})
+
+test('select all spans pages, respects filtered results, skips ambiguous rows and preserves existing selection without writes',()=>{
+ const s=fixture();delete s.remote[key]
+ const safe=reviewRows(s.local,s.remote)[0]
+ const rows=Array.from({length:14},(_,i)=>({...safe,key:`products/item-${i}`,safe:i!==3}))
+ const previous=['products/previous'],before=JSON.stringify(rows)
+ const all=selectAllReviewRows(rows,previous)
+ assert.equal(all.length,14);assert.ok(all.includes('products/item-13'));assert.ok(!all.includes('products/item-3'))
+ assert.deepEqual(selectAllReviewRows(rows,all),all)
+ assert.deepEqual(selectAllReviewRows(rows.slice(10),previous),['products/previous',...rows.slice(10).map(row=>row.key)])
+ assert.deepEqual(previous,['products/previous']);assert.equal(JSON.stringify(rows),before)
 })
 
 test('remote-only item with a similar local identity or invalid local version requires individual review',()=>{

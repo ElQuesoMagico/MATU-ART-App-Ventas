@@ -8,7 +8,7 @@ import type {RemoteRecord,SyncState} from '../../services/firebase/catalogModel'
 import {assertRepairPreview} from '../../services/firebase/catalogRepair'
 import {catalogStatus,startCatalog,reportCatalogError} from '../../services/firebase/catalogRuntime'
 import type {FirebaseRole} from '../../services/firebase/access'
-import {bulkReviewChoices,reviewDifferences,reviewError,reviewOutcome,reviewRows,elementCount} from '../../services/firebase/catalogReview'
+import {bulkReviewChoices,reviewDifferences,reviewError,reviewOutcome,reviewRows,elementCount,selectAllReviewRows} from '../../services/firebase/catalogReview'
 import '../../styles/catalog-review.css'
 
 export interface ReviewSnapshot {local:LocalView;remote:Record<string,RemoteRecord>}
@@ -84,6 +84,11 @@ export function CatalogInclusionReview({uid,role,services}:{uid:string;role:Fire
    {step==='review'&&<>
     <p>Elige qué compartir. Lo que dejes pendiente seguirá guardado en este dispositivo.</p>
     <label>Buscar por nombre o tipo<input type="search" value={search} onChange={e=>{setSearch(e.target.value);setPage(0)}}/></label>
+    {role!=='seller'&&<div className="pending-actions">
+     <button type="button" className="button secondary" disabled={busy||!filtered.some(row=>row.safe&&!selected.includes(row.key))} onClick={()=>setSelected(previous=>selectAllReviewRows(filtered,previous))}>Seleccionar todos</button>
+     <button type="button" className="button secondary" disabled={busy||!selected.length} onClick={()=>setSelected([])}>Quitar selección</button>
+     <p className="local-note">Incluye los elementos seguros de todas las páginas{search.trim()?' que coinciden con la búsqueda':''}. Solo los marca; los cambios se aplican después de revisar el resumen y confirmar.</p>
+    </div>}
     {role!=='seller'&&<div className="pending-bulk"><span>{selected.length} seleccionados para acción conjunta</span><button type="button" className="button secondary" disabled={!selected.length} onClick={()=>{setChoices(previous=>bulkReviewChoices(rows,selected,previous));setSelected([])}}>Compartir seleccionados</button><button type="button" className="button secondary" disabled={!selected.length} onClick={()=>{setChoices(previous=>Object.fromEntries(Object.entries(previous).filter(([key])=>!selected.includes(key))));setSelected([])}}>Dejar pendientes</button></div>}
     <p className="local-note">Los elementos con cambios diferentes o posibles duplicados se revisan individualmente.</p>
     <div className="pending-list">{filtered.slice(page*6,page*6+6).map(card)}{!filtered.length&&<p>No encontramos elementos con ese nombre.</p>}</div>
