@@ -822,3 +822,5 @@ Validado: 294 tests locales, lint, build Pages; 11 tests Firebase en emuladores 
 ## UX de pendientes (2026-11-06)
 Nuevo flujo Detectar/Revisar/Confirmar/Resultado en CatalogInclusionReview. Diferencias humanas, comparaciones de clasificaciones por nombre, paginación, acciones masivas seguras y JSON/UUID ocultos en Información técnica. Mantiene catalogInclusion y sus garantías, sin schema/rules cambios. Resultados consultan baseline/pending/conflicts; no confundir encolado con compartido. No hay combinación campo por campo ni borrador persistente de decisiones antes de confirmar.
 Validado: lint, build Pages, 300 pruebas locales. Navegador fixture aislado a 390x844,425x876,1280x900, cancelación/confirmación/error/reconexión simulada, cero overflow. Ninguna escritura comercial real. Se conserva autorización de publicar GitHub Pages; no afirmar nueva prueba física entre dispositivos.
+
+Corrección UX posterior: Seleccionar ya no exige existencia local; acepta registros solo remotos seguros. Detecta parecidos tanto locales como remotos y deja los ambiguos para revisión individual. Pruebas en catalog-review.test.ts; no se incorporaron datos comerciales.

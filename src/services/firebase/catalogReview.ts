@@ -9,11 +9,12 @@ export const elementCount=(count:number)=>`${count} ${count===1?'elemento':'elem
 export function reviewRows(local:LocalView,remote:Record<string,RemoteRecord>){
  return (local.state?.excluded??[]).map(key=>{
   const here=local.records[key],there=remote[key]?.payload,p=here??there
-  const similar=Object.entries(remote).filter(([other,r])=>other!==key&&p&&r.payload.entity===p.entity&&normalizedName(r.payload.name).replace(/^sticker\s+/,'')===normalizedName(p.name).replace(/^sticker\s+/,''))
+  const candidates=[...Object.entries(remote),...Object.entries(local.records).map(([other,payload])=>[other,{payload,revision:0,operationId:''}] as const)]
+  const similar=[...new Map(candidates.filter(([other,r])=>other!==key&&p&&r.payload.entity===p.entity&&normalizedName(r.payload.name).replace(/^sticker\s+/,'')===normalizedName(p.name).replace(/^sticker\s+/,''))).entries()]
   const different=!!here&&!!there&&stable(here)!==stable(there)
   const test=/\b(test|prueba|demo|qa)\b/i.test(p?.name??'')
   return {key,here,there,name:p?.name??'Elemento que necesita corrección',type:p?reviewTypes[p.entity]:'Elemento',similar,different,test,
-   safe:!!here&&!different&&!test&&!similar.length,
+   safe:!!p&&!local.invalid[key]&&!different&&!test&&!similar.length,
    reason:!p?'Hay información incompleta. Revisa este elemento desde Inventario antes de compartirlo.':similar.length?'Encontramos otro elemento parecido. Revisa si se trata del mismo antes de compartirlo.':different?'Encontramos cambios diferentes.':here&&there?'Coincide con los demás dispositivos, pero aquí no recibe futuras actualizaciones.':here?'Solo disponible en este dispositivo.':'Disponible en otros dispositivos, pero todavía no en este.'}
  })
 }

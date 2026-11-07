@@ -59,6 +59,7 @@ export function CatalogInclusionReview({uid,role,services}:{uid:string;role:Fire
  const card=(row:typeof rows[number])=><article className="pending-card" key={row.key}>
   <div className="pending-card-heading"><div><span className="pending-type">{row.type}</span><h5>{row.name}</h5></div>
    {row.safe&&role!=='seller'&&<label className="pending-select"><input type="checkbox" aria-label={`Seleccionar ${row.name}`} checked={selected.includes(row.key)} disabled={busy} onChange={e=>setSelected(previous=>e.target.checked?[...previous,row.key]:previous.filter(k=>k!==row.key))}/>Seleccionar</label>}
+   {!row.safe&&<span className="pending-type">Revisar individualmente</span>}
   </div>
   <p>{row.reason}</p>
   {row.test&&<p className="local-note">Parece un dato de prueba por su nombre. Revisa si quieres compartirlo.</p>}

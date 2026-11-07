@@ -46,6 +46,24 @@ test('errors explain recovery without exposing raw infrastructure codes',()=>{
   const message=reviewError(error);assert.ok(message.length>30);assert.doesNotMatch(message,/UUID|Firebase|CONFLICT|permission-denied/)
  }
 })
+
+test('remote-only category and product are selectable and prepare downloads',()=>{
+ const s=fixture();delete s.local.records[key];delete s.local.records[ref]
+ s.local.state!.excluded=[ref,key]
+ const rows=reviewRows(s.local,s.remote)
+ assert.ok(rows.every(row=>row.safe))
+ assert.deepEqual(bulkReviewChoices(rows,[ref,key],{}),{[ref]:'remote',[key]:'remote'})
+})
+
+test('remote-only item with a similar local identity or invalid local version requires individual review',()=>{
+ const s=fixture();delete s.local.records[key]
+ const other=crypto.randomUUID();s.local.records[`products/${other}`]={...p,id:other}
+ let rows=reviewRows(s.local,s.remote)
+ assert.equal(rows[0].safe,false);assert.equal(rows[0].similar.length,1)
+ assert.deepEqual(bulkReviewChoices(rows,[key],{}),{})
+ delete s.local.records[`products/${other}`];s.local.invalid[key]='invalid local version'
+ rows=reviewRows(s.local,s.remote);assert.equal(rows[0].safe,false)
+})
 test('results never call queued or conflicted writes successful; confirmation changes status',()=>{
  const s=fixture(),entry={key,payload:p,action:'upload' as const},state=s.local.state!
  state.excluded=[];state.pending[key]={id:crypto.randomUUID(),payload:p,expectedRevision:2}
