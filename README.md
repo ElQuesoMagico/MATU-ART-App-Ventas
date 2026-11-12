@@ -36,7 +36,7 @@ IndexedDB aisladas y listeners del SDK contra emuladores, no dos teléfonos fís
 Revisión visual no ejecutada: herramienta de navegador no disponible.
 Advertencia de tamaño de bundle >500 kB pendiente de optimización.
 
-Estado de publicación: preparado; consultar el registro de despliegue al final de
+Estado de publicación: reglas y frontend publicados; consultar el registro al final de
 `docs/shared-commerce-deployment.md`. No confundir pruebas emuladas con producción.
 
 

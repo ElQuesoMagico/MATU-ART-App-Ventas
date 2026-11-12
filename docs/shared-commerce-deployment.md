@@ -80,6 +80,8 @@ La herramienta de navegador falló al iniciar. La comprobación manual queda pen
 ## Registro de despliegue
 
 12-11-2026: Firebase CLI compiló y publicó `firestore.commercial.rules` en `matu-art`.
-Variables de Pages de inventario y comercio activadas. Publicación del frontend en curso;
-el resultado de GitHub Actions debe verificarse antes de anunciar disponibilidad.
+Variables de Pages de inventario y comercio activadas. Frontend `03ae140` publicado
+correctamente por [GitHub Actions 43327472657](https://github.com/ElQuesoMagico/MATU-ART-App-Ventas/actions/runs/43327472657).
+La URL pública responde HTTP 200 y sirve el bundle con los módulos comerciales nuevos.
+La ejecución de CI completó lint, pruebas, build y despliegue.
 No se escribieron datos comerciales en producción.
