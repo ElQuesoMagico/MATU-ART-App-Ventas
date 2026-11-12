@@ -76,7 +76,7 @@ export function buildAnalytics(sales: readonly StoredSale[], events: readonly Ca
   const records: AnalyticalSale[] = []
   const byEvent = new Map<string, AnalyticalSale[]>()
   for (const sale of sales) {
-    if (sale.status !== 'completed') continue
+    if (sale.status !== 'completed' || sale.sharedStatus === 'pending' || sale.sharedStatus === 'review') continue
     const record = { sale, day: santiagoDay(sale.soldAt), lineRevenues: historicalLineRevenues(sale) }
     records.push(record)
     if (sale.event) { const group = byEvent.get(sale.event.id) ?? []; group.push(record); byEvent.set(sale.event.id, group) }

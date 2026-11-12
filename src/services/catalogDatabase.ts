@@ -7,8 +7,10 @@ import { openDB, type DBSchema } from 'idb'
 import type { CatalogClassification, CatalogCategory, CatalogProduct, EstimatedCostChange, InventoryMovement } from '../types/catalog.ts'
 import type { RealSalesEvent, StoredPayment, StoredSale } from '../types/sales.ts'
 export const CATALOG_DB_NAME = 'clown-ufo-catalog'
-export const CATALOG_DB_VERSION = 11
+export const CATALOG_DB_VERSION = 13
 export interface CatalogSchema extends DBSchema {
+  commercialSync: { key: string; value: import('./firebase/commercial/commercialState.ts').CommercialState }
+  inventorySync: { key: string; value: import('./firebase/commercial/inventoryState.ts').InventorySyncState }
   catalogSync: { key: string; value: import('./firebase/catalogModel.ts').SyncState }
   importRecords: { key:string; value:import('../types/imports').ImportRecord; indexes:{'by-source':string} }
   expenses: { key: string; value: Expense; indexes: { 'by-event': string; 'by-date': string } }
@@ -99,6 +101,15 @@ export function openCatalogDatabase(name = CATALOG_DB_NAME) {
       }
       if (oldVersion < 10) db.createObjectStore('importRecords',{keyPath:'id'}).createIndex('by-source','sourceKey',{unique:true})
       if (oldVersion < 11) db.createObjectStore('catalogSync', {keyPath:'key'})
+      if (oldVersion < 12) db.createObjectStore('inventorySync', {keyPath:'key'})
+      if (oldVersion < 13) {
+        db.createObjectStore('commercialSync', { keyPath: 'key' })
+        if(db.objectStoreNames.contains('sales')) {
+          const sales=tx.objectStore('sales')
+          if(sales.indexNames.contains('by-number'))sales.deleteIndex('by-number')
+          sales.createIndex('by-number','number')
+        }
+      }
       void dataMigration.catch(() => { tx.abort() })
     },
     blocked() { if (typeof window !== 'undefined') window.dispatchEvent(new Event('catalog-blocked')) },

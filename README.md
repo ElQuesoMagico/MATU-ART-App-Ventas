@@ -1,5 +1,108 @@
 # MATU ART
 
+## Integración D2 + D3 + D4 — 12-11-2026 (estado vigente)
+
+Se integraron inventario, configuración comercial, ventas y anulaciones compartidas.
+Este apartado sustituye los estados D2-only y bloqueos de D3 de las notas históricas
+conservadas más abajo. Arquitectura operativa: React/IndexedDB + Auth/Firestore Spark
++ GitHub Pages. No se activaron servicios de pago ni infraestructura legacy.
+
+- IndexedDB **v13**, migración aditiva `commercialSync` sobre `inventorySync` v12.
+  El índice de número de venta deja de ser único: dos dispositivos pueden emitir el
+  mismo número visible; UUID de venta/operación y dispositivo identifican cada registro.
+- Cola durable y recibos idempotentes. Confirmación comercial únicamente después
+  del recibo de Firestore; ventas pendientes quedan fuera de estadísticas confirmadas.
+- Conteos, ajustes, reposiciones, eventos/activo/cierre, gastos, promociones/combos,
+  precios por evento y composición de packs utilizan los repositorios existentes.
+  Ventas y pagos conservan copias históricas; anulaciones compensan solo unidades
+  efectivamente descontadas. Pagos originales no se borran ni implican reembolso.
+- Incorporación inicial explícita desde Mi cuenta. No se subieron existencias,
+  ventas históricas ni otros datos comerciales reales durante el desarrollo.
+- Listeners paginados, liderazgo entre pestañas, transacciones y reintentos estables.
+  Conflictos de inventario/configuración requieren revisión; no gana el último reloj.
+
+Ver [procedimiento, límites y verificación](docs/shared-commerce-deployment.md).
+Código principal: `src/services/firebase/commercial/`, `salesRepository.ts`,
+`catalogDatabase.ts`, adaptadores de respaldo, Bootstrap/CloudConnection,
+InventorySyncPanel/CommercialSyncPanel, StockForm, MovementHistory, Checkout,
+SaleDetail/StoredSaleList, POS y analytics. Reglas generadas en
+`firestore.commercial.rules`, configuración explícita `firebase.commercial.json`.
+
+Verificación local: **324/324 pruebas**, **27/27 Auth/Firestore en emuladores**,
+TypeScript, lint y build Pages aprobados. Una prueba local pertenece a trabajo legacy
+no incluido en esta publicación; CI ejecutará 323. El emulador anterior produjo un
+fallo de limpieza; con instancia nueva la batería completa pasó. Se probaron dos
+IndexedDB aisladas y listeners del SDK contra emuladores, no dos teléfonos físicos.
+Revisión visual no ejecutada: herramienta de navegador no disponible.
+Advertencia de tamaño de bundle >500 kB pendiente de optimización.
+
+Estado de publicación: preparado; consultar el registro de despliegue al final de
+`docs/shared-commerce-deployment.md`. No confundir pruebas emuladas con producción.
+
+
+## D2 integrado localmente — 11-11-2026
+
+Inventario compartido conectado a los formularios existentes, historial, cola durable
+y recepción automática. IndexedDB v12 añade `inventorySync` sin reescribir datos anteriores.
+Incorporación explícita desde Mi cuenta; no se publican cantidades locales automáticamente.
+El usuario autorizó bloquear ventas/devoluciones locales solo de productos incorporados
+a D2, hasta que exista venta compartida. Los demás productos conservan su operación.
+Respaldos incluyen cola/originales/UUID y permiten restaurar en un perfil vacío; se bloquea
+reemplazar un inventario vinculado. Reglas compuestas preparadas, **no publicadas**.
+Activación `VITE_FIREBASE_INVENTORY_ENABLED` sigue false por defecto. No se modificaron
+datos comerciales reales ni se inició D3.
+
+Ver [integración, archivos, límites y procedimiento de ensayo](docs/inventory-d2-deployment.md).
+Nuevos módulos inventoryState/inventoryLocal/inventoryRuntime amplían inventoryProtocol/Remote;
+UI InventorySyncPanel, StockForm, MovementHistory, Inventory, CloudConnection/Bootstrap;
+adaptadores en catalogDatabase, backup/snapshot/validation y guards de repositorios;
+composición de Rules/config explícita y pruebas de migración, cola y emuladores.
+
+315/315 pruebas locales aprobadas; lint, TypeScript y build Pages correctos (23 recursos
+locales/PWA verificados, sin publicar). Persiste advertencia de bundles >500 kB.
+22/22 pruebas Auth/Firestore aprobadas (emuladores; dos IndexedDB aisladas y SDK real), no
+prueba física ni producción. Herramienta de navegador no disponible: revisión visual y
+piloto real pendientes antes de activar. Detalle y resultado final de comprobaciones abajo.
+
+## Estado actual — Hito D, 10-11-2026
+
+**Decisión definitiva posterior:** el usuario acepta el motor comercial en el cliente
+con auditoría y controles de integridad, usando exclusivamente Firebase Spark.
+El bloqueo de validación exhaustiva descrito en el informe anterior queda reemplazado.
+Se implementó el protocolo/transporte candidato de inventario (apertura desconocida,
+conteo, ajustes, reposiciones, recibo atómico e idempotencia) y un listener, aislados
+del runtime hasta completar cola, incorporación y ventas. No es todavía inventario
+compartido habilitado. No se migró IndexedDB ni se publicaron reglas candidatas.
+Validación de esta continuación: 307 pruebas locales, lint/build/TypeScript correctos;
+20 pruebas Firestore en emulador local reutilizado correctas. El arranque completo
+falló por puerto ocupado y Auth no se repitió. Sin pruebas comerciales reales.
+Archivos nuevos: src/services/firebase/commercial/inventoryProtocol.ts,
+inventoryRemote.ts, tests/commercial-inventory.test.ts,
+tests/firebase/inventory-candidate.test.mjs y su fragmento Rules en fixtures.
+También se acotó el tipo de entrada de restockCost, sin cambiar su cálculo.
+Próximo: completar D2 con outbox/respaldos, incorporación explícita y UI; después
+D3 eventos, D4 ventas, D5 reconciliación y D6 validación. Detalle en el documento enlazado.
+
+### Informe D1 anterior (conservado; decisión de validación reemplazada arriba)
+
+El catálogo compartido del Hito C está publicado; el usuario reporta funcionamiento
+entre dispositivos. Ventas, stock, costos, eventos y pagos siguen siendo locales.
+La auditoría D1 está en [Hito D: modelo y seguridad](docs/hito-d-commercial-sync.md).
+No se habilitó sincronización comercial: falta un protocolo que valide el motor
+completo de promociones/combos sin confiar en el navegador bajo Firebase Spark.
+Se documentan alternativas y las puertas de validación antes de D2–D5.
+IndexedDB permanece en v11; no se modificaron datos ni reglas publicadas.
+Los apartados fechados anteriores se conservan como documentación histórica.
+
+Validación D1: `npm test` 303/303; `npm run test:firebase` 16/16 en emuladores
+Auth/Firestore con proyectos demo aislados; `npm run lint` y `npm run build`
+(incluye TypeScript) correctos. Se mantienen advertencias de chunks >500 kB.
+Cinco pruebas nuevas comprueban rechazo comercial por roles/anónimo y atomicidad
+de un batch rechazado; no prueban ventas sincronizadas habilitadas. No se realizaron
+escrituras en Firebase real ni pruebas físicas de dos dispositivos en este bloque.
+Archivos: este README, PROJECT_CONTEXT, docs/hito-d-commercial-sync.md y
+tests/firebase/commercial-boundary.test.mjs. Sin cambios al POS ni migraciones.
+
 Actualización Hito C (04-11-2026): comparación inicial y sincronización de catálogo
 disponibles en desarrollo local. Selección excluida por defecto, filtros por entidad
 y nombre, inclusión explícita de dependencias, resolución de conflictos y cola

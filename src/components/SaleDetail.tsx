@@ -1,3 +1,4 @@
+import { firebaseConnection } from '../services/firebase/client'
 import { useState, type FormEvent } from 'react'
 import type { StoredSale } from '../types/sales'
 import { useCatalog } from '../hooks/useCatalog'
@@ -19,10 +20,11 @@ export function SaleDetail({ sale: initialSale, onClose }: { sale: StoredSale; o
   const [notice, setNotice] = useState('')
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    void action.run(() => salesRepository.voidSale({ saleId: sale.id, operationId, reason, returnStock }), result => { setSaved(result); setVoiding(false); setNotice('Venta anulada. Se conserva el registro original.') })
+    void action.run(() => salesRepository.voidSale({ saleId: sale.id, operationId, reason, returnStock }, firebaseConnection()?.commercialIdentity()), result => { setSaved(result); setVoiding(false); setNotice(result.status==='voided'?'Venta anulada. Se conserva el registro original.':'Anulación guardada en este dispositivo, pendiente de confirmación compartida.') })
   }
   return <Modal title={saleNumber(sale.number)} onClose={onClose} busy={action.saving} protectChanges={voiding} hasChanges={voiding && (!!reason || returnStock)} headerAction={sale.status === 'completed' && !voiding ? <button type="button" className="button secondary" onClick={() => setVoiding(true)}>Anular venta</button> : undefined}>
     {notice && <p className="save-notice" role="status">{notice}</p>}{action.error && <p className="storage-error" role="alert">{action.error}</p>}
+    {sale.sharedStatus && <p className="stock-warning">{sale.sharedStatus==='confirmed'?'Compartido correctamente':'Guardado en este dispositivo · Pendiente de sincronizar'} · Dispositivo {sale.deviceId?.slice(0,8)}</p>}
     {sale.historicalSource && <p className="stock-warning">Histórica importada · {sale.historicalSource.file} · Fila {sale.historicalSource.row}. Registro de origen independiente; transacción original desconocida. Sin efectos sobre stock local.</p>}
     <p className="muted">{dateTimeLabel(sale.soldAt)} · {sale.event?.name ?? 'Sin evento'}</p><p className={`badge ${sale.status === 'completed' ? 'green' : 'neutral'}`}>{sale.status === 'completed' ? 'Registrada' : 'Anulada'}</p>
     {sale.status === 'completed' && voiding && <form className="catalog-form" onSubmit={submit}><fieldset className="form-fields" disabled={action.saving}><label>Motivo de anulación<textarea autoFocus required maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label><label className="check-label"><input type="checkbox" disabled={!!sale.historicalSource} checked={returnStock} onChange={event => setReturnStock(event.target.checked)} />Devolver stock</label><p className="muted">Si seleccionas devolver stock, se reintegrarán solo las unidades descontadas. Los pagos originales se conservan; esta acción no realiza una devolución de dinero.</p></fieldset><div className="form-actions"><button className="button secondary" type="button" disabled={action.saving} onClick={() => setVoiding(false)}>Cancelar</button><button className="button primary" disabled={action.saving || !reason.trim()}>{action.saving ? 'Anulando…' : 'Confirmar anulación'}</button></div></form>}

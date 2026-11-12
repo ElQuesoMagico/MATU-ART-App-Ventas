@@ -90,6 +90,7 @@ export class CatalogRepository {
     return this.write(async tx => {
       const product = await tx.objectStore('products').get(id)
       if (!product) throw new CatalogError('El producto ya no existe.')
+      if (product.inventoryShared && input.estimatedUnitCost !== product.estimatedUnitCost) throw new CatalogError('El costo de este producto está vinculado al inventario compartido. No se puede cambiar localmente.')
       if (product.revision !== expectedRevision) throw new CatalogError('El producto cambió en otra ventana. Cierra el formulario y vuelve a abrirlo.')
       await this.packReferences(tx,id,input,product)
       const categoryId = input.categoryId ?? product.categoryId
@@ -134,6 +135,7 @@ export class CatalogRepository {
       }
       const product = await tx.objectStore('products').get(input.productId)
       if (!product || product.isArchived) throw new CatalogError('El producto está archivado o no existe.')
+      if (product.inventoryShared) throw new CatalogError('Utiliza el formulario de inventario compartido para registrar este movimiento.')
       if (product.revision !== input.expectedRevision) throw new CatalogError('El stock cambió. Cierra el formulario y vuelve a abrirlo antes de ajustar.')
       if(product.stockCountPending && input.type!=='count')throw new CatalogError('Registra primero un conteo físico inicial.');
       const change = input.type === 'count' ? input.quantity - product.stock : input.quantity
@@ -166,6 +168,7 @@ export class CatalogRepository {
       const product = await tx.objectStore('products').get(original.productId)
       if (!product) throw new CatalogError('El producto ya no existe.')
       if (product.revision !== input.expectedRevision) throw new CatalogError('El producto cambió. Cierra la reversión y revisa los valores actuales.')
+      if (product.inventoryShared) throw new CatalogError('Las reversiones locales no pueden modificar inventario compartido. Registra un ajuste compensatorio con motivo.')
       const plan = planMovementReversal(product, original)
       const now = new Date().toISOString()
       const movement: InventoryMovement = {

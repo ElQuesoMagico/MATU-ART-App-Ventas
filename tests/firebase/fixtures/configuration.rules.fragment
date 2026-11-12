@@ -1,0 +1,24 @@
+function commercialConfig(d) {
+  return d is map && d.keys().hasOnly(['events','promotions','expenses','expenseCategories','expenseChanges','eventPrices','packs'])
+    && d.packs is list && d.packs.size()<=2000 && d.events is list && d.events.size()<=1000 && d.promotions is list && d.promotions.size()<=1000
+    && d.expenses is list && d.expenses.size()<=2000 && d.expenseCategories is list && d.expenseCategories.size()<=100
+    && d.expenseChanges is list && d.expenseChanges.size()<=5000 && d.eventPrices is list && d.eventPrices.size()<=2000;
+}
+match /commercialConfiguration/current {
+  allow read: if member(w);
+  allow create,update: if editor(w) && request.resource.data.keys().hasOnly(['payload','revision','operationId','actorUid','confirmedAt'])
+    && request.resource.data.actorUid==request.auth.uid && request.resource.data.confirmedAt==request.time
+    && request.resource.data.revision==(exists(/databases/$(database)/documents/workspaces/$(w)/commercialConfiguration/current)?resource.data.revision+1:1)
+    && commercialConfig(request.resource.data.payload) && uuid(request.resource.data.operationId)
+    && !exists(/databases/$(database)/documents/workspaces/$(w)/configurationOperations/$(request.resource.data.operationId))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/configurationOperations/$(request.resource.data.operationId)).data.record=={'revision':request.resource.data.revision,'operationId':request.resource.data.operationId,'payload':request.resource.data.payload};
+}
+match /configurationOperations/{op} {
+  allow read: if member(w);
+  allow create: if editor(w) && request.resource.data.keys().hasOnly(['intent','record','confirmedAt']) && request.resource.data.confirmedAt==request.time
+    && request.resource.data.intent.actorUid==request.auth.uid && uuid(request.resource.data.intent.deviceId) && request.resource.data.intent.operationId==op && uuid(op)
+    && request.resource.data.record.operationId==op && request.resource.data.record.revision==request.resource.data.intent.expectedRevision+1
+    && request.resource.data.record.payload==request.resource.data.intent.payload
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/commercialConfiguration/current).data.payload==request.resource.data.record.payload
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/commercialConfiguration/current).data.operationId==op;
+}

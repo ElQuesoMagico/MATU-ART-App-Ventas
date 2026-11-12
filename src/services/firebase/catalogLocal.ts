@@ -46,8 +46,12 @@ export function preview(local: LocalView, remote: Record<string,RemoteRecord>) {
 }
 export async function applyLocal(expected: LocalView, state: SyncState, incoming: Payload[], name?: string, unlink = false) {
   const db=await openCatalogDatabase(name)
-  const tx=db.transaction([...kinds,'catalogSync'],'readwrite'); void tx.done.catch(()=>{})
+  const tx=db.transaction([...kinds,'catalogSync','inventorySync','commercialSync'],'readwrite'); void tx.done.catch(()=>{})
   try {
+    const commerce=await tx.objectStore('commercialSync').get('commerce')
+    if(commerce&&(unlink||commerce.ownerUid!==state.ownerUid||commerce.workspaceId!==state.workspaceId))throw new Error('La operación comercial sigue vinculada; no se puede reemplazar su cuenta o espacio.')
+    const inventory=await tx.objectStore('inventorySync').get('inventory')
+    if(inventory && (unlink || inventory.ownerUid!==state.ownerUid || inventory.workspaceId!==state.workspaceId)) throw new Error('El inventario compartido sigue vinculado. No se puede cambiar o quitar la cuenta del catálogo sin resolver su vinculación de inventario.')
     const records: Record<string,Payload>={},invalid: Record<string,string>={}
     for(const kind of kinds) for(const row of await tx.objectStore(kind).getAll()) {
       try{const p=project(kind,row);records[keyOf(p)]=p}catch{invalid[`${kind}/${row.id}`]=`${row.name}: requiere categoría válida y como máximo 3 familias y 3 IPs; revisa nombre/precio.`}

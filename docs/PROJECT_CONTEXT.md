@@ -1,5 +1,45 @@
 # MATU ART — Contexto persistente del proyecto
 
+## Integración D2 + D3 + D4 — 12-11-2026 (estado vigente)
+
+Se integraron inventario, configuración comercial, ventas y anulaciones compartidas.
+Este apartado sustituye los estados D2-only y bloqueos de D3 de las notas históricas
+conservadas más abajo. Arquitectura operativa: React/IndexedDB + Auth/Firestore Spark
++ GitHub Pages. No se activaron servicios de pago ni infraestructura legacy.
+
+- IndexedDB **v13**, migración aditiva `commercialSync` sobre `inventorySync` v12.
+  El índice de número de venta deja de ser único: dos dispositivos pueden emitir el
+  mismo número visible; UUID de venta/operación y dispositivo identifican cada registro.
+- Cola durable y recibos idempotentes. Confirmación comercial únicamente después
+  del recibo de Firestore; ventas pendientes quedan fuera de estadísticas confirmadas.
+- Conteos, ajustes, reposiciones, eventos/activo/cierre, gastos, promociones/combos,
+  precios por evento y composición de packs utilizan los repositorios existentes.
+  Ventas y pagos conservan copias históricas; anulaciones compensan solo unidades
+  efectivamente descontadas. Pagos originales no se borran ni implican reembolso.
+- Incorporación inicial explícita desde Mi cuenta. No se subieron existencias,
+  ventas históricas ni otros datos comerciales reales durante el desarrollo.
+- Listeners paginados, liderazgo entre pestañas, transacciones y reintentos estables.
+  Conflictos de inventario/configuración requieren revisión; no gana el último reloj.
+
+Ver [procedimiento, límites y verificación](shared-commerce-deployment.md).
+Código principal: `src/services/firebase/commercial/`, `salesRepository.ts`,
+`catalogDatabase.ts`, adaptadores de respaldo, Bootstrap/CloudConnection,
+InventorySyncPanel/CommercialSyncPanel, StockForm, MovementHistory, Checkout,
+SaleDetail/StoredSaleList, POS y analytics. Reglas generadas en
+`firestore.commercial.rules`, configuración explícita `firebase.commercial.json`.
+
+Verificación local: **324/324 pruebas**, **27/27 Auth/Firestore en emuladores**,
+TypeScript, lint y build Pages aprobados. Una prueba local pertenece a trabajo legacy
+no incluido en esta publicación; CI ejecutará 323. El emulador anterior produjo un
+fallo de limpieza; con instancia nueva la batería completa pasó. Se probaron dos
+IndexedDB aisladas y listeners del SDK contra emuladores, no dos teléfonos físicos.
+Revisión visual no ejecutada: herramienta de navegador no disponible.
+Advertencia de tamaño de bundle >500 kB pendiente de optimización.
+
+Estado de publicación: preparado; consultar el registro de despliegue al final de
+`docs/shared-commerce-deployment.md`. No confundir pruebas emuladas con producción.
+
+
 Actualizado: **4 de noviembre de 2026**, America/Santiago.
 
 Hito C: interfaz habilitada solo en `.env.local` (5193), sin vinculación confirmada.
@@ -826,3 +866,98 @@ Validado: lint, build Pages, 300 pruebas locales. Navegador fixture aislado a 39
 Corrección UX posterior: Seleccionar ya no exige existencia local; acepta registros solo remotos seguros. Detecta parecidos tanto locales como remotos y deja los ambiguos para revisión individual. Pruebas en catalog-review.test.ts; no se incorporaron datos comerciales.
 
 UX pendiente: añadido Seleccionar todos (todas las páginas del filtro, solo filas seguras) y Quitar selección. Seleccionar no guarda ni confirma nada; conserva el resumen y confirmación existentes.
+
+## Hito D — auditoría D1, 2026-11-10
+
+Solicitud vigente: sincronización comercial completa, exclusivamente Spark, por bloques
+D1–D5. Usuario reporta catálogo funcionando entre dispositivos. No interpretar ausencia
+de ventas/stock remotos como fallo de listeners: catálogo los excluye intencionalmente.
+Ver docs/hito-d-commercial-sync.md: auditoría de transacciones locales, modelo propuesto,
+estados offline, conciliación, autoridad y bloqueo de seguridad. D1 auditado pero protocolo
+completo no aprobado; D2–D5 no implementados. No activar ventas confiando en total/hash
+cliente ni cambiar motor comercial para ajustarlo silenciosamente a Rules.
+Opciones pendientes de decisión: Spark con protocolo acotado y revisión humana de
+operaciones complejas, o servicio confiable para ejecutar motor completo. Ninguna se
+ha implementado/contratado. No se requiere decisión para conservar funcionamiento local.
+Detectados by-number único local (colisión futura al recibir ventas), backups con almacenes
+estrictos, y firebase.json aún apuntando reglas B; no desplegar ese archivo sobre catálogo C.
+No migración, escrituras reales ni publicación en este bloque. Nuevo test aislado de
+frontera comercial contra firestore.catalog.rules; reglas y repositorios sin cambios.
+
+Ejecución real D1: npm test 303/303; npm run test:firebase 16/16, emuladores arrancados
+y detenidos por CLI sobre proyectos demo; lint y build (tsc -b incluido) correctos.
+Persisten warnings de tamaño de bundles. No hubo prueba de escritura en Firebase real,
+dos dispositivos físicos ni sincronización de ventas; no afirmar Hito D terminado.
+
+## Decisión definitiva Hito D y candidato de inventario — 2026-11-10
+
+El usuario REEMPLAZA bloqueo anterior: acepta motor comercial cliente (personas de
+confianza), auditoría sin garantía contra manipulación deliberada. Arquitectura solo
+Pages+Auth+Firestore Spark+IndexedDB. NO volver a pedir backend/revisión humana como
+condición para avanzar; no activar servicios de pago. Integridad/roles/atomicidad siguen
+obligatorios. Documento completo en adjunto 93ab03cc-370d-4051-a1b2-30751167263a.
+Nuevo orden D1 diseño, D2 inventario, D3 eventos/configuración, D4 ventas/pagos,
+D5 offline, D6 auditoría/estadísticas/validación real. docs/hito-d-commercial-sync.md
+actualizado; conserva informe anterior explícitamente como historia sustituida.
+
+Implementados módulos candidatos inventoryProtocol/inventoryRemote: apertura desconocida,
+conteo/ajuste/reposición CAS, costos mediante restockCost existente, recibo inmutable
+con movimiento embebido y saldo en transacción; reintento comprueba intención completa;
+listener solo servidor. NO conectados al runtime, sin outbox, UI ni migración aún.
+Rules candidatas solo tests/firebase/fixtures/inventory.rules.fragment. Validación
+completa en recibo, saldo exige recibo nuevo y coincidente en commit; antes duplicada
+excedía 1000 expresiones. Cinco tests emulados pasan tras corregir. No desplegar fragmento
+aislado ni firebase.json legacy. No cambiar catálogo C publicado.
+
+307 tests locales pasan, lint/build/TypeScript pasan, 20 Firestore tests pasan contra
+Java emulator local verificado en 8080 con proyectos demo aislados. npm test:firebase
+falló al iniciar por puerto ocupado; Auth no se repitió esta vez. No hubo acceso a datos
+reales ni dispositivos físicos ni publicación. Próximo: completar D2, outbox atómica,
+base confirmada/proyección, respaldo/restauración, incorporación explícita, coordinador
+y estados UI; no activar inventario compartido antes de integrar efecto de ventas.
+
+## Continuación D2 — 2026-11-11
+
+Usuario pidió completar D2 sin D3 y **autorizó explícitamente bloquear ventas de productos
+incorporados a D2**. Ya no se exige esperar D4 para ensayar inventario: guard de ventas,
+devoluciones y reversiones locales protege únicamente productos marcados inventoryShared.
+Los no vinculados siguen normales. Costo estimado local no se edita en vinculados.
+
+Integración implementada: inventoryState/Local/Runtime, InventorySyncPanel en Mi cuenta,
+StockForm existente, movimientos compartidos en historial y badges Inventario. IDB v12
+añade inventorySync: baseline, originales, queue, cursor, propietario. Operación+movimiento+
+proyección atómicos, ACK remoto real, CAS estricto, conflicto explícito, descartado auditable.
+Una cuenta diferente no reenvía la cola. Web Locks líder por origen, listener paginado100
+timestamp+UUID, cursor durable, reintento exponencial. Lectura inicial máximo2000productos.
+Se impide desvincular catálogo/cambiar owner cuando inventario vinculado.
+
+Incorporación compara remoto/local, nunca precarga el stock local como confirmado. Usuario
+elige recibir nube o abrir desconocido/contar explícitamente. Originales stock/costos quedan
+guardados; costos nuevos de apertura desconocidos. Nuevo producto necesita incorporación
+de existencias, no auto-publicación de pruebas. Usuarios pueden crear operaciones offline
+con sesión conservada; si se pierde sesión al reabrir, cola sigue guardada pero nuevos
+movimientos requieren login. Reversión remota no implementada: ajuste compensatorio manual.
+
+Respaldos formato1/databaseVersion12 con adaptadores9/10/11; conservan pending UUID/cursor;
+restauran en perfil vacío y bloquean reemplazar una base inventario vinculada. No rollback
+automático de versión. No hubo lecturas ni escrituras de datos comerciales de producción.
+
+Reglas: firestore.inventory.rules compuesto por script build-inventory-rules.mjs,
+firebase.inventory.json apunta explícitamente al candidato; se verifica igualdad del
+archivo publicado candidato con el emulado. NO desplegado. Flag público
+VITE_FIREBASE_INVENTORY_ENABLED=false por defecto, añadido a workflow Pages (sin ejecutar).
+Doc procedimiento docs/inventory-d2-deployment.md. No publicar parcialmente ni establecer
+existencias reales sin confirmación. D3 no comenzado.
+
+22 tests Auth+Firestore pasaron en demos locales; puerto8080 Java existente verificado,
+Auth arrancado por CLI y detenido. Nueva integración dos fakeIndexedDB con SDK/listeners
+Firestore real contra emulador valida ajustes, reposición, pérdidaACK y reconexión.
+Runner usa --test-force-exit para temporizadores SDK tras cleanup; no fuerza pruebas a
+aprobar. No son dispositivos físicos. CUA falló inicialización de kernel assets: no revisión
+visual en esta sesión, mantener pendiente para publicación/piloto. Consultar README para
+resultado final npm test/build/lint y no declarar D2 validado real antes del piloto.
+
+Cierre de comprobaciones D2: npm test 315/315, Auth+Firestore 22/22, lint y build Pages
+(incluye tsc -b) correctos; 23 recursos PWA locales verificados. Warning preexistente
+chunks >500kB. No se ejecutó git push, workflow Pages ni deploy Firebase. No se ingresó
+al perfil real del usuario. Pendiente revisión visual y piloto autorizado, no D3.

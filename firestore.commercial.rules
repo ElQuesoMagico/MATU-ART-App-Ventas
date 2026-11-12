@@ -1,0 +1,257 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function member(w) { return request.auth != null && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.enabled == true && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.role in ['administrator','manager','seller']; }
+  function editor(w) { return member(w) && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.role in ['administrator','manager']; }
+  function uuid(v) { return v is string && v.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'); }
+  function kind(k) { return k in ['categories','families','ips','products']; }
+  function ref(w,k,id) { return uuid(id) && exists(/databases/$(database)/documents/workspaces/$(w)/$(k)/$(id)); }
+  function refs(w,k,ids) { return ids is list && ids.size() <= 3 && ids.toSet().size()==ids.size() && (ids.size()<1||ref(w,k,ids[0])) && (ids.size()<2||ref(w,k,ids[1])) && (ids.size()<3||ref(w,k,ids[2])); }
+  function payload(w,k,id,p) {
+    return p is map && p.id == id && uuid(id) && p.entity == k && p.name is string && p.name.size()>0 && p.name.size()<=120 && !p.name.matches('.*[/].*')
+      && p.description is string && p.description.size()<=2000 && p.createdAt is string && p.createdAt.size()<=40
+      && (k=='products'
+        ? p.keys().hasOnly(['entity','id','name','description','createdAt','categoryId','familyIds','ipIds','price','isArchived','isFavorite','kind'])
+          && ref(w,'categories',p.categoryId) && refs(w,'families',p.familyIds) && refs(w,'ips',p.ipIds)
+          && p.price is int && p.price>=0 && p.price<=1000000000 && p.isArchived is bool && p.isFavorite is bool && p.kind in ['product','pack']
+        : p.keys().hasOnly(['entity','id','name','description','createdAt','isActive','order']) && p.isActive is bool && p.order is int && p.order>=0 && p.order<=1000000);
+  }
+  function validRecord(w,k,id) {
+    let d=request.resource.data;
+    let receipt=getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogOperations/$(d.operationId)).data;
+    let nameId=k+'_'+d.payload.name.lower();
+    return d.keys().hasOnly(['payload','revision','operationId','actorUid','confirmedAt']) && d.actorUid==request.auth.uid && d.confirmedAt==request.time
+      && d.revision is int && d.revision>0 && uuid(d.operationId) && payload(w,k,id,d.payload)
+      && receipt.actorUid==request.auth.uid && receipt.record=={'payload':d.payload,'revision':d.revision,'operationId':d.operationId}
+      && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.id==id && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.entity==k;
+  }
+  match /workspaces/{w} {
+// D4 candidate. Immutable operations connect one sale and all of its inventory effects.
+function saleEffect(r,n) {
+  let id=r.sale.items[n].productId;
+  return getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(id)).data.balance==r.after[id];
+}
+function saleInventory(d,id) {
+  let r=d.receipt;
+  let items=r.sale.items;
+  let n=items[0].productId==id?0:(items.size()>1 && items[1].productId==id?1:(items.size()>2 && items[2].productId==id?2:(items.size()>3 && items[3].productId==id?3:4)));
+  return d.kind=='sale'?saleLine(r,n):d.kind=='void' && voidLine(r,get(/databases/$(database)/documents/workspaces/$(w)/sharedSales/$(r.intent.saleId)).data.sale,n);
+}
+function saleOpId(d) { return d.kind=='sale'?d.receipt.intent.sale.operationId:d.receipt.intent.operationId; }
+function saleLine(r,n) {
+  let i=r.sale.items[n];
+  let b=r.before[i.productId];
+  let a=r.after[i.productId];
+  let m=r.movements[n];
+  return uuid(i.productId) && i.quantity is int && i.quantity>0 && i.unitPrice is int && i.unitPrice>=0
+    && i.lineTotal==i.quantity*i.unitPrice && !b.countPending
+    && a.keys().toSet()==b.keys().toSet() && a.productId==i.productId && invInteger(a.stock) && a.revision==b.revision+1 && a.operationId==r.sale.operationId
+    && a.countPending==false && i.stock.previousStock==b.stock && i.stock.quantitySold==i.quantity
+    && i.stock.quantityDeducted==(b.stock<=0?0:(i.quantity<b.stock?i.quantity:b.stock))
+    && i.stock.uncoveredQuantity==i.quantity-i.stock.quantityDeducted && a.stock==b.stock-i.stock.quantityDeducted
+    && i.stock.resultingStock==a.stock && a.costs.averageCost==b.costs.averageCost
+    && a.costs.lastKnownCost==b.costs.lastKnownCost && a.costs.estimatedUnitCost==b.costs.estimatedUnitCost
+    && a.costs.averageCostIsProvisional==(b.costs.averageCostIsProvisional || a.stock<=0)
+    && m.id==r.sale.movementIds[n] && uuid(m.id) && m.productId==i.productId && m.saleId==r.sale.id && m.type=='sale'
+    && m.sharedOperationId==r.sale.operationId && m.actorUid==request.auth.uid && m.sharedStatus=='confirmed'
+    && m.quantityChange==0-i.stock.quantityDeducted && m.previousStock==b.stock && m.resultingStock==a.stock
+    && m.requestedQuantity==i.quantity && m.uncoveredQuantity==i.stock.uncoveredQuantity
+    && get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==b
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==a;
+}
+function salePayment(s,n) {
+  let p=s.payments[n];
+  return uuid(p.id) && p.saleId==s.id && p.method in ['cash','transfer','debit'] && p.amount is int && p.amount>=0;
+}
+function newSharedSale(r) {
+  let s=r.sale;
+  let count=s.items.size();
+  return uuid(s.id) && uuid(s.operationId) && s.status=='completed' && !('voidAudit' in s) && !('historicalSource' in s)
+    && s.sharedActorUid==request.auth.uid && s.deviceId==r.intent.deviceId
+    && s.number is int && s.number>0 && s.items is list && count>0 && count<=5
+    && r.movements.size()==count && s.movementIds.size()==count && s.movementIds.toSet().size()==count
+    && r.before.size()==count && r.after.size()==count
+    && s.subtotal is int && s.subtotal>=0 && s.discount is int && s.discount>=0 && s.total==s.subtotal-s.discount && s.total>=0
+    && s.payments is list && s.payments.size()<=3
+    && (s.payments.size()<1||salePayment(s,0)) && (s.payments.size()<2||salePayment(s,1)) && (s.payments.size()<3||salePayment(s,2))
+    && s.total==(s.payments.size()>0?s.payments[0].amount:0)+(s.payments.size()>1?s.payments[1].amount:0)+(s.payments.size()>2?s.payments[2].amount:0)
+    && s.subtotal==s.items[0].lineTotal+(count>1?s.items[1].lineTotal:0)+(count>2?s.items[2].lineTotal:0)+(count>3?s.items[3].lineTotal:0)+(count>4?s.items[4].lineTotal:0)
+    && saleEffect(r,0) && (count<2||saleEffect(r,1)) && (count<3||saleEffect(r,2)) && (count<4||saleEffect(r,3)) && (count<5||saleEffect(r,4));
+}
+function voidLine(r,old,n) {
+  let i=old.items[n];
+  let b=r.before[i.productId];
+  let a=r.after[i.productId];
+  let m=r.movements[n];
+  return !b.countPending && a.keys().toSet()==b.keys().toSet() && a.productId==i.productId && invInteger(a.stock)
+    && a.revision==b.revision+1 && a.operationId==r.intent.operationId && !a.countPending
+    && a.stock==b.stock+i.stock.quantityDeducted
+    && a.costs.averageCost==b.costs.averageCost && a.costs.lastKnownCost==b.costs.lastKnownCost
+    && a.costs.estimatedUnitCost==b.costs.estimatedUnitCost
+    && a.costs.averageCostIsProvisional==(b.costs.averageCostIsProvisional || i.stock.quantityDeducted>0)
+    && m.id==r.intent.movementIds[n] && uuid(m.id) && m.productId==i.productId && m.saleId==old.id && m.type=='sale_void'
+    && m.sharedOperationId==r.intent.operationId && m.actorUid==request.auth.uid && m.sharedStatus=='confirmed'
+    && m.previousStock==b.stock && m.resultingStock==a.stock && m.quantityChange==i.stock.quantityDeducted && m.requestedQuantity==i.stock.quantityDeducted
+    && get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==b
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==a;
+}
+function validSharedVoid(r) {
+  let old=get(/databases/$(database)/documents/workspaces/$(w)/sharedSales/$(r.intent.saleId)).data.sale;
+  let count=old.items.size();
+  return editor(w) && old.status=='completed' && r.sale.id==old.id && r.sale.status=='voided'
+    && r.sale.diff(old).affectedKeys().hasOnly(['status','voidAudit','voidActorUid'])
+    && r.sale.voidActorUid==request.auth.uid
+    && r.intent.reason is string && r.intent.reason.size()>0 && r.intent.reason.size()<=500 && r.intent.returnStock is bool
+    && r.sale.voidAudit=={'operationId':r.intent.operationId,'reason':r.intent.reason,'returnStock':r.intent.returnStock,'voidedAt':r.intent.occurredAt,'movementIds':r.intent.movementIds}
+    && (r.intent.returnStock
+      ? count<=5 && r.before.size()==count && r.after.size()==count && r.movements.size()==count && r.intent.movementIds.size()==count && r.intent.movementIds.toSet().size()==count
+        && saleEffect(r,0) && (count<2||saleEffect(r,1)) && (count<3||saleEffect(r,2)) && (count<4||saleEffect(r,3)) && (count<5||saleEffect(r,4))
+      : r.before.size()==0 && r.after.size()==0 && r.movements.size()==0 && r.intent.movementIds.size()==0);
+}
+match /saleOperations/{op} {
+  allow read: if member(w);
+  allow create: if member(w) && request.resource.data.keys().hasOnly(['kind','receipt','confirmedAt'])
+    && request.resource.data.confirmedAt==request.time && uuid(op) && saleOpId(request.resource.data)==op
+    && request.resource.data.receipt.intent.schemaVersion==1 && request.resource.data.receipt.intent.actorUid==request.auth.uid && uuid(request.resource.data.receipt.intent.deviceId)
+    && (request.resource.data.kind=='sale'?newSharedSale(request.resource.data.receipt):request.resource.data.kind=='void' && validSharedVoid(request.resource.data.receipt))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/sharedSales/$(request.resource.data.receipt.sale.id)).data.sale==request.resource.data.receipt.sale
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/sharedSales/$(request.resource.data.receipt.sale.id)).data.operationId==op;
+}
+match /sharedSales/{id} {
+  allow read: if member(w);
+  allow create, update: if member(w) && request.resource.data.keys().hasOnly(['sale','operationId','actorUid','deviceId','confirmedAt'])
+    && request.resource.data.sale.id==id && request.resource.data.actorUid==request.auth.uid && request.resource.data.confirmedAt==request.time
+    && !exists(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.operationId))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.operationId)).data.receipt.sale==request.resource.data.sale
+    && (exists(/databases/$(database)/documents/workspaces/$(w)/sharedSales/$(id))
+      ? resource.data.sale.status=='completed' && getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.operationId)).data.kind=='void'
+      : getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.operationId)).data.kind=='sale');
+}
+match /inventory/{id} {
+  allow update: if member(w) && request.resource.data.keys().hasOnly(['balance','confirmedAt']) && request.resource.data.confirmedAt==request.time
+    && !exists(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId)).data.receipt.after[id]==request.resource.data.balance
+    && saleInventory(getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId)).data,id);
+}
+
+function commercialConfig(d) {
+  return d is map && d.keys().hasOnly(['events','promotions','expenses','expenseCategories','expenseChanges','eventPrices','packs'])
+    && d.packs is list && d.packs.size()<=2000 && d.events is list && d.events.size()<=1000 && d.promotions is list && d.promotions.size()<=1000
+    && d.expenses is list && d.expenses.size()<=2000 && d.expenseCategories is list && d.expenseCategories.size()<=100
+    && d.expenseChanges is list && d.expenseChanges.size()<=5000 && d.eventPrices is list && d.eventPrices.size()<=2000;
+}
+match /commercialConfiguration/current {
+  allow read: if member(w);
+  allow create,update: if editor(w) && request.resource.data.keys().hasOnly(['payload','revision','operationId','actorUid','confirmedAt'])
+    && request.resource.data.actorUid==request.auth.uid && request.resource.data.confirmedAt==request.time
+    && request.resource.data.revision==(exists(/databases/$(database)/documents/workspaces/$(w)/commercialConfiguration/current)?resource.data.revision+1:1)
+    && commercialConfig(request.resource.data.payload) && uuid(request.resource.data.operationId)
+    && !exists(/databases/$(database)/documents/workspaces/$(w)/configurationOperations/$(request.resource.data.operationId))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/configurationOperations/$(request.resource.data.operationId)).data.record=={'revision':request.resource.data.revision,'operationId':request.resource.data.operationId,'payload':request.resource.data.payload};
+}
+match /configurationOperations/{op} {
+  allow read: if member(w);
+  allow create: if editor(w) && request.resource.data.keys().hasOnly(['intent','record','confirmedAt']) && request.resource.data.confirmedAt==request.time
+    && request.resource.data.intent.actorUid==request.auth.uid && uuid(request.resource.data.intent.deviceId) && request.resource.data.intent.operationId==op && uuid(op)
+    && request.resource.data.record.operationId==op && request.resource.data.record.revision==request.resource.data.intent.expectedRevision+1
+    && request.resource.data.record.payload==request.resource.data.intent.payload
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/commercialConfiguration/current).data.payload==request.resource.data.record.payload
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/commercialConfiguration/current).data.operationId==op;
+}
+
+// Candidate D2 rules, inserted inside match /workspaces/{w} by isolated tests only.
+function invMoney(v) { return v == null || (v is int && v>=0 && v<=1000000000); }
+function invInteger(v) { return v is int && v>=-1000000000 && v<=1000000000; }
+function invCosts(c) {
+  return c is map && c.keys().hasAll(['averageCost','lastKnownCost','estimatedUnitCost','averageCostIsProvisional'])
+    && c.keys().hasOnly(['averageCost','lastKnownCost','estimatedUnitCost','averageCostIsProvisional'])
+    && invMoney(c.averageCost) && invMoney(c.lastKnownCost) && invMoney(c.estimatedUnitCost) && c.averageCostIsProvisional is bool;
+}
+function invBalance(b,id) {
+  return b is map && b.keys().hasAll(['productId','stock','countPending','revision','costs','operationId'])
+    && b.keys().hasOnly(['productId','stock','countPending','revision','costs','operationId'])
+    && b.productId==id && uuid(id) && invInteger(b.stock) && b.countPending is bool
+    && b.revision is int && b.revision>=1 && b.revision<=1000000000 && uuid(b.operationId) && invCosts(b.costs);
+}
+function invIntent(i,op) {
+  return i is map && i.keys().hasAll(['schemaVersion','operationId','productId','deviceId','actorUid','occurredAt','expectedRevision','type','quantity','unitCost','reason'])
+    && i.keys().hasOnly(['schemaVersion','operationId','productId','deviceId','actorUid','occurredAt','expectedRevision','type','quantity','unitCost','reason'])
+    && i.schemaVersion==1 && i.operationId==op && uuid(op) && uuid(i.productId) && uuid(i.deviceId)
+    && i.actorUid==request.auth.uid && i.occurredAt is string && i.occurredAt.size()>0 && i.occurredAt.size()<=40
+    && i.expectedRevision is int && i.expectedRevision>=0 && i.expectedRevision<1000000000
+    && i.type in ['initialize','count','adjustment','restock'] && invInteger(i.quantity)
+    && invMoney(i.unitCost) && (i.type=='restock' || i.unitCost==null)
+    && (i.type!='restock' || i.quantity>0) && i.reason is string && i.reason.size()<=500;
+}
+function invTransition(r) {
+  let i=r.intent;
+  let b=r.before;
+  let a=r.after;
+  return invBalance(a,i.productId) && a.operationId==i.operationId && a.revision==i.expectedRevision+1
+    && invInteger(r.quantityChange)
+    && (i.type=='initialize'
+      ? b==null && i.expectedRevision==0 && i.quantity==0 && a.stock==0 && a.countPending==true && r.quantityChange==0
+        && a.costs=={'averageCost':null,'lastKnownCost':null,'estimatedUnitCost':null,'averageCostIsProvisional':true}
+      : invBalance(b,i.productId) && b.revision==i.expectedRevision && a.countPending==false
+        && (!b.countPending || i.type=='count')
+        && a.stock==(i.type=='count'?i.quantity:b.stock+i.quantity)
+        && r.quantityChange==a.stock-b.stock && a.costs.estimatedUnitCost==b.costs.estimatedUnitCost
+        && (i.type=='restock'
+          ? (i.unitCost==null
+              ? a.costs.averageCost==b.costs.averageCost && a.costs.lastKnownCost==b.costs.lastKnownCost && a.costs.averageCostIsProvisional==true
+              : a.costs.lastKnownCost==i.unitCost)
+          : a.costs.averageCost==b.costs.averageCost && a.costs.lastKnownCost==b.costs.lastKnownCost
+            && a.costs.averageCostIsProvisional==(b.costs.averageCostIsProvisional || a.stock<=0 || r.quantityChange>0)));
+}
+function invValidReceipt(r,op) {
+  return r.keys().hasAll(['intent','before','after','quantityChange','confirmedAt'])
+    && r.keys().hasOnly(['intent','before','after','quantityChange','confirmedAt']) && r.confirmedAt==request.time
+    && invIntent(r.intent,op) && invTransition(r)
+    && get(/databases/$(database)/documents/workspaces/$(w)/products/$(r.intent.productId)).data.payload.isArchived==false
+    && (r.before==null
+      ? !exists(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId))
+      : get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId)).data.balance==r.before);
+}
+match /inventory/{id} {
+  allow read: if member(w);
+  allow create, update: if editor(w)
+    && request.resource.data.keys().hasAll(['balance','confirmedAt']) && request.resource.data.keys().hasOnly(['balance','confirmedAt'])
+    && request.resource.data.confirmedAt==request.time && request.resource.data.balance.productId==id
+    && !exists(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId)).data.intent.productId==id
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId)).data.after==request.resource.data.balance;
+}
+match /inventoryOperations/{op} {
+  allow read: if member(w);
+  allow create: if editor(w) && invValidReceipt(request.resource.data,op)
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(request.resource.data.intent.productId)).data.balance==request.resource.data.after;
+}
+
+    allow get: if member(w);
+    match /members/{uid} { allow get: if request.auth!=null && request.auth.uid==uid && member(w); }
+    match /{k}/{id} {
+      allow read: if kind(k) && member(w);
+      allow create: if kind(k) && editor(w) && request.resource.data.revision==1 && validRecord(w,k,id);
+      allow update: if kind(k) && editor(w) && request.resource.data.revision==resource.data.revision+1
+        && request.resource.data.payload.createdAt==resource.data.payload.createdAt
+        && (k!='products'||request.resource.data.payload.kind==resource.data.payload.kind) && validRecord(w,k,id);
+    }
+    match /catalogOperations/{op} {
+      allow get: if member(w);
+      allow create: if editor(w) && uuid(op) && request.resource.data.keys().hasOnly(['record','actorUid','deviceId','confirmedAt'])
+        && request.resource.data.actorUid==request.auth.uid && uuid(request.resource.data.deviceId) && request.resource.data.confirmedAt==request.time
+        && request.resource.data.record.operationId==op
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.operationId==op
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.payload==request.resource.data.record.payload
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.revision==request.resource.data.record.revision;
+    }
+    match /catalogNames/{nameId} {
+      allow get: if member(w);
+      allow create, update: if editor(w) && request.resource.data.keys().hasOnly(['entity','id'])
+        && (!exists(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)) || (resource.data.entity==request.resource.data.entity && resource.data.id==request.resource.data.id))
+        && nameId==getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.entity)/$(request.resource.data.id)).data.payload.entity+'_'+getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.entity)/$(request.resource.data.id)).data.payload.name.lower();
+      allow delete: if editor(w) && nameId!=getAfter(/databases/$(database)/documents/workspaces/$(w)/$(resource.data.entity)/$(resource.data.id)).data.payload.entity+'_'+getAfter(/databases/$(database)/documents/workspaces/$(w)/$(resource.data.entity)/$(resource.data.id)).data.payload.name.lower();
+    }
+  }
+ }
+}

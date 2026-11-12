@@ -1,5 +1,8 @@
 import { z } from 'zod'
+import { commercialStateSchema } from '../firebase/commercial/commercialState.ts'
+import { validateConfiguration } from '../firebase/commercial/configuration.ts'
 import { syncStateSchema } from '../firebase/catalogModel.ts'
+import { inventoryStateSchema } from '../firebase/commercial/inventoryState.ts'
 import type { DataSnapshot } from './snapshot.ts'
 import { canonical, stores } from './snapshot.ts'
 import { normalizedName } from '../catalogValidation.ts'
@@ -20,6 +23,8 @@ const combo = z.object({ id, name, price: money, applications: integer.positive(
 const movement = z.object({ ...base, productId: id, type: z.enum(['initial','restock','adjustment','count','sale','sale_void','manual_reversal']), quantityChange: integer, previousStock: integer, resultingStock: integer, requestedQuantity: integer, unitCost: optionalCost, reason: text.optional(), saleId: id.optional(), uncoveredQuantity: money.optional(), costBefore: costState.optional(), costAfter: costState.optional(), productRevisionAfter: integer.optional(), reversedById: id.optional(), reversesMovementId: id.optional() }).passthrough()
 const expense = z.object({ ...base, concept: name, amount: integer.positive(), categoryId: id, date: day, eventId: id.optional(), notes: text.optional(), updatedAt: timestamp, revision: integer.positive(), status: z.enum(['active','voided']) }).passthrough()
 export const dataSchema = z.object({
+  commercialSync: z.array(commercialStateSchema).max(1),
+  inventorySync: z.array(inventoryStateSchema).max(1),
   catalogSync: z.array(syncStateSchema).max(1),
   importRecords:z.array(z.object({id,sourceKey:name,sourceHash:z.string().regex(/^[a-f0-9]{64}$/),sourceName:name,kind:z.enum(['catalog','families','ips','sales','event']),row:integer.min(2),targetId:id,batchId:id,createdAt:timestamp,original:z.record(z.string(),z.string())}).strict()),
   products: z.array(z.object({ ...named, description: text.optional(), categoryIds: ids, categoryId: id.optional(), familyIds: ids.optional(), ipIds: ids.optional(), classificationPending: z.boolean().optional(), price: money, stock: integer, stockCountPending:z.boolean().optional(), lowStockThreshold: money, averageCost: optionalCost, estimatedUnitCost: optionalCost, lastKnownCost: optionalCost, averageCostIsProvisional: z.boolean(), revision: integer.positive(), isFavorite: z.boolean(), isArchived: z.boolean(), activeName: text.optional(), kind: z.enum(['product','pack']).optional(), packContents: z.array(z.object({productId: id, quantity: integer.positive()}).passthrough()).optional(), eventPrices: z.array(z.object({eventId:id,price:money}).passthrough()).optional(), image: z.instanceof(Blob).optional() }).passthrough()),
@@ -44,8 +49,35 @@ export function validateData(value: unknown): asserts value is DataSnapshot {
   const sets = Object.fromEntries(stores.map(store => [store, new Set(data[store].map(row => 'id' in row ? row.id : row.key))])) as Record<typeof stores[number], Set<string>>
   for (const store of stores) if (sets[store].size !== data[store].length) fail(`UUID o clave repetida en ${store}.`)
   const ref = (store: typeof stores[number], key?: string) => { if (key !== undefined && !sets[store].has(key)) fail(`Falta referencia ${store}/${key}.`) }
+  for(const state of data.commercialSync) {
+    validateConfiguration(state.original);validateConfiguration(state.observed)
+    if(state.baseline){if(!Number.isSafeInteger(state.baseline.revision)||state.baseline.revision<1||!id.safeParse(state.baseline.operationId).success)fail('Revisión comercial inválida.');validateConfiguration(state.baseline.payload)}
+    if(state.configurationPending){const pending=state.configurationPending;if(!id.safeParse(pending.operationId).success||pending.actorUid!==state.ownerUid||pending.deviceId!==state.deviceId||!Number.isSafeInteger(pending.expectedRevision)||pending.expectedRevision<0)fail('Configuración pendiente inválida.');validateConfiguration(pending.payload)}
+    for(const resolution of state.configurationResolutions??[]){validateConfiguration(resolution.local);validateConfiguration(resolution.remote.payload);if(!['local','remote'].includes(resolution.choice)||!Number.isFinite(Date.parse(resolution.at)))fail('Resolución comercial inválida.')}
+    const operations=new Set<string>()
+    for(const op of state.operations){
+      if(!['pending','confirmed','review'].includes(op.state)||!Number.isSafeInteger(op.attempts)||op.attempts<0||op.intent.actorUid!==state.ownerUid||op.intent.deviceId!==state.deviceId||op.intent.schemaVersion!==1)fail('Operación comercial inválida.')
+      let opId:string
+      if(op.kind==='sale'){dataSchema.shape.sales.element.parse(op.intent.sale);ref('sales',op.intent.sale.id);opId=op.intent.sale.operationId}
+      else if(op.kind==='void'){ref('sales',op.intent.saleId);opId=op.intent.operationId;if(!op.intent.reason.trim()||typeof op.intent.returnStock!=='boolean'||!timestamp.safeParse(op.intent.occurredAt).success||!ids.safeParse(op.intent.movementIds).success)fail('Anulación pendiente inválida.')}
+      else fail('Tipo de operación comercial inválido.')
+      if(!id.safeParse(opId).success||operations.has(opId))fail('Operación comercial repetida.');operations.add(opId)
+    }
+  }
+  for (const state of data.inventorySync) {
+    for (const id of state.products) { ref('products',id); if (!data.products.find(p=>p.id===id)?.inventoryShared) fail('Producto compartido sin marca de vinculación.') }
+    for (const [id,balance] of Object.entries(state.baseline)) if (!state.products.includes(id) || balance.productId!==id) fail('Saldo sin producto vinculado.')
+    if (new Set(state.operations.map(op=>op.intent.operationId)).size!==state.operations.length) fail('Operaciones de inventario duplicadas.')
+    for (const op of state.operations) {
+      ref('products',op.intent.productId); ref('movements',op.intent.operationId)
+      if (!state.products.includes(op.intent.productId)||op.intent.actorUid!==state.ownerUid||op.intent.deviceId!==state.deviceId) fail('Operación de otro dispositivo o cuenta.')
+      const m=data.movements.find(m=>m.id===op.intent.operationId)
+      if(m?.sharedOperationId!==op.intent.operationId || m.productId!==op.intent.productId || m.requestedQuantity!==op.intent.quantity || m.sharedStatus!==op.state) fail('La cola y su movimiento no coinciden.')
+    }
+  }
+  for(const p of data.products) if(p.inventoryShared&&!data.inventorySync.some(s=>s.products.includes(p.id))) fail('Producto vinculado sin estado de inventario.')
   const unique = (values: (string | number | undefined)[], label: string) => { const present = values.filter(v=>v!==undefined); if(new Set(present).size!==present.length) fail(`Valor duplicado: ${label}.`) }
-  unique(data.products.map(p=>p.activeName),'nombre activo'); unique(data.sales.map(s=>s.number),'número de venta'); unique(data.sales.map(s=>s.operationId),'operación de venta'); unique(data.expenseCategories.map(c=>c.normalizedName),'categoría de gasto')
+  unique(data.products.map(p=>p.activeName),'nombre activo'); unique(data.sales.map(s=>s.operationId),'operación de venta'); unique(data.expenseCategories.map(c=>c.normalizedName),'categoría de gasto')
   unique(data.categories.map(c=>c.activeName),'categoría activa')
   unique(data.managedEvents.map(e=>e.activeKey),'evento activo')
   for(const event of data.managedEvents) if(event.endDate<event.startDate || (event.status==='active')!==(event.activeKey==='active')) fail('Estado o fechas de evento inconsistentes.')

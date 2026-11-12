@@ -1,3 +1,4 @@
+import { firebaseConnection } from '../services/firebase/client'
 import { useState, type FormEvent } from 'react'
 import type { Cart } from '../hooks/useCart'
 import type { CheckoutItem, StoredSale } from '../types/sales'
@@ -33,7 +34,7 @@ export function Checkout({ cart, onBack, onSaved }: { cart: Cart; onBack: () => 
     if (!valid) { action.setError('Los pagos deben ser enteros no negativos y sumar exactamente el total.'); return }
     const items: CheckoutItem[] = lines.map(line => ({ productId: line.product.id, quantity: line.quantity, unitPrice: line.priceSnapshot.unitPrice, expectedRevision: line.product.revision, discount: line.discount }))
     void action.run(async () => {
-      try { return await salesRepository.confirm({ operationId, items, payments: paymentInputs, generalDiscount, pricingSignature: promotionPricingSignature(pricing), priceReview }) }
+      try { return await salesRepository.confirm({ operationId, items, payments: paymentInputs, generalDiscount, pricingSignature: promotionPricingSignature(pricing), priceReview }, firebaseConnection()?.commercialIdentity()) }
       catch (error) { await catalog.reload(); throw error }
     }, sale => { cart.clear(); onSaved(sale) })
   }

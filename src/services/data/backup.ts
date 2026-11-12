@@ -17,7 +17,7 @@ async function encode(data: DataSnapshot): Promise<BackupEnvelope['data']> {
   return rows
 }
 export async function createBackup(data: DataSnapshot): Promise<string> {
-  validateData(data); assertNoPendingOperations({...data,catalogSync:[]})
+  validateData(data); assertNoPendingOperations({...data,catalogSync:[],inventorySync:[],commercialSync:[]})
   if(data.products.reduce((n,p)=>n+(p.image?.size??0),0)>MAX_BACKUP_BYTES/2) throw new Error('Las imágenes superan el límite de 64 MB por respaldo.')
   const body = {application:'MATU ART' as const,formatVersion:BACKUP_FORMAT_VERSION,databaseVersion:CATALOG_DB_VERSION,generatedAt:new Date().toISOString(),counts:Object.fromEntries(stores.map(s=>[s,data[s].length])),data:await encode(data)}
   const result = JSON.stringify({...body,sha256:await digest(canonical(body))})
@@ -33,7 +33,7 @@ export async function parseBackup(text: string): Promise<{data:DataSnapshot; gen
   const raw = safeJSON(text)
   if(!raw||typeof raw!=='object') throw new Error('El archivo no es un respaldo de MATU ART.')
   const envelope=raw as BackupEnvelope
-  if(envelope.application!=='MATU ART'||envelope.formatVersion!==BACKUP_FORMAT_VERSION||![9,10,CATALOG_DB_VERSION].includes(envelope.databaseVersion)) throw new Error('Versión de respaldo incompatible. No se modificaron los datos. Se requiere un adaptador explícito para otra versión.')
+  if(envelope.application!=='MATU ART'||envelope.formatVersion!==BACKUP_FORMAT_VERSION||![9,10,11,12,CATALOG_DB_VERSION].includes(envelope.databaseVersion)) throw new Error('Versión de respaldo incompatible. No se modificaron los datos. Se requiere un adaptador explícito para otra versión.')
   const {sha256,...body}=envelope
   if(!/^[a-f0-9]{64}$/.test(sha256??'')||await digest(canonical(body))!==sha256) throw new Error('La verificación SHA-256 falló: archivo incompleto o modificado.')
   if(!body.data||!body.counts||!Number.isFinite(Date.parse(body.generatedAt))) throw new Error('Faltan datos esenciales del respaldo.')
@@ -45,6 +45,14 @@ export async function parseBackup(text: string): Promise<{data:DataSnapshot; gen
   if(envelope.databaseVersion < 11) {
     if('catalogSync' in body.data) throw new Error('Respaldo anterior con estado cloud inesperado.')
     body.data.catalogSync=[]; body.counts.catalogSync=0
+  }
+  if(envelope.databaseVersion < 12) {
+    if('inventorySync' in body.data) throw new Error('Respaldo anterior con inventario cloud inesperado.')
+    body.data.inventorySync=[];body.counts.inventorySync=0
+  }
+  if(envelope.databaseVersion < 13) {
+    if('commercialSync' in body.data) throw new Error('Respaldo anterior con estado comercial inesperado.')
+    body.data.commercialSync=[];body.counts.commercialSync=0
   }
   assertStoreSet(Object.keys(body.data))
   let count=0
@@ -62,12 +70,12 @@ export async function parseBackup(text: string): Promise<{data:DataSnapshot; gen
       product.image=new Blob([Uint8Array.from(binary,c=>c.charCodeAt(0))],{type:image.mime})
     }
   }
-  validateData(body.data); assertNoPendingOperations({...body.data,catalogSync:[]})
+  validateData(body.data); assertNoPendingOperations({...body.data,catalogSync:[],inventorySync:[],commercialSync:[]})
   return {data:body.data,generatedAt:body.generatedAt,counts:body.counts}
 }
 /** Called only after explicit UI confirmation. All clears, writes and verification share one transaction. */
 export async function restoreBackup(data: DataSnapshot, expectedLocalToken: string, name?: string) {
-  validateData(data); assertNoPendingOperations(data)
+  validateData(data); assertNoPendingOperations({...data,catalogSync:[],inventorySync:[],commercialSync:[]})
   const db=await openCatalogDatabase(name)
   try {
     assertStoreSet(db.objectStoreNames)

@@ -36,7 +36,7 @@ export function validateFields(input: ProductFields) {
   if (input.image && (!(input.image instanceof Blob) || !['image/png', 'image/jpeg', 'image/webp'].includes(input.image.type) || input.image.size > 5 * 1024 * 1024)) throw new CatalogError('La imagen debe ser PNG, JPEG o WebP, de hasta 5 MB.')
 }
 /** Redondeo CLP con aritmética entera, sin confundir costo 0 con desconocido. */
-export function restockCost(product: CatalogProduct, units: number, unitCost?: number) {
+export function restockCost(product: Pick<CatalogProduct, 'stock' | 'averageCost' | 'lastKnownCost' | 'averageCostIsProvisional'>, units: number, unitCost?: number) {
   const resultingStock = product.stock + units
   if (unitCost === undefined) return { averageCost: product.averageCost, lastKnownCost: product.lastKnownCost, averageCostIsProvisional: true }
   if (product.stock <= 0) return { averageCost: unitCost, lastKnownCost: unitCost, averageCostIsProvisional: product.stock < 0 || resultingStock <= 0 }

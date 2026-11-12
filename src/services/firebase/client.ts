@@ -3,6 +3,9 @@ import { initializeAuth, browserSessionPersistence, onAuthStateChanged, signInWi
 import { initializeFirestore, memoryLocalCache, doc, getDocFromServer, connectFirestoreEmulator } from 'firebase/firestore'
 import { parseAccess } from './access'
 import { catalogRemote } from './catalogRemote'
+import { configurationRemote } from './commercial/configurationRemote'
+import { saleRemote } from './commercial/saleRemote'
+import { inventoryRemote } from './commercial/inventoryRemote'
 export interface FirebaseIdentity { uid: string; email: string | null }
 function initializeConnection() {
   const env = import.meta.env
@@ -22,6 +25,18 @@ function initializeConnection() {
   }
   return {
     workspaceId,
+    commercialEnabled: env.VITE_FIREBASE_COMMERCIAL_ENABLED === 'true',
+    commercialIdentity: () => env.VITE_FIREBASE_COMMERCIAL_ENABLED === 'true' && auth.currentUser ? { uid: auth.currentUser.uid, workspaceId } : undefined,
+    commercial: () => {
+      if(env.VITE_FIREBASE_COMMERCIAL_ENABLED !== 'true'||!auth.currentUser)throw new Error('Operación comercial no habilitada o sesión cerrada.')
+      return { configuration: configurationRemote(db,workspaceId,auth.currentUser.uid), sales:saleRemote(db,workspaceId,auth.currentUser.uid) }
+    },
+    inventoryEnabled: env.VITE_FIREBASE_INVENTORY_ENABLED === 'true',
+    identity: () => auth.currentUser?.uid,
+    inventory: () => {
+      if (env.VITE_FIREBASE_INVENTORY_ENABLED !== 'true' || !auth.currentUser) throw new Error('Inventario compartido no habilitado o sesión cerrada.')
+      return inventoryRemote(db, workspaceId, auth.currentUser.uid)
+    },
     catalogEnabled: env.VITE_FIREBASE_CATALOG_ENABLED === 'true',
     inspectCatalog: async () => {
       const user = auth.currentUser

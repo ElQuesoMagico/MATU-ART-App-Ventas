@@ -5,6 +5,7 @@ export function inventoryCosts(product: InventoryCostState): InventoryCostState 
   return { averageCost: product.averageCost, lastKnownCost: product.lastKnownCost, averageCostIsProvisional: product.averageCostIsProvisional }
 }
 export function canReverseMovement(movement: InventoryMovement) {
+  if (movement.sharedOperationId) return false
   return !movement.previousStockUnknown && ['restock', 'adjustment', 'count'].includes(movement.type) && !movement.saleId && !movement.reversedById && movement.quantityChange !== 0
 }
 /** Compensates the original delta against CURRENT stock, never restores an old stock balance. */

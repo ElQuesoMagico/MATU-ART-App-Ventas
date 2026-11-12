@@ -1,3 +1,4 @@
+import { CommercialSyncPanel } from './CommercialSyncPanel'
 import { useEffect, useRef, useState } from 'react'
 import { Modal } from '../Modal'
 import { firebaseConnection } from '../../services/firebase/client'
@@ -5,6 +6,7 @@ import type { FirebaseIdentity } from '../../services/firebase/client'
 import { firebaseMessage } from '../../services/firebase/access'
 import type { VerifiedAccess } from '../../services/firebase/access'
 import { CatalogSyncPanel } from './CatalogSyncPanel'
+import { InventorySyncPanel } from './InventorySyncPanel'
 
 export function CloudConnection({ onClose, offerLocal = false }: { onClose: () => void; offerLocal?: boolean }) {
   const [configuration] = useState(() => {
@@ -59,7 +61,7 @@ export function CloudConnection({ onClose, offerLocal = false }: { onClose: () =
   }
   return <Modal title={user ? 'Mi cuenta' : 'Iniciar sesión'} onClose={onClose} busy={busy}>
     <div className="data-manager cloud-connection">
-      <p className="local-note">{client?.catalogEnabled?'Ventas, stock y costos locales. Consulta el estado del catálogo más abajo.':'Datos locales · La sincronización todavía no está habilitada.'}</p>
+      <p className="local-note">{client?.inventoryEnabled?'Ventas locales. El inventario solo se comparte para los productos incorporados explícitamente.':client?.catalogEnabled?'Ventas, stock y costos locales. Consulta el estado del catálogo más abajo.':'Datos locales · La sincronización todavía no está habilitada.'}</p>
       {!client && !error && <p>Firebase no está configurado. Puedes seguir trabajando con tus datos locales.</p>}
       {!online && <p className="stock-warning">Sin conexión. El POS y el inventario local siguen disponibles.</p>}
       {client && (user ? <>
@@ -69,6 +71,7 @@ export function CloudConnection({ onClose, offerLocal = false }: { onClose: () =
         <button type="button" className="button secondary" disabled={busy || !online} onClick={() => void run(inspectCatalog)}>Comprobar lectura del catálogo</button>
         <button type="button" className="button secondary" disabled={busy} onClick={() => void run(async () => { revision.current++; await client.logout(); if (mounted.current) setMessage('Sesión cerrada. Tus datos locales se conservan.') })}>Cerrar sesión</button>
         {access&&<CatalogSyncPanel uid={user.uid} role={access.role} />}
+        {access&&<><InventorySyncPanel uid={user.uid} role={access.role} /><CommercialSyncPanel uid={user.uid} role={access.role} /></>}
       </> : <form onSubmit={event => { event.preventDefault(); void run(async () => { await client.login(email, password); if (mounted.current) setMessage('Sesión iniciada. Pulsa Verificar acceso para comprobar tu membresía.') }) }}>
         <label>Correo electrónico<input type="email" autoComplete="username" value={email} required disabled={busy || !online} onChange={event => setEmail(event.target.value)} /></label>
         <label>Contraseña<input type="password" autoComplete="current-password" value={password} required disabled={busy || !online} onChange={event => setPassword(event.target.value)} /></label>

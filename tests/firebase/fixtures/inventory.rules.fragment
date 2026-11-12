@@ -1,0 +1,67 @@
+// Candidate D2 rules, inserted inside match /workspaces/{w} by isolated tests only.
+function invMoney(v) { return v == null || (v is int && v>=0 && v<=1000000000); }
+function invInteger(v) { return v is int && v>=-1000000000 && v<=1000000000; }
+function invCosts(c) {
+  return c is map && c.keys().hasAll(['averageCost','lastKnownCost','estimatedUnitCost','averageCostIsProvisional'])
+    && c.keys().hasOnly(['averageCost','lastKnownCost','estimatedUnitCost','averageCostIsProvisional'])
+    && invMoney(c.averageCost) && invMoney(c.lastKnownCost) && invMoney(c.estimatedUnitCost) && c.averageCostIsProvisional is bool;
+}
+function invBalance(b,id) {
+  return b is map && b.keys().hasAll(['productId','stock','countPending','revision','costs','operationId'])
+    && b.keys().hasOnly(['productId','stock','countPending','revision','costs','operationId'])
+    && b.productId==id && uuid(id) && invInteger(b.stock) && b.countPending is bool
+    && b.revision is int && b.revision>=1 && b.revision<=1000000000 && uuid(b.operationId) && invCosts(b.costs);
+}
+function invIntent(i,op) {
+  return i is map && i.keys().hasAll(['schemaVersion','operationId','productId','deviceId','actorUid','occurredAt','expectedRevision','type','quantity','unitCost','reason'])
+    && i.keys().hasOnly(['schemaVersion','operationId','productId','deviceId','actorUid','occurredAt','expectedRevision','type','quantity','unitCost','reason'])
+    && i.schemaVersion==1 && i.operationId==op && uuid(op) && uuid(i.productId) && uuid(i.deviceId)
+    && i.actorUid==request.auth.uid && i.occurredAt is string && i.occurredAt.size()>0 && i.occurredAt.size()<=40
+    && i.expectedRevision is int && i.expectedRevision>=0 && i.expectedRevision<1000000000
+    && i.type in ['initialize','count','adjustment','restock'] && invInteger(i.quantity)
+    && invMoney(i.unitCost) && (i.type=='restock' || i.unitCost==null)
+    && (i.type!='restock' || i.quantity>0) && i.reason is string && i.reason.size()<=500;
+}
+function invTransition(r) {
+  let i=r.intent;
+  let b=r.before;
+  let a=r.after;
+  return invBalance(a,i.productId) && a.operationId==i.operationId && a.revision==i.expectedRevision+1
+    && invInteger(r.quantityChange)
+    && (i.type=='initialize'
+      ? b==null && i.expectedRevision==0 && i.quantity==0 && a.stock==0 && a.countPending==true && r.quantityChange==0
+        && a.costs=={'averageCost':null,'lastKnownCost':null,'estimatedUnitCost':null,'averageCostIsProvisional':true}
+      : invBalance(b,i.productId) && b.revision==i.expectedRevision && a.countPending==false
+        && (!b.countPending || i.type=='count')
+        && a.stock==(i.type=='count'?i.quantity:b.stock+i.quantity)
+        && r.quantityChange==a.stock-b.stock && a.costs.estimatedUnitCost==b.costs.estimatedUnitCost
+        && (i.type=='restock'
+          ? (i.unitCost==null
+              ? a.costs.averageCost==b.costs.averageCost && a.costs.lastKnownCost==b.costs.lastKnownCost && a.costs.averageCostIsProvisional==true
+              : a.costs.lastKnownCost==i.unitCost)
+          : a.costs.averageCost==b.costs.averageCost && a.costs.lastKnownCost==b.costs.lastKnownCost
+            && a.costs.averageCostIsProvisional==(b.costs.averageCostIsProvisional || a.stock<=0 || r.quantityChange>0)));
+}
+function invValidReceipt(r,op) {
+  return r.keys().hasAll(['intent','before','after','quantityChange','confirmedAt'])
+    && r.keys().hasOnly(['intent','before','after','quantityChange','confirmedAt']) && r.confirmedAt==request.time
+    && invIntent(r.intent,op) && invTransition(r)
+    && get(/databases/$(database)/documents/workspaces/$(w)/products/$(r.intent.productId)).data.payload.isArchived==false
+    && (r.before==null
+      ? !exists(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId))
+      : get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId)).data.balance==r.before);
+}
+match /inventory/{id} {
+  allow read: if member(w);
+  allow create, update: if editor(w)
+    && request.resource.data.keys().hasAll(['balance','confirmedAt']) && request.resource.data.keys().hasOnly(['balance','confirmedAt'])
+    && request.resource.data.confirmedAt==request.time && request.resource.data.balance.productId==id
+    && !exists(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId)).data.intent.productId==id
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId)).data.after==request.resource.data.balance;
+}
+match /inventoryOperations/{op} {
+  allow read: if member(w);
+  allow create: if editor(w) && invValidReceipt(request.resource.data,op)
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(request.resource.data.intent.productId)).data.balance==request.resource.data.after;
+}

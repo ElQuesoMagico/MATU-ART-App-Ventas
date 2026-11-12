@@ -1,3 +1,5 @@
+import { stable } from './firebase/catalogModel.ts'
+import { MAX_SHARED_SALE_LINES } from './firebase/commercial/saleProtocol.ts'
 import type { IDBPDatabase, IDBPTransaction } from 'idb'
 import { openCatalogDatabase, type CatalogSchema } from './catalogDatabase.ts'
 import { CatalogError, integer, validId } from './catalogValidation.ts'
@@ -5,7 +7,7 @@ import { calculatePromotionPricing, promotionPricingSignature, type PromotionLin
 import { calculateSaleStock, resolveSaleCost } from './saleRules.ts'
 import { resolveProductPrice, samePriceContext } from './productPricing.ts'
 import type { CheckoutInput, StoredSale, StoredSaleItem, VoidSaleInput } from '../types/sales.ts'
-type SaleTransaction = IDBPTransaction<CatalogSchema, ['products', 'sales', 'payments', 'movements', 'metadata', 'events', 'promotions', 'managedEvents'], 'readwrite'>
+type SaleTransaction = IDBPTransaction<CatalogSchema, ['products', 'sales', 'payments', 'movements', 'metadata', 'events', 'promotions', 'managedEvents', 'inventorySync', 'commercialSync'], 'readwrite'>
 export function saleMoney(value: number, label: string) {
   if (!Number.isSafeInteger(value) || value < 0) throw new CatalogError(`${label}: ingresa un importe entero válido, mayor o igual a cero.`)
 }
@@ -28,12 +30,12 @@ export class SalesRepository {
     return { sales: sales.sort((a, b) => b.number - a.number), realEvents, eventRevision: revision?.value ?? 0 }
   }
   private async write<T>(work: (tx: SaleTransaction) => Promise<T>) {
-    const db = await this.db(); const tx = db.transaction(['products', 'sales', 'payments', 'movements', 'metadata', 'events', 'promotions', 'managedEvents'], 'readwrite')
+    const db = await this.db(); const tx = db.transaction(['products', 'sales', 'payments', 'movements', 'metadata', 'events', 'promotions', 'managedEvents', 'inventorySync', 'commercialSync'], 'readwrite')
     const completion = tx.done; void completion.catch(() => {})
     try { const result = await work(tx); await completion; return result }
     catch (error) { try { tx.abort() } catch { /* Ya finalizada. */ } await completion.catch(() => {}); throw error }
   }
-  async confirm(input: CheckoutInput): Promise<StoredSale> {
+  async confirm(input: CheckoutInput, sharedIdentity?: { uid: string; workspaceId: string }): Promise<StoredSale> {
     validId(input.operationId)
     if (!input.items.length || new Set(input.items.map(item => item.productId)).size !== input.items.length) throw new CatalogError('El carrito está vacío o tiene productos repetidos.')
     for (const item of input.items) {
@@ -49,12 +51,28 @@ export class SalesRepository {
       const activeEvent = await tx.objectStore('managedEvents').index('active-event').get('active')
       const eventRevision = (await tx.objectStore('metadata').get('event-price-revision'))?.value ?? 0
       if (input.priceReview && !samePriceContext(input.priceReview, { eventId: activeEvent?.id ?? null, revision: eventRevision })) throw new CatalogError('El evento cambió durante el pago. Vuelve al carrito para revisar precios y total.')
+      const commerce=await tx.objectStore('commercialSync').get('commerce'), inventory=await tx.objectStore('inventorySync').get('inventory')
+      const shared=(await Promise.all(input.items.map(i=>tx.objectStore('products').get(i.productId)))).some(p=>p?.inventoryShared)
+      if(shared){
+        if(!commerce||!inventory||!sharedIdentity||commerce.ownerUid!==sharedIdentity.uid||commerce.workspaceId!==sharedIdentity.workspaceId||inventory.ownerUid!==sharedIdentity.uid)throw new CatalogError('Vincula la operación comercial e inicia sesión antes de vender inventario compartido.')
+        if(input.items.length>MAX_SHARED_SALE_LINES)throw new CatalogError(`La venta compartida admite hasta ${MAX_SHARED_SALE_LINES} productos distintos.`)
+        if(!commerce.baseline||commerce.configurationPending||commerce.configurationConflict)throw new CatalogError('La configuración comercial necesita confirmación antes de cobrar.')
+        const liveEvents=await tx.objectStore('managedEvents').getAll(),livePromotions=await tx.objectStore('promotions').getAll()
+        const livePrices=(await tx.objectStore('products').getAll()).filter(p=>p.eventPrices?.length).map(p=>({productId:p.id,prices:p.eventPrices!}))
+        const livePacks=(await tx.objectStore('products').getAll()).filter(p=>p.kind==='pack').map(p=>({productId:p.id,contents:p.packContents??[]}))
+        if(stable(livePacks)!==stable(commerce.baseline.payload.packs))throw new CatalogError('Hay cambios de packs pendientes de compartir.')
+        if(stable(liveEvents)!==stable(commerce.baseline.payload.events)||stable(livePromotions)!==stable(commerce.baseline.payload.promotions)||stable(livePrices)!==stable(commerce.baseline.payload.eventPrices))throw new CatalogError('Hay cambios comerciales pendientes. Espera su confirmación antes de cobrar con esta configuración.')
+        const event=commerce.baseline.payload.events.find(e=>e.status==='active')
+        if(event?.id!==activeEvent?.id)throw new CatalogError('El evento cambió. Revisa el carrito antes de confirmar.')
+        for(const item of input.items)if(!inventory.products.includes(item.productId)||!inventory.baseline[item.productId]||inventory.operations.some(op=>op.intent.productId===item.productId&&['pending','conflict'].includes(op.state)))throw new CatalogError('Confirma la incorporación y los ajustes pendientes de inventario antes de vender este producto.')
+      }
       const items: StoredSaleItem[] = []
       const pricingLines: PromotionLine[] = []
       let subtotal = 0
       for (const item of input.items) {
         const product = await tx.objectStore('products').get(item.productId)
         if (!product || product.isArchived) throw new CatalogError('Un producto fue archivado o ya no existe. Regresa al carrito para revisarlo.')
+        if (shared && !product.inventoryShared) throw new CatalogError('Incorpora todos los productos de esta venta al inventario compartido; no se mezclan existencias locales y compartidas.')
         if (product.stockCountPending) throw new CatalogError('Producto pendiente de conteo físico inicial.');
         const cost = resolveSaleCost(product)
         const priceSnapshot = resolveProductPrice(product, activeEvent?.id)
@@ -82,17 +100,18 @@ export class SalesRepository {
       for (const item of items) {
         const product = (await tx.objectStore('products').get(item.productId))!
         const movementId = crypto.randomUUID(); movementIds.push(movementId)
-        await tx.objectStore('products').put({ ...product, stock: item.stock.resultingStock, revision: product.revision + 1, updatedAt: now, averageCostIsProvisional: product.averageCostIsProvisional || item.stock.resultingStock <= 0 })
-        await tx.objectStore('movements').add({ id: movementId, productId: item.productId, type: 'sale', quantityChange: -item.stock.quantityDeducted, previousStock: item.stock.previousStock, resultingStock: item.stock.resultingStock, requestedQuantity: item.quantity, uncoveredQuantity: item.stock.uncoveredQuantity, saleId, unitCost: item.cost.unitCost, reason: `Venta ${number}`, createdAt: now })
+        await tx.objectStore('products').put({ ...product, ...(shared?{inventoryPending:true}:{}), stock: item.stock.resultingStock, revision: product.revision + 1, updatedAt: now, averageCostIsProvisional: product.averageCostIsProvisional || item.stock.resultingStock <= 0 })
+        await tx.objectStore('movements').add({ ...(shared?{sharedOperationId:input.operationId,sharedStatus:'pending' as const,actorUid:commerce!.ownerUid}:{}), id: movementId, productId: item.productId, type: 'sale', quantityChange: -item.stock.quantityDeducted, previousStock: item.stock.previousStock, resultingStock: item.stock.resultingStock, requestedQuantity: item.quantity, uncoveredQuantity: item.stock.uncoveredQuantity, saleId, unitCost: item.cost.unitCost, reason: `Venta ${number}`, createdAt: now })
       }
-      const sale: StoredSale = { id: saleId, operationId: input.operationId, operationFingerprint: key, number, soldAt: now, createdAt: now, items, subtotal, discount: pricing.discount, generalDiscount: pricing.appliedGeneralDiscount, calculationVersion: pricing.combos.length ? 'combos-v1' : pricing.promotions.length ? 'promotions-v1' : 'manual-v1', appliedPromotions: pricing.promotions, appliedCombos: pricing.combos, total: pricing.total, payments, event, status: 'completed', stockDifferences: items.filter(item => item.stock.uncoveredQuantity > 0).map(item => ({ productId: item.productId, quantity: item.stock.uncoveredQuantity })), movementIds }
+      const sale: StoredSale = { ...(shared?{sharedStatus:'pending' as const,deviceId:commerce!.deviceId}:{}), id: saleId, operationId: input.operationId, operationFingerprint: key, number, soldAt: now, createdAt: now, items, subtotal, discount: pricing.discount, generalDiscount: pricing.appliedGeneralDiscount, calculationVersion: pricing.combos.length ? 'combos-v1' : pricing.promotions.length ? 'promotions-v1' : 'manual-v1', appliedPromotions: pricing.promotions, appliedCombos: pricing.combos, total: pricing.total, payments, event, status: 'completed', stockDifferences: items.filter(item => item.stock.uncoveredQuantity > 0).map(item => ({ productId: item.productId, quantity: item.stock.uncoveredQuantity })), movementIds }
+      if(shared){commerce!.operations.push({kind:'sale',intent:{schemaVersion:1,actorUid:commerce!.ownerUid,deviceId:commerce!.deviceId,sale},state:'pending',attempts:0});await tx.objectStore('commercialSync').put(commerce!)}
       await tx.objectStore('sales').add(sale)
       for (const payment of payments) await tx.objectStore('payments').add(payment)
       await tx.objectStore('metadata').put({ key: 'sale-number', value: number })
       return sale
     })
   }
-  async voidSale(input: VoidSaleInput): Promise<StoredSale> {
+  async voidSale(input: VoidSaleInput, sharedIdentity?: { uid: string; workspaceId: string }): Promise<StoredSale> {
     validId(input.saleId); validId(input.operationId)
     if (!input.reason.trim() || input.reason.trim().length > 500) throw new CatalogError('Indica el motivo de anulación (hasta 500 caracteres).')
     if (typeof input.returnStock !== 'boolean') throw new CatalogError('Indica si se debe devolver el stock.')
@@ -104,10 +123,21 @@ export class SalesRepository {
         if (sale.voidAudit?.operationId === input.operationId && sale.voidAudit.reason === input.reason.trim() && sale.voidAudit.returnStock === input.returnStock) return sale
         throw new CatalogError('La venta ya fue anulada. No se devolvió stock nuevamente.')
       }
+      const commerce=await tx.objectStore('commercialSync').get('commerce')
+      if(sale.sharedStatus){
+        if(!commerce||!commerce.canWrite||!sharedIdentity||commerce.ownerUid!==sharedIdentity.uid||commerce.workspaceId!==sharedIdentity.workspaceId)throw new CatalogError('Administración debe iniciar sesión para anular esta venta compartida.')
+        if(sale.sharedStatus!=='confirmed')throw new CatalogError('Espera la confirmación de la venta antes de anularla.')
+        const existing=commerce.operations.find(op=>op.kind==='void'&&op.intent.saleId===sale.id)
+        if(existing){if(existing.kind==='void'&&existing.intent.operationId===input.operationId)return sale;throw new CatalogError('Esta venta ya tiene una anulación pendiente.')}
+        commerce.operations.push({kind:'void',state:'pending',attempts:0,intent:{schemaVersion:1,operationId:input.operationId,saleId:sale.id,actorUid:commerce.ownerUid,deviceId:commerce.deviceId,occurredAt:new Date().toISOString(),reason:input.reason.trim(),returnStock:input.returnStock,movementIds:input.returnStock?sale.items.map(()=>crypto.randomUUID()):[]}})
+        await tx.objectStore('commercialSync').put(commerce)
+        return sale
+      }
       const now = new Date().toISOString(); const movementIds: string[] = []
       if (input.returnStock) for (const item of sale.items) {
         const product = await tx.objectStore('products').get(item.productId)
         if (!product) throw new CatalogError('No se puede devolver el stock: falta un producto original.')
+        if (product.inventoryShared) throw new CatalogError('La devolución afecta inventario compartido D2. Espera la integración de anulaciones compartidas; no se modificaron datos.')
         // Se devuelve solo lo descontado, nunca unidades de la diferencia no cubierta.
         const stock = product.stock + item.stock.quantityDeducted; integer(stock, 'Stock devuelto', true)
         const movementId = crypto.randomUUID(); movementIds.push(movementId)

@@ -1,6 +1,8 @@
 export interface PackContent { productId: string; quantity: number }
 export interface ProductEventPrice { eventId: string; price: number }
 export interface CatalogProduct {
+  inventoryShared?: boolean
+  inventoryPending?: boolean
   kind?: 'product' | 'pack'
   packContents?: PackContent[]
   id: string
@@ -45,6 +47,9 @@ export type MovementType = 'initial' | 'restock' | 'adjustment' | 'count' | 'sal
 export type InventoryCostState = Pick<CatalogProduct, 'averageCost' | 'lastKnownCost' | 'averageCostIsProvisional'>
 export interface ReverseMovementInput { id: string; movementId: string; expectedRevision: number; reason: string }
 export interface InventoryMovement {
+  sharedOperationId?: string
+  sharedStatus?: 'pending' | 'confirmed' | 'conflict' | 'cancelled'
+  actorUid?: string
   previousStockUnknown?: boolean
   id: string
   productId: string

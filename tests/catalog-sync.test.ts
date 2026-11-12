@@ -97,9 +97,9 @@ test('migration v10 adds only catalogSync; old backups retain all entities',asyn
  const fixture={id:crypto.randomUUID(),opaque:'preserved original bytes',stock:-3,averageCost:0}
  await old.put('products',fixture);await old.put('metadata',{key:'sale-number',value:8});old.close()
  const next=await openCatalogDatabase(name)
- assert.equal(next.version,11);assert.deepEqual(await next.get('products',fixture.id),fixture);assert.equal(await next.count('catalogSync'),0);assert.deepEqual(await next.get('metadata','sale-number'),{key:'sale-number',value:8});next.close()
+ assert.equal(next.version, 13);assert.deepEqual(await next.get('products',fixture.id),fixture);assert.equal(await next.count('catalogSync'),0);assert.deepEqual(await next.get('metadata','sale-number'),{key:'sale-number',value:8});next.close()
  const data=await readData(`legacy-backup-${crypto.randomUUID()}`)
- const envelope=JSON.parse(await createBackup(data));envelope.databaseVersion=10;delete envelope.data.catalogSync;delete envelope.counts.catalogSync
+ const envelope=JSON.parse(await createBackup(data));envelope.databaseVersion=10;delete envelope.data.catalogSync;delete envelope.counts.catalogSync;delete envelope.data.inventorySync;delete envelope.counts.inventorySync;delete envelope.data.commercialSync;delete envelope.counts.commercialSync
  const {sha256:_old,...body}=envelope;envelope.sha256=await digest(canonical(body))
  const restored=await parseBackup(JSON.stringify(envelope));assert.deepEqual(restored.data.catalogSync,[]);assert.deepEqual(restored.data.expenseCategories,data.expenseCategories)
 })

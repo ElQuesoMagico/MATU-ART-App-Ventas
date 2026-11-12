@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function member(w) { return request.auth != null && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.enabled == true && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.role in ['administrator','manager','seller']; }
+  function editor(w) { return member(w) && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.role in ['administrator','manager']; }
+  function uuid(v) { return v is string && v.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'); }
+  function kind(k) { return k in ['categories','families','ips','products']; }
+  function ref(w,k,id) { return uuid(id) && exists(/databases/$(database)/documents/workspaces/$(w)/$(k)/$(id)); }
+  function refs(w,k,ids) { return ids is list && ids.size() <= 3 && ids.toSet().size()==ids.size() && (ids.size()<1||ref(w,k,ids[0])) && (ids.size()<2||ref(w,k,ids[1])) && (ids.size()<3||ref(w,k,ids[2])); }
+  function payload(w,k,id,p) {
+    return p is map && p.id == id && uuid(id) && p.entity == k && p.name is string && p.name.size()>0 && p.name.size()<=120 && !p.name.matches('.*[/].*')
+      && p.description is string && p.description.size()<=2000 && p.createdAt is string && p.createdAt.size()<=40
+      && (k=='products'
+        ? p.keys().hasOnly(['entity','id','name','description','createdAt','categoryId','familyIds','ipIds','price','isArchived','isFavorite','kind'])
+          && ref(w,'categories',p.categoryId) && refs(w,'families',p.familyIds) && refs(w,'ips',p.ipIds)
+          && p.price is int && p.price>=0 && p.price<=1000000000 && p.isArchived is bool && p.isFavorite is bool && p.kind in ['product','pack']
+        : p.keys().hasOnly(['entity','id','name','description','createdAt','isActive','order']) && p.isActive is bool && p.order is int && p.order>=0 && p.order<=1000000);
+  }
+  function validRecord(w,k,id) {
+    let d=request.resource.data;
+    let receipt=getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogOperations/$(d.operationId)).data;
+    let nameId=k+'_'+d.payload.name.lower();
+    return d.keys().hasOnly(['payload','revision','operationId','actorUid','confirmedAt']) && d.actorUid==request.auth.uid && d.confirmedAt==request.time
+      && d.revision is int && d.revision>0 && uuid(d.operationId) && payload(w,k,id,d.payload)
+      && receipt.actorUid==request.auth.uid && receipt.record=={'payload':d.payload,'revision':d.revision,'operationId':d.operationId}
+      && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.id==id && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.entity==k;
+  }
+  match /workspaces/{w} {
+// Candidate D2 rules, inserted inside match /workspaces/{w} by isolated tests only.
+function invMoney(v) { return v == null || (v is int && v>=0 && v<=1000000000); }
+function invInteger(v) { return v is int && v>=-1000000000 && v<=1000000000; }
+function invCosts(c) {
+  return c is map && c.keys().hasAll(['averageCost','lastKnownCost','estimatedUnitCost','averageCostIsProvisional'])
+    && c.keys().hasOnly(['averageCost','lastKnownCost','estimatedUnitCost','averageCostIsProvisional'])
+    && invMoney(c.averageCost) && invMoney(c.lastKnownCost) && invMoney(c.estimatedUnitCost) && c.averageCostIsProvisional is bool;
+}
+function invBalance(b,id) {
+  return b is map && b.keys().hasAll(['productId','stock','countPending','revision','costs','operationId'])
+    && b.keys().hasOnly(['productId','stock','countPending','revision','costs','operationId'])
+    && b.productId==id && uuid(id) && invInteger(b.stock) && b.countPending is bool
+    && b.revision is int && b.revision>=1 && b.revision<=1000000000 && uuid(b.operationId) && invCosts(b.costs);
+}
+function invIntent(i,op) {
+  return i is map && i.keys().hasAll(['schemaVersion','operationId','productId','deviceId','actorUid','occurredAt','expectedRevision','type','quantity','unitCost','reason'])
+    && i.keys().hasOnly(['schemaVersion','operationId','productId','deviceId','actorUid','occurredAt','expectedRevision','type','quantity','unitCost','reason'])
+    && i.schemaVersion==1 && i.operationId==op && uuid(op) && uuid(i.productId) && uuid(i.deviceId)
+    && i.actorUid==request.auth.uid && i.occurredAt is string && i.occurredAt.size()>0 && i.occurredAt.size()<=40
+    && i.expectedRevision is int && i.expectedRevision>=0 && i.expectedRevision<1000000000
+    && i.type in ['initialize','count','adjustment','restock'] && invInteger(i.quantity)
+    && invMoney(i.unitCost) && (i.type=='restock' || i.unitCost==null)
+    && (i.type!='restock' || i.quantity>0) && i.reason is string && i.reason.size()<=500;
+}
+function invTransition(r) {
+  let i=r.intent;
+  let b=r.before;
+  let a=r.after;
+  return invBalance(a,i.productId) && a.operationId==i.operationId && a.revision==i.expectedRevision+1
+    && invInteger(r.quantityChange)
+    && (i.type=='initialize'
+      ? b==null && i.expectedRevision==0 && i.quantity==0 && a.stock==0 && a.countPending==true && r.quantityChange==0
+        && a.costs=={'averageCost':null,'lastKnownCost':null,'estimatedUnitCost':null,'averageCostIsProvisional':true}
+      : invBalance(b,i.productId) && b.revision==i.expectedRevision && a.countPending==false
+        && (!b.countPending || i.type=='count')
+        && a.stock==(i.type=='count'?i.quantity:b.stock+i.quantity)
+        && r.quantityChange==a.stock-b.stock && a.costs.estimatedUnitCost==b.costs.estimatedUnitCost
+        && (i.type=='restock'
+          ? (i.unitCost==null
+              ? a.costs.averageCost==b.costs.averageCost && a.costs.lastKnownCost==b.costs.lastKnownCost && a.costs.averageCostIsProvisional==true
+              : a.costs.lastKnownCost==i.unitCost)
+          : a.costs.averageCost==b.costs.averageCost && a.costs.lastKnownCost==b.costs.lastKnownCost
+            && a.costs.averageCostIsProvisional==(b.costs.averageCostIsProvisional || a.stock<=0 || r.quantityChange>0)));
+}
+function invValidReceipt(r,op) {
+  return r.keys().hasAll(['intent','before','after','quantityChange','confirmedAt'])
+    && r.keys().hasOnly(['intent','before','after','quantityChange','confirmedAt']) && r.confirmedAt==request.time
+    && invIntent(r.intent,op) && invTransition(r)
+    && get(/databases/$(database)/documents/workspaces/$(w)/products/$(r.intent.productId)).data.payload.isArchived==false
+    && (r.before==null
+      ? !exists(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId))
+      : get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId)).data.balance==r.before);
+}
+match /inventory/{id} {
+  allow read: if member(w);
+  allow create, update: if editor(w)
+    && request.resource.data.keys().hasAll(['balance','confirmedAt']) && request.resource.data.keys().hasOnly(['balance','confirmedAt'])
+    && request.resource.data.confirmedAt==request.time && request.resource.data.balance.productId==id
+    && !exists(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId))
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId)).data.intent.productId==id
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventoryOperations/$(request.resource.data.balance.operationId)).data.after==request.resource.data.balance;
+}
+match /inventoryOperations/{op} {
+  allow read: if member(w);
+  allow create: if editor(w) && invValidReceipt(request.resource.data,op)
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(request.resource.data.intent.productId)).data.balance==request.resource.data.after;
+}
+
+    allow get: if member(w);
+    match /members/{uid} { allow get: if request.auth!=null && request.auth.uid==uid && member(w); }
+    match /{k}/{id} {
+      allow read: if kind(k) && member(w);
+      allow create: if kind(k) && editor(w) && request.resource.data.revision==1 && validRecord(w,k,id);
+      allow update: if kind(k) && editor(w) && request.resource.data.revision==resource.data.revision+1
+        && request.resource.data.payload.createdAt==resource.data.payload.createdAt
+        && (k!='products'||request.resource.data.payload.kind==resource.data.payload.kind) && validRecord(w,k,id);
+    }
+    match /catalogOperations/{op} {
+      allow get: if member(w);
+      allow create: if editor(w) && uuid(op) && request.resource.data.keys().hasOnly(['record','actorUid','deviceId','confirmedAt'])
+        && request.resource.data.actorUid==request.auth.uid && uuid(request.resource.data.deviceId) && request.resource.data.confirmedAt==request.time
+        && request.resource.data.record.operationId==op
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.operationId==op
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.payload==request.resource.data.record.payload
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.revision==request.resource.data.record.revision;
+    }
+    match /catalogNames/{nameId} {
+      allow get: if member(w);
+      allow create, update: if editor(w) && request.resource.data.keys().hasOnly(['entity','id'])
+        && (!exists(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)) || (resource.data.entity==request.resource.data.entity && resource.data.id==request.resource.data.id))
+        && nameId==getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.entity)/$(request.resource.data.id)).data.payload.entity+'_'+getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.entity)/$(request.resource.data.id)).data.payload.name.lower();
+      allow delete: if editor(w) && nameId!=getAfter(/databases/$(database)/documents/workspaces/$(w)/$(resource.data.entity)/$(resource.data.id)).data.payload.entity+'_'+getAfter(/databases/$(database)/documents/workspaces/$(w)/$(resource.data.entity)/$(resource.data.id)).data.payload.name.lower();
+    }
+  }
+ }
+}

@@ -3,6 +3,10 @@ import type { CatalogProduct, MovementInput } from '../../types/catalog'
 import { useStorageAction } from '../../hooks/useStorageAction'
 import { catalogRepository } from '../../services/catalogRepository'
 import { Modal } from '../Modal'
+import { firebaseConnection } from '../../services/firebase/client'
+import { enqueueInventory } from '../../services/firebase/commercial/inventoryLocal'
+import { notifyInventory } from '../../services/firebase/commercial/inventoryRuntime'
+import { CatalogError } from '../../services/catalogValidation'
 export function StockForm({ product, onClose, onSaved }: { product: CatalogProduct; onClose: () => void; onSaved: (message: string) => void }) {
   const action = useStorageAction()
   const [id] = useState(() => crypto.randomUUID())
@@ -15,10 +19,17 @@ export function StockForm({ product, onClose, onSaved }: { product: CatalogProdu
   const nextStock = type === 'count' ? value : product.stock + value
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    void action.run(() => catalogRepository.recordMovement({ id, productId: product.id, type, quantity: value, unitCost: type === 'restock' && cost !== '' ? Number(cost) : undefined, reason, expectedRevision: product.revision }), () => { onSaved('Movimiento registrado.'); onClose() })
+    const input = { id, productId: product.id, type, quantity: value, unitCost: type === 'restock' && cost !== '' ? Number(cost) : undefined, reason, expectedRevision: product.revision }
+    void action.run(async () => {
+      if (!product.inventoryShared) return catalogRepository.recordMovement(input)
+      const client = firebaseConnection(), uid = client?.identity()
+      if (!client?.inventoryEnabled || !uid) throw new CatalogError('Inicia sesión con la cuenta vinculada para registrar inventario compartido.')
+      await enqueueInventory(input, uid, client.workspaceId); notifyInventory()
+    }, () => { onSaved(product.inventoryShared ? 'Movimiento guardado en este dispositivo. Pendiente de compartir.' : 'Movimiento registrado.'); onClose() })
   }
   return <Modal title="Ajustar stock" onClose={onClose} busy={action.saving} protectChanges><form className="catalog-form" onSubmit={submit}>
     <p><strong>{product.name}</strong> · Stock actual: {product.stockCountPending?'Pendiente de conteo':product.stock}</p>
+    {product.inventoryShared && <p className="local-note">Inventario compartido{product.inventoryPending ? ' · Incluye cambios pendientes' : ''}. Se confirmará al recibir respuesta de la nube.</p>}
     {action.error && <p className="storage-error" role="alert">{action.error}</p>}
     <fieldset className="form-fields" disabled={action.saving}>
       <label>Tipo de movimiento<select disabled={product.stockCountPending} value={type} onChange={event => setType(event.target.value as MovementInput['type'])}><option value="restock">Reposición</option><option value="adjustment">Ajuste manual</option><option value="count">Conteo físico</option></select></label>

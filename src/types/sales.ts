@@ -37,6 +37,11 @@ export interface StoredSaleItem {
   stock: SaleStockResult
 }
 export interface StoredSale {
+  sharedActorUid?: string
+  voidActorUid?: string
+  sharedStatus?: 'pending' | 'confirmed' | 'review'
+  deviceId?: string
+
   historicalSource?: import('./imports').HistoricalSource
   id: string
   operationId: string

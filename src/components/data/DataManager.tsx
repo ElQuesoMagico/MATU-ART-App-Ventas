@@ -8,7 +8,7 @@ import { historyEventOptions } from '../../services/eventRules'
 import { santiagoDay } from '../../utils/format'
 import '../../styles/data.css'
 import { useOfflineStatus } from '../../services/offlineStatus'
-const entityLabels:Record<string,string>={products:'Productos',categories:'Categorías',families:'Familias',ips:'IPs',movements:'Movimientos',costChanges:'Cambios de costo',sales:'Ventas',payments:'Pagos',metadata:'Configuración',events:'Eventos históricos',managedEvents:'Eventos',promotions:'Promociones y combos',expenses:'Gastos',expenseCategories:'Categorías de gasto',expenseChanges:'Auditoría de gastos'}
+const entityLabels:Record<string,string>={commercialSync:'Sincronización comercial',inventorySync:'Inventario compartido y cola',catalogSync:'Catálogo compartido',products:'Productos',categories:'Categorías',families:'Familias',ips:'IPs',movements:'Movimientos',costChanges:'Cambios de costo',sales:'Ventas',payments:'Pagos',metadata:'Configuración',events:'Eventos históricos',managedEvents:'Eventos',promotions:'Promociones y combos',expenses:'Gastos',expenseCategories:'Categorías de gasto',expenseChanges:'Auditoría de gastos'}
 type Preview=Awaited<ReturnType<typeof prepareRestore>>
 export function DataManager({onClose,onCloud}:{onClose:()=>void;onCloud?:()=>void}) {
   const catalog=useCatalog(),lock=useRef(false)
