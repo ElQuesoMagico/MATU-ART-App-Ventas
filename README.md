@@ -1,5 +1,30 @@
 # MATU ART
 
+## Incorporación masiva de inventario — 12-11-2026
+
+Mi cuenta → Compartir inventario ahora ofrece Compartir todo, Seleccionar todos y
+Deseleccionar todos, selección individual, contador, resumen y una sola confirmación.
+Modo inicial seguro: cantidades pendientes de conteo. El modo cantidades revisadas
+permite corregir valores; los desconocidos quedan vacíos y nunca equivalen a cero.
+Los saldos remotos existentes se reciben sin sobrescribirlos. Solo se seleccionan
+productos activos aún no incorporados; los ya compartidos se omiten.
+
+Cada producto se prepara en una transacción IndexedDB independiente y se entrega a
+la cola durable existente. Se muestran progreso, errores parciales y confirmación de
+Firestore. Reintentar omite productos ya preparados y conserva UUID de operaciones.
+No se ejecutan cambios durante selección/vista previa. Cambiar cantidades o selección
+invalida la confirmación anterior. No hay migración: permanece IndexedDB v13 y las
+mismas reglas de Firestore. No se cargaron existencias comerciales durante las pruebas.
+
+Se eliminó el aviso antiguo de bloqueo D2. Se conserva la protección para devolver
+stock de ventas locales anteriores sobre inventario compartido; D4 permanece operativo.
+Archivos: InventorySyncPanel.tsx, inventoryOnboarding.ts, salesRepository.ts y
+inventory-onboarding.test.ts. 329/329 pruebas locales (328 de esta publicación),
+27/27 emuladores; lint, TypeScript y build Pages aprobados. Nuevas pruebas cubren
+selección, cantidades desconocidas/cero, incorporación parcial/masiva, cambios
+concurrentes, errores parciales y reintentos. No se realizó ensayo físico móvil.
+
+
 ## Integración D2 + D3 + D4 — 12-11-2026 (estado vigente)
 
 Se integraron inventario, configuración comercial, ventas y anulaciones compartidas.

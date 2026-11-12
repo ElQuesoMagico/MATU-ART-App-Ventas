@@ -137,7 +137,7 @@ export class SalesRepository {
       if (input.returnStock) for (const item of sale.items) {
         const product = await tx.objectStore('products').get(item.productId)
         if (!product) throw new CatalogError('No se puede devolver el stock: falta un producto original.')
-        if (product.inventoryShared) throw new CatalogError('La devolución afecta inventario compartido D2. Espera la integración de anulaciones compartidas; no se modificaron datos.')
+        if (product.inventoryShared) throw new CatalogError('Esta venta local anterior no descontó inventario compartido. No se puede devolver stock automáticamente; anula sin devolución y revisa el inventario por separado.')
         // Se devuelve solo lo descontado, nunca unidades de la diferencia no cubierta.
         const stock = product.stock + item.stock.quantityDeducted; integer(stock, 'Stock devuelto', true)
         const movementId = crypto.randomUUID(); movementIds.push(movementId)
