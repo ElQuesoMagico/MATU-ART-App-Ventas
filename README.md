@@ -1,5 +1,25 @@
 # MATU ART
 
+## Favicon e iconos PWA — 13-11-2026
+
+`public/branding/` contiene derivados versionados v2 del logo oficial intacto:
+favicon PNG 16/32/48 e ICO, Apple 180, PWA 192/512 y maskable 192/512.
+Fondo rosa oficial `--cherry: #E89DAF`. Solo se elimina margen transparente
+en las copias, se centra y escala proporcionalmente; no se recolorea el dibujo.
+Maskable conserva todo el arte dentro del círculo central de diámetro 78%.
+Generación reproducible: `python scripts/generate-brand-icons.py` (Pillow).
+Referencias: `index.html`, `offlinePlugin.ts`, `src/assets/manifest.json`.
+Los nombres nuevos forman parte del precache y cambian su versión automáticamente.
+Se conservan identidad, scope y start_url PWA, tema de la interfaz y datos locales.
+
+Verificación local: lint, TypeScript/build Pages y 329 pruebas aprobadas; revisión
+visual a 16/32/48 px, tamaños PNG/ICO y color de fondo comprobados. A 16 px se
+reconoce la silueta; el texto interno no es legible sin simplificar el original.
+La actualización del icono instalado depende de Chrome/Android y puede tardar;
+abrir la app con Internet, cerrarla y volverla a abrir. No borrar datos del sitio.
+No se ha comprobado en un dispositivo Android físico. Los originales del artista
+y la auditoría visual anterior se conservan sin cambios.
+
 ## Incorporación masiva de inventario — 12-11-2026
 
 Mi cuenta → Compartir inventario ahora ofrece Compartir todo, Seleccionar todos y

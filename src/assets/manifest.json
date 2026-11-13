@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-15",
+  "updatedAt": "2026-11-13",
   "policy": "Todo recurso artístico confirmado como generado por IA es provisional y debe reemplazarse por trabajo de artistas. Pendiente no significa generado por IA.",
   "resources": [
     {
@@ -924,6 +924,28 @@
       "dimensions": "Adaptable; borde 1,5 px, muescas 8/10 px",
       "replacementStatus": "temporary-placeholder",
       "artistNotes": "Sustituible en TicketFrame y ticketGeometry; Eventos arriba/abajo, otros laterales. Mantener legibilidad y continuidad; no cambiar lógica comercial."
+    },
+    {
+      "id": "matu-art-app-icons-v2",
+      "name": "Favicon e iconos instalables rosa",
+      "path": "public/branding/",
+      "type": "brand-derivatives",
+      "origin": "not-ai",
+      "evidence": "Derivados deterministas del logo oficial proporcionado por el usuario. Original intacto; solo espacio transparente, escala proporcional y fondo --cherry #E89DAF.",
+      "screens": [
+        "Pestaña del navegador",
+        "Instalación PWA Android",
+        "Pantalla de inicio"
+      ],
+      "components": [
+        "index.html",
+        "offlinePlugin.ts",
+        "scripts/generate-brand-icons.py"
+      ],
+      "format": "PNG / ICO",
+      "dimensions": "Favicon 16,32,48; Apple 180; PWA any/maskable 192,512 px cuadrados",
+      "replacementStatus": "official-user-supplied-derivative",
+      "artistNotes": "Maskable: dibujo dentro del círculo central de diámetro 78%; no recoloreado. Nombres v2 evitan caché de iconos antiguos."
     }
   ]
 }

@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto'
 import type { Plugin } from 'vite'
+const brandIcons = ['favicon-v2.ico','favicon-v2-16.png','favicon-v2-32.png','favicon-v2-48.png','apple-touch-v2-180.png','pwa-v2-192.png','pwa-v2-512.png','pwa-maskable-v2-192.png','pwa-maskable-v2-512.png'].map(name=>`branding/${name}`)
 export function precachePaths(files:string[]):string[] {
-  return [...new Set([...files,'index.html','manifest.webmanifest','./','fonts/Fraunces-Variable.ttf','icons.svg','favicon.svg'])]
+  return [...new Set([...files,...brandIcons,'index.html','manifest.webmanifest','./','fonts/Fraunces-Variable.ttf','icons.svg','favicon.svg'])]
 }
 /** Cache the exact production build, including export workers and local artwork.
  * Public build assets are identical across Origin headers. Vite's Vary: Origin
@@ -19,9 +20,11 @@ self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(ev
 }
 export function offlinePlugin():Plugin {
   return {name:'matu-offline-shell',apply:'build',enforce:'post',generateBundle(_options,bundle){
-    const logo=Object.keys(bundle).find(path=>/matu-art-official.*\.png$/.test(path))
-    if(!logo)throw new Error('Falta el logo oficial para el manifiesto PWA.')
-    this.emitFile({type:'asset',fileName:'manifest.webmanifest',source:JSON.stringify({id:'./',name:'MATU ART',short_name:'MATU ART',lang:'es',start_url:'./#inicio',scope:'./',display:'standalone',background_color:'#FFF8EE',theme_color:'#FFF8EE',icons:[{src:logo,sizes:'any',type:'image/png',purpose:'any'}]})})
+    const icons = [192,512].flatMap(size=>[
+      {src:`branding/pwa-v2-${size}.png`,sizes:`${size}x${size}`,type:'image/png',purpose:'any'},
+      {src:`branding/pwa-maskable-v2-${size}.png`,sizes:`${size}x${size}`,type:'image/png',purpose:'maskable'},
+    ])
+    this.emitFile({type:'asset',fileName:'manifest.webmanifest',source:JSON.stringify({id:'./',name:'MATU ART',short_name:'MATU ART',lang:'es',start_url:'./#inicio',scope:'./',display:'standalone',background_color:'#FFF8EE',theme_color:'#FFF8EE',icons})})
     this.emitFile({type:'asset',fileName:'sw.js',source:offlineWorkerSource(precachePaths(Object.keys(bundle)))})
   }}
 }
