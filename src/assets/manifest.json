@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-13",
+  "updatedAt": "2026-11-14",
   "policy": "Todo recurso artístico confirmado como generado por IA es provisional y debe reemplazarse por trabajo de artistas. Pendiente no significa generado por IA.",
   "resources": [
     {
       "id": "circus-tent",
-      "name": "Carpa circense principal",
-      "path": "src/assets/placeholders/illustrations/circus-tent.svg#circus-tent",
+      "name": "ILU-001 · Carpa de artista (uso temporal)",
+      "path": "src/assets/illustrations/circus-tent-artist.svg",
       "type": "illustration",
-      "origin": "pending-verification",
-      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "origin": "not-ai",
+      "evidence": "Circus tent2.svg entregado por el usuario el 14-11-2026. Copia binaria original, sin redibujo.",
       "screens": [
         "Inicio",
         "Eventos"
@@ -17,10 +17,11 @@
       "components": [
         "CircusIllustration"
       ],
-      "format": "SVG symbol",
-      "dimensions": "320 × 300; 16:15",
-      "replacementStatus": "awaiting-origin-review",
-      "artistNotes": "Mantener composición, espacio transparente y legibilidad a 100 px. Conservar id circus-tent y viewBox o adaptar solo el wrapper. Colores mediante variables CSS. Extraída de JSX en 7.1; la extracción no acredita el origen."
+      "format": "SVG",
+      "dimensions": "viewBox 1080 × 1080; Inicio 120 px móvil, hasta 330/360 px escritorio; tarjetas Eventos 190 × 190 px máximo; destacado 150 × 150 px desde 600 px.",
+      "replacementStatus": "temporary-user-artwork",
+      "artistNotes": "Placeholder temporal ILU-001. Comparte archivo con ORN-003; reemplazar solo la referencia circusTent cuando llegue la ilustración definitiva. object-fit: contain; no recortar.",
+      "viewBox": "0 0 1080 1080"
     },
     {
       "id": "demo-product-moon",
@@ -244,11 +245,11 @@
     },
     {
       "id": "ornament-bunting",
-      "name": "Banderines",
-      "path": "src/components/Ornament.tsx#bunting",
+      "name": "ORN-003 · Carpa ornamental del artista",
+      "path": "src/assets/illustrations/circus-tent-artist.svg",
       "type": "decoration",
-      "origin": "pending-verification",
-      "evidence": "No existe registro de autoría o proceso de creación verificable en el proyecto.",
+      "origin": "not-ai",
+      "evidence": "Circus tent2.svg entregado por el usuario el 14-11-2026. Copia binaria original, sin redibujo.",
       "screens": [
         "Inicio",
         "POS",
@@ -265,10 +266,11 @@
         "ProductImage",
         "Statistics"
       ],
-      "format": "SVG JSX",
-      "dimensions": "240 × 36; 20:3",
-      "replacementStatus": "awaiting-origin-review",
-      "artistNotes": "SVG breve centralizado; mantener props, aria-hidden y herencia currentColor. El rosetón también identifica imágenes ausentes."
+      "format": "SVG",
+      "dimensions": "viewBox 1080 × 1080; lateral escritorio 128 × 128 CSS px, max-width 100%; tarjeta lateral oculta en móvil.",
+      "replacementStatus": "integrated-user-artwork",
+      "artistNotes": "Reemplaza guirnalda 100 × 18; composición cuadrada, sin deformación. Misma fuente que ILU-001 temporal.",
+      "viewBox": "0 0 1080 1080"
     },
     {
       "id": "brand-icon-home",

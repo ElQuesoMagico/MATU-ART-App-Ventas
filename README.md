@@ -1,5 +1,17 @@
 # MATU ART
 
+## Carpa del artista — 14-11-2026
+
+Se integra `src/assets/illustrations/circus-tent-artist.svg`, copia intacta del
+SVG entregado por el usuario. ORN-003 sustituye la antigua guirnalda lateral
+por una composición cuadrada de 128 px. ILU-001 reutiliza temporalmente el
+mismo archivo en Inicio y Eventos, sin recortes ni deformación. Referencias
+centralizadas en artisticAssets.ts; adaptadores Ornament/CircusIllustration
+y CSS ajustados, sin cambios comerciales. Inventario visual, miniaturas y
+manifiesto actualizados; el recurso anterior se conserva sin uso.
+Verificado: build/TypeScript, lint y 329 pruebas. Composición aislada con CSS real
+en 390, 425 y 1440 px sin deformación ni overflow; no prueba física Android.
+
 ## Favicon e iconos PWA — 13-11-2026
 
 `public/branding/` contiene derivados versionados v2 del logo oficial intacto:

@@ -1,0 +1,2819 @@
+{
+  "date": "2026-11-13",
+  "resources": [
+    {
+      "id": "DEC-004",
+      "name": "Perforación de eventos y promociones",
+      "group": "Identidad visual y decoraciones",
+      "function": "Separador ornamental antes de acciones",
+      "path": "src/App.css#.event-card .event-actions, .promotion-card footer",
+      "dimensions": "2 px dotted; ancho del contenedor; margen superior 16 y padding 12 px",
+      "viewBox": "No aplica",
+      "alternate": "Depende del contenedor; muestra de referencia, no medida del diseño completo.",
+      "type": "CSS personalizado",
+      "origin": "CSS personalizado; autoría no verificada",
+      "uses": 2,
+      "screens": "Eventos; Promociones",
+      "priority": "Media",
+      "notes": "Tratar como motivo de perforación, no redibujar textos ni controles.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "DEC-005",
+      "name": "Cartel de Inicio con muescas",
+      "group": "Identidad visual y decoraciones",
+      "function": "Marco editorial compuesto alrededor de bienvenida y carpa",
+      "path": "src/App.css#.home-pos-poster, .event-poster",
+      "dimensions": "Fluido; máscara lateral radio10 px; marco doble separado 7 px; radio12/6 px",
+      "viewBox": "No aplica",
+      "alternate": "Depende del contenedor; muestra de referencia, no medida del diseño completo.",
+      "type": "CSS personalizado",
+      "origin": "CSS personalizado; autoría no verificada",
+      "uses": 1,
+      "screens": "Inicio",
+      "priority": "Media",
+      "notes": "Es un marco compuesto, no otra ilustración. La carpa corresponde a ILU-001.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "MAR-001",
+      "name": "Logo oficial MATU ART",
+      "group": "Identidad visual y decoraciones",
+      "function": "Identificar la marca en aplicación, PWA y PDF",
+      "path": "src/assets/branding/matu-art-official.png",
+      "dimensions": "Archivo: 4000 × 4000 px. CSS: encabezado 52 × 52; lateral 150 × 150.",
+      "viewBox": "No aplica",
+      "alternate": "Lateral visible desde 1000 px; favicon/PWA según plataforma. PDF 38 × 38 mm.",
+      "type": "PNG",
+      "origin": "Oficial proporcionado por usuario; README branding",
+      "uses": 5,
+      "screens": "Todas (componente global); eventPDF.ts; index.html; offlinePlugin.ts",
+      "priority": "Baja",
+      "notes": "Conservar original. Miniatura muestra presentación circular; incluye márgenes transparentes. Consultar antes de redibujar identidad oficial.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "MAR-002",
+      "name": "Payaso de marca",
+      "group": "Identidad visual y decoraciones",
+      "function": "Avatar, sello de evento/promoción y producto sin imagen",
+      "path": "src/assets/branding/clown-icon.png",
+      "dimensions": "Archivo: 1414 × 2000 px; ventana CSS cuadrada: 20, 26, 30, 40 o 54 px.",
+      "viewBox": "No aplica",
+      "alternate": "Inventario/carrito 26; catálogo sin imagen 54; navegación 30; evento 40; promoción 20.",
+      "type": "PNG + encuadre CSS",
+      "origin": "Oficial proporcionado por usuario; README branding",
+      "uses": 8,
+      "screens": "Crear/editar producto; Eventos; Inicio; Inventario; Promociones; Punto de venta; Todas (componente global)",
+      "priority": "Baja",
+      "notes": "Un maestro para rosette y starburst: ambas variantes usan el mismo PNG. Límites alfa documentados (245,633)–(1106,1394); conservar original y proporción.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ORN-001",
+      "name": "Estrella curva de cuatro puntas",
+      "group": "Identidad visual y decoraciones",
+      "function": "Encabezados, talones o programa lateral",
+      "path": "src/components/Ornament.tsx#star",
+      "dimensions": "12 px talón; 15 px selector; 16 px modal",
+      "viewBox": "0 0 64 64",
+      "alternate": "Guirnalda y separador solo en barra lateral escritorio; estrella visible también móvil.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 42,
+      "screens": "Administración de gastos; Ajustar stock; Creación rápida de clasificación; Crear/editar evento; Crear/editar gasto; Crear/editar producto; Crear/editar promoción; Datos y respaldos; Detalle del gasto; Detalle y anulación de venta; Eliminación controlada; Estadísticas; Eventos; Historial de inventario; Importación masiva; Inicio; Inventario; Mi cuenta / Conexión a la nube; Organizar catálogo; Pago; Promociones; Punto de venta; Reasignación de categorías; Reversión de movimiento",
+      "priority": "Alta",
+      "notes": "Separador y guirnalda son composiciones maestras. Mantener proporción, aire y legibilidad.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ORN-002",
+      "name": "Separador con estrella y puntos",
+      "group": "Identidad visual y decoraciones",
+      "function": "Encabezados, talones o programa lateral",
+      "path": "src/components/Ornament.tsx#divider",
+      "dimensions": "Escritorio: 150 × 23 px de caja CSS",
+      "viewBox": "0 0 240 36",
+      "alternate": "Guirnalda y separador solo en barra lateral escritorio; estrella visible también móvil.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 1,
+      "screens": "Todas (componente global)",
+      "priority": "Alta",
+      "notes": "Separador y guirnalda son composiciones maestras. Mantener proporción, aire y legibilidad.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ORN-003",
+      "name": "Carpa ornamental del artista",
+      "group": "Identidad visual y decoraciones",
+      "function": "Encabezados, talones o programa lateral",
+      "path": "src/assets/illustrations/circus-tent-artist.svg",
+      "dimensions": "SVG 1080 × 1080. CSS lateral: 128 × 128 px; max-width 100%.",
+      "viewBox": "0 0 1080 1080",
+      "alternate": "Lateral oculto en móvil; conserva composición 1:1.",
+      "type": "SVG local original",
+      "origin": "Recurso original proporcionado por el usuario (14-11-2026); sin IA",
+      "uses": 1,
+      "screens": "Todas (componente global)",
+      "priority": "Alta",
+      "notes": "Integrado. Sustituye guirnalda horizontal; comparte archivo con ILU-001 temporal. No recortar ni deformar.",
+      "status": "integrado",
+      "active": true
+    },
+    {
+      "id": "DEC-001",
+      "name": "Rayas de carpa",
+      "group": "Navegación",
+      "function": "Patrón de rayas en navegación y carrito",
+      "path": "src/styles/themes.css#--stripe",
+      "dimensions": "Módulo 24 px (12 rosa + 12 crema); lateral 4 px móvil / 10 escritorio; carrito 7 px",
+      "viewBox": "No aplica",
+      "alternate": "Depende del contenedor; muestra de referencia, no medida del diseño completo.",
+      "type": "CSS personalizado",
+      "origin": "CSS personalizado; autoría no verificada",
+      "uses": 2,
+      "screens": "Navegación; POS",
+      "priority": "Media",
+      "notes": "Muestra ampliada para ver patrón. Reglas desk-event/editorial-panel son heredadas u ocultas y no cuentan como uso actual.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-001",
+      "name": "Tienda / Inicio",
+      "group": "Navegación",
+      "function": "Abrir Inicio desde la navegación",
+      "path": "src/components/Icon.tsx#paths.home",
+      "dimensions": "20 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 1,
+      "screens": "Todas (componente global)",
+      "priority": "Alta",
+      "notes": "Nombre exacto interno: home. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-002",
+      "name": "Bolsa de venta",
+      "group": "Navegación",
+      "function": "Abrir Punto de venta, acceder al carrito e identificar ventas en listados",
+      "path": "src/components/Icon.tsx#paths.bag",
+      "dimensions": "19 y 20 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 4,
+      "screens": "Historial de ventas; Inicio; Punto de venta; Todas (componente global)",
+      "priority": "Alta",
+      "notes": "Nombre exacto interno: bag. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-003",
+      "name": "Caja de inventario",
+      "group": "Navegación",
+      "function": "Abrir el inventario",
+      "path": "src/components/Icon.tsx#paths.box",
+      "dimensions": "20 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 1,
+      "screens": "Todas (componente global)",
+      "priority": "Alta",
+      "notes": "Nombre exacto interno: box. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-004",
+      "name": "Cronómetro / Historial",
+      "group": "Navegación",
+      "function": "Abrir el historial de ventas",
+      "path": "src/components/Icon.tsx#paths.clock",
+      "dimensions": "20 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 1,
+      "screens": "Todas (componente global)",
+      "priority": "Alta",
+      "notes": "Nombre exacto interno: clock. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-005",
+      "name": "Carpa / Eventos",
+      "group": "Navegación",
+      "function": "Abrir la administración de eventos",
+      "path": "src/components/Icon.tsx#paths.tent",
+      "dimensions": "20 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 1,
+      "screens": "Todas (componente global)",
+      "priority": "Alta",
+      "notes": "Nombre exacto interno: tent. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "CTL-001",
+      "name": "Cerrar o quitar etiqueta",
+      "group": "Acciones y controles",
+      "function": "Símbolo tipográfico empleado como icono funcional",
+      "path": "src/components/catalog/ClassificationSelect.tsx",
+      "dimensions": "24 px cierre del selector; 12 px en etiquetas. Glifo, no caja SVG.",
+      "viewBox": "No aplica",
+      "alternate": "Depende de fuente del sistema; área táctil independiente.",
+      "type": "Glifo Unicode",
+      "origin": "Fuente del sistema (no ilustración)",
+      "uses": 2,
+      "screens": "Selectores de clasificaciones",
+      "priority": "Baja",
+      "notes": "No es icono de biblioteca. Solo encargar equivalente si se quiere sustituir el control por SVG.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "CTL-002",
+      "name": "Opción seleccionada",
+      "group": "Acciones y controles",
+      "function": "Símbolo tipográfico empleado como icono funcional",
+      "path": "src/components/catalog/ClassificationSelect.tsx",
+      "dimensions": "18 px",
+      "viewBox": "No aplica",
+      "alternate": "Depende de fuente del sistema; área táctil independiente.",
+      "type": "Glifo Unicode",
+      "origin": "Fuente del sistema (no ilustración)",
+      "uses": 1,
+      "screens": "Selectores de clasificaciones",
+      "priority": "Baja",
+      "notes": "No es icono de biblioteca. Solo encargar equivalente si se quiere sustituir el control por SVG.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "CTL-003",
+      "name": "Crear clasificación / entidad",
+      "group": "Acciones y controles",
+      "function": "Símbolo tipográfico empleado como icono funcional",
+      "path": "src/components/catalog/ClassificationSelect.tsx",
+      "dimensions": "11 px text-button; 12 px botón Crear nuevo; 11 px detalle diario",
+      "viewBox": "No aplica",
+      "alternate": "Depende de fuente del sistema; área táctil independiente.",
+      "type": "Glifo Unicode",
+      "origin": "Fuente del sistema (no ilustración)",
+      "uses": 4,
+      "screens": "Menú Crear nuevo; Selectores de clasificaciones",
+      "priority": "Baja",
+      "notes": "No es icono de biblioteca. Solo encargar equivalente si se quiere sustituir el control por SVG. Incluye el signo + del detalle diario cerrado; no operadores matemáticos del código.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "DEC-006",
+      "name": "Ojal de etiqueta",
+      "group": "Acciones y controles",
+      "function": "Orificio ilustrado en filtros y etiquetas",
+      "path": "src/App.css#.filter-chip::before",
+      "dimensions": "4 × 4 px de caja, borde1; con box-sizing:border-box",
+      "viewBox": "No aplica",
+      "alternate": "Depende del contenedor; muestra de referencia, no medida del diseño completo.",
+      "type": "CSS personalizado",
+      "origin": "CSS personalizado; autoría no verificada",
+      "uses": 5,
+      "screens": "Historial de inventario; Inventario; Organizar catálogo; Selectores de clasificaciones",
+      "priority": "Media",
+      "notes": "Elemento CSS mínimo, baja prioridad; no reemplazar todo el control.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-006",
+      "name": "Lupa",
+      "group": "Acciones y controles",
+      "function": "Buscar en listas y catálogos",
+      "path": "src/components/Icon.tsx#paths.search",
+      "dimensions": "20 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 5,
+      "screens": "Administración de gastos; Eventos; Inventario; Promociones; Punto de venta",
+      "priority": "Media",
+      "notes": "Nombre exacto interno: search. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-007",
+      "name": "Flecha a la derecha",
+      "group": "Acciones y controles",
+      "function": "Indicar accesos directos y navegación hacia otra sección",
+      "path": "src/components/Icon.tsx#paths.arrow",
+      "dimensions": "14, 16, 17, 18 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 7,
+      "screens": "Inicio; Punto de venta; Todas (componente global)",
+      "priority": "Media",
+      "notes": "Nombre exacto interno: arrow. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-009",
+      "name": "Más",
+      "group": "Acciones y controles",
+      "function": "Agregar producto al carrito o aumentar cantidad",
+      "path": "src/components/Icon.tsx#paths.plus",
+      "dimensions": "15 px cantidad; 18 px agregar",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 2,
+      "screens": "Punto de venta",
+      "priority": "Media",
+      "notes": "Nombre exacto interno: plus. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-010",
+      "name": "Menos",
+      "group": "Acciones y controles",
+      "function": "Reducir cantidad del carrito",
+      "path": "src/components/Icon.tsx#paths.minus",
+      "dimensions": "15 px",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 1,
+      "screens": "Punto de venta",
+      "priority": "Media",
+      "notes": "Nombre exacto interno: minus. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-011",
+      "name": "Cerrar en cruz",
+      "group": "Acciones y controles",
+      "function": "Cerrar ventanas y quitar líneas del carrito",
+      "path": "src/components/Icon.tsx#paths.close",
+      "dimensions": "16 px carrito; 20 px modal",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 26,
+      "screens": "Administración de gastos; Ajustar stock; Creación rápida de clasificación; Crear/editar evento; Crear/editar gasto; Crear/editar producto; Crear/editar promoción; Datos y respaldos; Detalle del gasto; Detalle y anulación de venta; Eliminación controlada; Eventos; Historial de inventario; Importación masiva; Mi cuenta / Conexión a la nube; Organizar catálogo; Pago; Promociones; Punto de venta; Reasignación de categorías; Reversión de movimiento",
+      "priority": "Media",
+      "notes": "Nombre exacto interno: close. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "NAT-001",
+      "name": "Indicador de desplegable",
+      "group": "Acciones y controles",
+      "function": "Control nativo, no arte de marca",
+      "path": "HTML nativo; ubicaciones en Usos",
+      "dimensions": "No fijo; determinado por navegador, SO, zoom y fuente",
+      "viewBox": "No aplica",
+      "alternate": "Android puede mostrar otra apariencia u omitir el icono.",
+      "type": "Nativo del navegador",
+      "origin": "Navegador / sistema operativo",
+      "uses": 31,
+      "screens": "Administración de gastos; Ajustar stock; Crear/editar gasto; Crear/editar producto; Crear/editar promoción; Datos y respaldos; Descuentos del POS; Estadísticas; Eventos; Historial de inventario; Historial de ventas; Importación masiva; Inventario compartido; Precios por evento; Promociones; Reasignación de categorías; Sincronización de catálogo",
+      "priority": "Sin reemplazo",
+      "notes": "Referencia renderizada en Edge de escritorio. No prometer correspondencia visual con Android; no necesita redibujo de marca.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "NAT-002",
+      "name": "Casilla de selección",
+      "group": "Acciones y controles",
+      "function": "Control nativo, no arte de marca",
+      "path": "HTML nativo; ubicaciones en Usos",
+      "dimensions": "19 × 19 px .check-label; 20 × 20 px .pending-select; otros nativos según navegador",
+      "viewBox": "No aplica",
+      "alternate": "Android puede mostrar otra apariencia u omitir el icono.",
+      "type": "Nativo del navegador",
+      "origin": "Navegador / sistema operativo",
+      "uses": 12,
+      "screens": "Crear/editar producto; Crear/editar promoción; Detalle y anulación de venta; Eventos y ventas compartidas; Importación masiva; Inventario compartido; Revisión de datos pendientes; Sincronización de catálogo",
+      "priority": "Sin reemplazo",
+      "notes": "Referencia renderizada en Edge de escritorio. No prometer correspondencia visual con Android; no necesita redibujo de marca. Acento cereza configurado en estas dos clases; otros contextos pueden usar el color nativo.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "NAT-003",
+      "name": "Calendario del campo fecha",
+      "group": "Acciones y controles",
+      "function": "Control nativo, no arte de marca",
+      "path": "HTML nativo; ubicaciones en Usos",
+      "dimensions": "No fijo; determinado por navegador, SO, zoom y fuente",
+      "viewBox": "No aplica",
+      "alternate": "Android puede mostrar otra apariencia u omitir el icono.",
+      "type": "Nativo del navegador",
+      "origin": "Navegador / sistema operativo",
+      "uses": 13,
+      "screens": "Crear/editar evento; Crear/editar gasto; Crear/editar promoción; Datos y respaldos; Estadísticas; Historial de ventas",
+      "priority": "Sin reemplazo",
+      "notes": "Referencia renderizada en Edge de escritorio. No prometer correspondencia visual con Android; no necesita redibujo de marca.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "NAT-004",
+      "name": "Indicador de detalle desplegable",
+      "group": "Acciones y controles",
+      "function": "Control nativo, no arte de marca",
+      "path": "HTML nativo; ubicaciones en Usos",
+      "dimensions": "No fijo; determinado por navegador, SO, zoom y fuente",
+      "viewBox": "No aplica",
+      "alternate": "Android puede mostrar otra apariencia u omitir el icono.",
+      "type": "Nativo del navegador",
+      "origin": "Navegador / sistema operativo",
+      "uses": 30,
+      "screens": "Crear/editar producto; Datos y respaldos; Detalle del gasto; Detalle y anulación de venta; Estadísticas; Eventos y ventas compartidas; Historial de inventario; Importación masiva; Inventario compartido; Precios por evento; Revisión de datos pendientes; Sincronización de catálogo",
+      "priority": "Sin reemplazo",
+      "notes": "Referencia renderizada en Edge de escritorio. No prometer correspondencia visual con Android; no necesita redibujo de marca.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "NAT-005",
+      "name": "Limpiar búsqueda",
+      "group": "Acciones y controles",
+      "function": "Control nativo, no arte de marca",
+      "path": "HTML nativo; ubicaciones en Usos",
+      "dimensions": "No fijo; determinado por navegador, SO, zoom y fuente",
+      "viewBox": "No aplica",
+      "alternate": "Android puede mostrar otra apariencia u omitir el icono.",
+      "type": "Nativo del navegador",
+      "origin": "Navegador / sistema operativo",
+      "uses": 6,
+      "screens": "Búsqueda compartida; Organizar catálogo; Revisión de datos pendientes; Selectores de clasificaciones; Sincronización de catálogo",
+      "priority": "Sin reemplazo",
+      "notes": "Referencia renderizada en Edge de escritorio. No prometer correspondencia visual con Android; no necesita redibujo de marca. Icono de limpiar visible con foco y valor; referencia capturada en ese estado.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "NAT-006",
+      "name": "Control numérico",
+      "group": "Acciones y controles",
+      "function": "Control nativo, no arte de marca",
+      "path": "HTML nativo; ubicaciones en Usos",
+      "dimensions": "No fijo; determinado por navegador, SO, zoom y fuente",
+      "viewBox": "No aplica",
+      "alternate": "Android puede mostrar otra apariencia u omitir el icono.",
+      "type": "Nativo del navegador",
+      "origin": "Navegador / sistema operativo",
+      "uses": 9,
+      "screens": "Ajustar stock; Crear/editar producto; Crear/editar promoción; Inventario compartido; Organizar catálogo",
+      "priority": "Sin reemplazo",
+      "notes": "Referencia renderizada en Edge de escritorio. No prometer correspondencia visual con Android; no necesita redibujo de marca. Flechas visibles con hover/foco en Edge; Android puede omitirlas.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "DEC-002",
+      "name": "Cinta adhesiva de tarjeta",
+      "group": "Productos e inventario",
+      "function": "Sujetar visualmente foto del catálogo POS",
+      "path": "src/App.css#.product-card::before",
+      "dimensions": "38 × 11 px; giro −3°; left:calc(50% - 19px), top:-6px",
+      "viewBox": "No aplica",
+      "alternate": "Depende del contenedor; muestra de referencia, no medida del diseño completo.",
+      "type": "CSS personalizado",
+      "origin": "CSS personalizado; autoría no verificada",
+      "uses": 1,
+      "screens": "Punto de venta",
+      "priority": "Media",
+      "notes": "Rectángulo semitransparente de papelería. No confundir con borde simple.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "TIC-003",
+      "name": "Entrada: Eventos",
+      "group": "Eventos",
+      "function": "Contorno vectorial con muescas",
+      "path": "src/components/TicketFrame.tsx; src/services/ticketGeometry.ts",
+      "dimensions": "Fluido, medido por ResizeObserver; radio muesca 10 px, esquinas9, trazo1,5 px",
+      "viewBox": "0 0 ancho alto (dinámico); inicio 300 × 200",
+      "alternate": "Resultados: min-height184; otras tarjetas dependen del contenido.",
+      "type": "SVG dinámico",
+      "origin": "Geometría CSS/SVG personalizada; creación por Codex documentada en manifiesto",
+      "uses": 1,
+      "screens": "Eventos",
+      "priority": "Alta",
+      "notes": "Mantener continuidad del trazo y espacio para contenido. No convertir el marco adaptable en una imagen de tamaño fijo.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "CTL-004",
+      "name": "Contraer detalle diario (menos)",
+      "group": "Historial y estadísticas",
+      "function": "Símbolo de cierre del detalle diario",
+      "path": "src/styles/analytics.css#.analytics-day[open] summary::after",
+      "dimensions": "11 px, tamaño de texto CSS",
+      "viewBox": "No aplica",
+      "alternate": "Se muestra al abrir un día del evento.",
+      "type": "Glifo CSS",
+      "origin": "Fuente del sistema (no ilustración)",
+      "uses": 2,
+      "screens": "Estadísticas",
+      "priority": "Baja",
+      "notes": "El + cerrado comparte CTL-003. No es una nueva ilustración.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "DAT-001",
+      "name": "Barras estadísticas positivas y negativas",
+      "group": "Historial y estadísticas",
+      "function": "Visualizar datos calculados",
+      "path": "src/components/analytics/Statistics.tsx#BarChart; src/styles/analytics.css",
+      "dimensions": "Pista14 px alto; ancho fluido; barra porcentual calculada",
+      "viewBox": "No aplica",
+      "alternate": "Adaptable al ancho del panel.",
+      "type": "HTML + CSS",
+      "origin": "CSS personalizado; gráfico funcional",
+      "uses": 3,
+      "screens": "Estadísticas",
+      "priority": "Sin reemplazo",
+      "notes": "Muestra de geometría con proporciones de referencia; no representa ventas reales. No sustituir por imagen estática.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "DEC-003",
+      "name": "Talón perforado de resultados",
+      "group": "Historial y estadísticas",
+      "function": "Separar talón del cuerpo de tickets",
+      "path": "src/App.css#.ticket-stub; src/styles/tickets.css",
+      "dimensions": "Ancho 32 px (30 móvil ≤450); borde punteado 1 px; altura adaptable",
+      "viewBox": "No aplica",
+      "alternate": "Depende del contenedor; muestra de referencia, no medida del diseño completo.",
+      "type": "CSS personalizado",
+      "origin": "CSS personalizado; autoría no verificada",
+      "uses": 3,
+      "screens": "Estadísticas; Inicio",
+      "priority": "Media",
+      "notes": "Referencia de composición de talón. Letras son texto funcional y la estrella tiene maestro ORN-001.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "TIC-001",
+      "name": "Entrada: Resultados",
+      "group": "Historial y estadísticas",
+      "function": "Contorno vectorial con muescas",
+      "path": "src/components/TicketFrame.tsx; src/services/ticketGeometry.ts",
+      "dimensions": "Fluido, medido por ResizeObserver; radio muesca 8 px, esquinas9, trazo1,5 px",
+      "viewBox": "0 0 ancho alto (dinámico); inicio 300 × 200",
+      "alternate": "Resultados: min-height184; otras tarjetas dependen del contenido.",
+      "type": "SVG dinámico",
+      "origin": "Geometría CSS/SVG personalizada; creación por Codex documentada en manifiesto",
+      "uses": 3,
+      "screens": "Estadísticas; Inicio",
+      "priority": "Alta",
+      "notes": "Mantener continuidad del trazo y espacio para contenido. No convertir el marco adaptable en una imagen de tamaño fijo.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "TIC-002",
+      "name": "Entrada: Promociones y tarjetas analíticas",
+      "group": "Historial y estadísticas",
+      "function": "Contorno vectorial con muescas",
+      "path": "src/components/TicketFrame.tsx; src/services/ticketGeometry.ts",
+      "dimensions": "Fluido, medido por ResizeObserver; radio muesca 10 px, esquinas9, trazo1,5 px",
+      "viewBox": "0 0 ancho alto (dinámico); inicio 300 × 200",
+      "alternate": "Resultados: min-height184; otras tarjetas dependen del contenido.",
+      "type": "SVG dinámico",
+      "origin": "Geometría CSS/SVG personalizada; creación por Codex documentada en manifiesto",
+      "uses": 4,
+      "screens": "Estadísticas; Inicio; Promociones",
+      "priority": "Alta",
+      "notes": "Mantener continuidad del trazo y espacio para contenido. No convertir el marco adaptable en una imagen de tamaño fijo.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ICO-008",
+      "name": "Destello angular",
+      "group": "Estados y mensajes",
+      "function": "Identificar Promociones y acompañar estados vacíos",
+      "path": "src/components/Icon.tsx#paths.sparkle",
+      "dimensions": "20 px navegación; 32 px vacío",
+      "viewBox": "0 0 24 24",
+      "alternate": "SVG escala uniforme; currentColor según control. Área táctil no es tamaño del icono.",
+      "type": "SVG inline",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 16,
+      "screens": "Administración de gastos; Estadísticas; Eventos; Historial de inventario; Inicio; Inicio e historial de ventas; Inventario; Promociones; Punto de venta; Todas (componente global)",
+      "priority": "Media",
+      "notes": "Nombre exacto interno: sparkle. No se identificó biblioteca de procedencia. Trazo 1,7; extremos redondos. SVG transparente, legible a 15–32 px.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ILU-001",
+      "name": "Carpa del artista · uso temporal",
+      "group": "Ilustraciones grandes",
+      "function": "Ilustración principal de Inicio y Eventos",
+      "path": "src/assets/illustrations/circus-tent-artist.svg",
+      "dimensions": "SVG 1080 × 1080. Inicio móvil hasta 120 × 120 px (limitado por columna; 100 px en muestra); escritorio hasta 330/360 px. Eventos tarjetas hasta 190 × 190 px.",
+      "viewBox": "0 0 1080 1080",
+      "alternate": "Destacado Eventos: 150 × 150 px desde 600 px; oculto en móvil.",
+      "type": "SVG local original",
+      "origin": "Recurso original proporcionado por el usuario (14-11-2026); sin IA",
+      "uses": 3,
+      "screens": "Eventos; Inicio",
+      "priority": "Alta",
+      "notes": "ILU-001 temporal. Misma fuente que ORN-003, sin duplicar archivo de aplicación. Pendiente de ilustración definitiva.",
+      "status": "pendiente",
+      "active": true
+    },
+    {
+      "id": "ANT-F01",
+      "name": "clown-ufo.svg",
+      "group": "No utilizado",
+      "function": "Plantilla o marca antigua; sin uso visible",
+      "path": "public/clown-ufo.svg",
+      "dimensions": "width=\"64\"; height=\"64\"",
+      "viewBox": "0 0 64 64",
+      "alternate": "Sin tamaño CSS activo",
+      "type": "SVG",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "No utilizado. React/Vite son marcas reconocibles, pero no se verificó autoría/licencia del archivo.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-F02",
+      "name": "favicon.svg",
+      "group": "No utilizado",
+      "function": "Plantilla o marca antigua; sin uso visible",
+      "path": "public/favicon.svg",
+      "dimensions": "width=\"48\"; height=\"46\"; width=\"48\"; height=\"46\"",
+      "viewBox": "0 0 48 46",
+      "alternate": "Sin tamaño CSS activo",
+      "type": "SVG",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "favicon.svg e icons.svg se precargan en service worker, pero no se muestran como favicon ni iconos activos.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-F03",
+      "name": "react.svg",
+      "group": "No utilizado",
+      "function": "Plantilla o marca antigua; sin uso visible",
+      "path": "src/assets/react.svg",
+      "dimensions": "width=\"35.93\"; height=\"32\"",
+      "viewBox": "0 0 256 228",
+      "alternate": "Sin tamaño CSS activo",
+      "type": "SVG",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "No utilizado. React/Vite son marcas reconocibles, pero no se verificó autoría/licencia del archivo. El SVG declara class=\"iconify iconify--logos\"; marca React. No hay dependencia Iconify activa.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-F04",
+      "name": "vite.svg",
+      "group": "No utilizado",
+      "function": "Plantilla o marca antigua; sin uso visible",
+      "path": "src/assets/vite.svg",
+      "dimensions": "width=\"77\"; height=\"47\"",
+      "viewBox": "0 0 77 47",
+      "alternate": "Sin tamaño CSS activo",
+      "type": "SVG",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "No utilizado. React/Vite son marcas reconocibles, pero no se verificó autoría/licencia del archivo.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-F05",
+      "name": "hero.png",
+      "group": "No utilizado",
+      "function": "Plantilla o marca antigua; sin uso visible",
+      "path": "src/assets/hero.png",
+      "dimensions": "(343, 361) px archivo",
+      "viewBox": "No aplica",
+      "alternate": "Sin tamaño CSS activo",
+      "type": "PNG",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "No utilizado. React/Vite son marcas reconocibles, pero no se verificó autoría/licencia del archivo.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-P01",
+      "name": "Muestra product-moon",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-moon",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 180 150",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-P02",
+      "name": "Muestra product-flower",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-flower",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 180 150",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-P03",
+      "name": "Muestra product-cat",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-cat",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 180 150",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-P04",
+      "name": "Muestra product-planet",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-planet",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 180 150",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-P05",
+      "name": "Muestra product-sun",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-sun",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 180 150",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-P06",
+      "name": "Muestra product-ghost",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "src/assets/placeholders/illustrations/product-samples.svg#product-ghost",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 180 150",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-S01",
+      "name": "Símbolo bluesky-icon",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "public/icons.svg#bluesky-icon",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 16 17",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-S02",
+      "name": "Símbolo discord-icon",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "public/icons.svg#discord-icon",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 20 19",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-S03",
+      "name": "Símbolo documentation-icon",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "public/icons.svg#documentation-icon",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 21 20",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-S04",
+      "name": "Símbolo github-icon",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "public/icons.svg#github-icon",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 19 19",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-S05",
+      "name": "Símbolo social-icon",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "public/icons.svg#social-icon",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 20 20",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    },
+    {
+      "id": "ANT-S06",
+      "name": "Símbolo x-icon",
+      "group": "No utilizado",
+      "function": "No utilizado en el árbol operativo",
+      "path": "public/icons.svg#x-icon",
+      "dimensions": "Archivo vectorial sin dimensión raster; Sin tamaño CSS activo",
+      "viewBox": "0 0 19 19",
+      "alternate": "No aplica",
+      "type": "SVG symbol",
+      "origin": "Origen desconocido (recurso local)",
+      "uses": 0,
+      "screens": "No utilizado",
+      "priority": "Sin reemplazo",
+      "notes": "Conservar solo como referencia histórica; no encargar redibujo sin reactivar uso.",
+      "status": "pendiente",
+      "active": false
+    }
+  ],
+  "uses": [
+    {
+      "id": "MAR-001",
+      "file": "src/App.tsx",
+      "line": 40,
+      "column": 60,
+      "context": "<img className=\"topbar-logo\" src={artisticAssets.brandLogo} alt=\"\" /"
+    },
+    {
+      "id": "MAR-001",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 15,
+      "column": 71,
+      "context": "<img className=\"official-logo\" src={artisticAssets.brandLogo} alt=\"MATU ART\" /"
+    },
+    {
+      "id": "MAR-001",
+      "file": "index.html",
+      "line": 5,
+      "column": 1,
+      "context": "Favicon"
+    },
+    {
+      "id": "MAR-001",
+      "file": "offlinePlugin.ts",
+      "line": 24,
+      "column": 1,
+      "context": "Icono PWA; sizes:any"
+    },
+    {
+      "id": "MAR-001",
+      "file": "src/services/data/eventPDF.ts",
+      "line": 13,
+      "column": 1,
+      "context": "Informe PDF; 38 × 38 mm"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 19,
+      "column": 62,
+      "context": "<Ornament kind=\"rosette\" size={30} /"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/screens/Events.tsx",
+      "line": 40,
+      "column": 276,
+      "context": "<Ornament kind=\"rosette\" className=\"event-rosette\" size={40} /"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/screens/Promotions.tsx",
+      "line": 34,
+      "column": 186,
+      "context": "<Ornament kind=\"starburst\" size={20} /"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/screens/Home.tsx",
+      "line": 38,
+      "column": 180,
+      "context": "<ProductImage product={product} small /"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/screens/Inventory.tsx",
+      "line": 53,
+      "column": 39,
+      "context": "<ProductImage product={product} small /"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 45,
+      "column": 359,
+      "context": "<ProductImage product={product} /"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 47,
+      "column": 163,
+      "context": "<ProductImage product={line.product} small /"
+    },
+    {
+      "id": "MAR-002",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 66,
+      "column": 52,
+      "context": "<ProductImage product={{ ...(product ?? { id, name, categoryIds: [], familyIds, ipIds, price: Number(price), stock: Number(stock), lowStockT"
+    },
+    {
+      "id": "ICO-001",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 8,
+      "column": 55,
+      "context": "icon: 'home'"
+    },
+    {
+      "id": "ICO-002",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 43,
+      "column": 196,
+      "context": "<Icon name=\"bag\" size={19} /"
+    },
+    {
+      "id": "ICO-002",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 8,
+      "column": 129,
+      "context": "icon: 'bag'"
+    },
+    {
+      "id": "ICO-002",
+      "file": "src/screens/History.tsx",
+      "line": 22,
+      "column": 133,
+      "context": "<StoredSaleList sales={sales} onOpen={setDetail} /"
+    },
+    {
+      "id": "ICO-002",
+      "file": "src/screens/Home.tsx",
+      "line": 40,
+      "column": 233,
+      "context": "<StoredSaleList sales={catalog.sales.slice(0, 3)} onOpen={setDetail} /"
+    },
+    {
+      "id": "ICO-003",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 9,
+      "column": 67,
+      "context": "icon: 'box'"
+    },
+    {
+      "id": "ICO-004",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 9,
+      "column": 143,
+      "context": "icon: 'clock'"
+    },
+    {
+      "id": "ICO-005",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 9,
+      "column": 296,
+      "context": "icon: 'tent'"
+    },
+    {
+      "id": "ICO-006",
+      "file": "src/screens/Events.tsx",
+      "line": 38,
+      "column": 52,
+      "context": "<SearchField value={query} onChange={setQuery} placeholder=\"Buscar eventos…\" /"
+    },
+    {
+      "id": "ICO-006",
+      "file": "src/screens/Inventory.tsx",
+      "line": 50,
+      "column": 30,
+      "context": "<SearchField value={query} onChange={setQuery} placeholder=\"Buscar por nombre o clasificación…\" /"
+    },
+    {
+      "id": "ICO-006",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 44,
+      "column": 77,
+      "context": "<SearchField value={query} onChange={setQuery} placeholder=\"Buscar un producto…\" /"
+    },
+    {
+      "id": "ICO-006",
+      "file": "src/screens/Promotions.tsx",
+      "line": 33,
+      "column": 30,
+      "context": "<SearchField value={query} onChange={setQuery} placeholder=\"Buscar promociones…\" /"
+    },
+    {
+      "id": "ICO-006",
+      "file": "src/components/expenses/ExpenseManager.tsx",
+      "line": 19,
+      "column": 38,
+      "context": "<SearchField value={query} onChange={setQuery} placeholder=\"Buscar gastos…\" /"
+    },
+    {
+      "id": "ICO-007",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 18,
+      "column": 413,
+      "context": "<Icon name=\"arrow\" size={14} /"
+    },
+    {
+      "id": "ICO-007",
+      "file": "src/screens/Home.tsx",
+      "line": 29,
+      "column": 203,
+      "context": "<Icon name=\"arrow\" size={18} /"
+    },
+    {
+      "id": "ICO-007",
+      "file": "src/screens/Home.tsx",
+      "line": 32,
+      "column": 486,
+      "context": "<Icon name=\"arrow\" size={16} /"
+    },
+    {
+      "id": "ICO-007",
+      "file": "src/screens/Home.tsx",
+      "line": 33,
+      "column": 203,
+      "context": "<Icon name=\"arrow\" size={16} /"
+    },
+    {
+      "id": "ICO-007",
+      "file": "src/screens/Home.tsx",
+      "line": 37,
+      "column": 268,
+      "context": "<Icon name=\"arrow\" size={16} /"
+    },
+    {
+      "id": "ICO-007",
+      "file": "src/screens/Home.tsx",
+      "line": 40,
+      "column": 187,
+      "context": "<Icon name=\"arrow\" size={16} /"
+    },
+    {
+      "id": "ICO-007",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 43,
+      "column": 351,
+      "context": "<Icon name=\"arrow\" size={17} /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 9,
+      "column": 222,
+      "context": "icon: 'sparkle'"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/components/StoredSaleList.tsx",
+      "line": 7,
+      "column": 29,
+      "context": "<EmptyState title=\"Sin ventas\" description=\"Las ventas registradas aparecerán aquí.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 2173,
+      "context": "<EmptyState title=\"Selecciona un evento\" description=\"Puedes crear o activar eventos desde Eventos.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 1206,
+      "context": "<EmptyState title=\"Sin ventas en este período\" description=\"Prueba otro evento o amplía las fechas.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 1792,
+      "context": "<EmptyState title=\"Sin eventos\" description=\"Las ventas sin evento siguen incluidas en los resultados globales.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Events.tsx",
+      "line": 40,
+      "column": 1518,
+      "context": "<EmptyState title={catalog.realEvents.length ? 'Sin coincidencias' : 'Sin eventos'} description={catalog.realEvents.length ? 'Prueba otra bú"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Home.tsx",
+      "line": 35,
+      "column": 624,
+      "context": "<EmptyState title=\"Sin eventos con ventas\" description=\"Puedes registrar ventas sin evento o crear uno desde Eventos.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Home.tsx",
+      "line": 38,
+      "column": 434,
+      "context": "<EmptyState title=\"Sin alertas de stock confirmado\" description=\"Los productos pendientes de conteo se revisan en Inventario.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Inventory.tsx",
+      "line": 57,
+      "column": 32,
+      "context": "<EmptyState title={catalog.products.length ? 'No hay coincidencias' : 'Tu catálogo está vacío'} description={catalog.products.length ? 'Prue"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 45,
+      "column": 1781,
+      "context": "<EmptyState title={allProducts.length ? 'No encontramos ese producto' : 'Sin productos activos'} description={allProducts.length ? 'Prueba o"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 47,
+      "column": 2072,
+      "context": "<EmptyState title=\"Carrito vacío\" description=\"Agrega productos del catálogo.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/screens/Promotions.tsx",
+      "line": 35,
+      "column": 61,
+      "context": "<EmptyState title=\"No hay promociones\" description={catalog.promotions.length ? 'Prueba otra búsqueda o estado.' : 'Crea una promoción cuand"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/components/analytics/Statistics.tsx",
+      "line": 53,
+      "column": 14,
+      "context": "<EmptyState title={emptyTitle} description={emptyDescription} /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 40,
+      "column": 2165,
+      "context": "<EmptyState title=\"Sin movimientos\" description=\"No hay movimientos para estos filtros.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 40,
+      "column": 2702,
+      "context": "<EmptyState title=\"Sin cambios de costo estimado\" description=\"Los cambios manuales se registrarán aquí.\" /"
+    },
+    {
+      "id": "ICO-008",
+      "file": "src/components/expenses/ExpenseManager.tsx",
+      "line": 21,
+      "column": 22,
+      "context": "<EmptyState title=\"Sin gastos\" description=\"Registra un gasto o cambia los filtros.\" /"
+    },
+    {
+      "id": "ICO-009",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 47,
+      "column": 992,
+      "context": "<Icon name=\"plus\" size={15} /"
+    },
+    {
+      "id": "ICO-009",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 45,
+      "column": 1585,
+      "context": "<AddToCartButton name={product.name} disabled={!!product.stockCountPending} onAdd={() ="
+    },
+    {
+      "id": "ICO-010",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 47,
+      "column": 782,
+      "context": "<Icon name=\"minus\" size={15} /"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 47,
+      "column": 547,
+      "context": "<Icon name=\"close\" size={16} /"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/Checkout.tsx",
+      "line": 41,
+      "column": 10,
+      "context": "<Modal title=\"Pago\" onClose={back} busy={action.saving} headerAction={<span className=\"checkout-header-total\""
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/SaleDetail.tsx",
+      "line": 25,
+      "column": 10,
+      "context": "<Modal title={saleNumber(sale.number)} onClose={onClose} busy={action.saving} protectChanges={voiding} hasChanges={voiding && (!!reason || r"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/screens/Events.tsx",
+      "line": 43,
+      "column": 23,
+      "context": "<Modal title={currentDetail.name} onClose={() ="
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/screens/Events.tsx",
+      "line": 44,
+      "column": 22,
+      "context": "<Modal title={confirmation.type === 'finish' ? 'Finalizar evento' : confirmation.type === 'deactivate' ? 'Desactivar evento' : 'Activar even"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/screens/Promotions.tsx",
+      "line": 39,
+      "column": 16,
+      "context": "<Modal title={detail.name} onClose={() ="
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/screens/Promotions.tsx",
+      "line": 40,
+      "column": 17,
+      "context": "<Modal title=\"Archivar promoción\" onClose={() ="
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/ClassificationManager.tsx",
+      "line": 28,
+      "column": 10,
+      "context": "<Modal title=\"Organizar catálogo\" onClose={onClose} busy={action.saving}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/ClassificationManager.tsx",
+      "line": 34,
+      "column": 18,
+      "context": "<Modal title={editing ? `Editar ${label}` : `Crear ${label}`} onClose={reset} busy={action.saving} protectChanges"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/DeleteEntityDialog.tsx",
+      "line": 11,
+      "column": 10,
+      "context": "<Modal title=\"Eliminar definitivamente\" onClose={onClose} busy={action.saving}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 36,
+      "column": 12,
+      "context": "<Modal title=\"Historial de inventario\" onClose={onClose}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 51,
+      "column": 10,
+      "context": "<Modal title={product ? 'Editar producto' : 'Nuevo producto'} onClose={onClose} busy={action.saving || quickBusy} protectChanges hasChanges="
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 74,
+      "column": 19,
+      "context": "<Modal title=\"Crear clasificación\" onClose={() ="
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 30,
+      "column": 10,
+      "context": "<Modal title={promotion ? 'Editar promoción' : 'Nueva promoción'} onClose={onClose} busy={action.saving || quickBusy} protectChanges hasChan"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/QuickClassificationDialog.tsx",
+      "line": 7,
+      "column": 10,
+      "context": "<Modal title=\"Crear clasificación\" onClose={onClose} busy={busy} protectChanges"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/ReassignCategoryDialog.tsx",
+      "line": 10,
+      "column": 10,
+      "context": "<Modal title=\"Reasignar categoría\" onClose={onClose} busy={action.saving}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/ReverseMovementForm.tsx",
+      "line": 24,
+      "column": 10,
+      "context": "<Modal title=\"Revertir movimiento\" onClose={onClose} busy={action.saving} protectChanges hasChanges={!!reason}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/catalog/StockForm.tsx",
+      "line": 30,
+      "column": 10,
+      "context": "<Modal title=\"Ajustar stock\" onClose={onClose} busy={action.saving} protectChanges"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/cloud/CloudConnection.tsx",
+      "line": 62,
+      "column": 10,
+      "context": "<Modal title={user ? 'Mi cuenta' : 'Iniciar sesión'} onClose={onClose} busy={busy}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 24,
+      "column": 10,
+      "context": "<Modal title=\"Datos y respaldos\" onClose={onClose} busy={!!busy} protectChanges hasChanges={!!preview}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/events/EventForm.tsx",
+      "line": 18,
+      "column": 10,
+      "context": "<Modal title={event ? 'Editar evento' : 'Nuevo evento'} onClose={onClose} busy={action.saving} protectChanges"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/expenses/ExpenseDetail.tsx",
+      "line": 20,
+      "column": 10,
+      "context": "<Modal title=\"Detalle del gasto\" onClose={onClose} busy={action.saving} protectChanges hasChanges={voiding && !!reason}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/expenses/ExpenseForm.tsx",
+      "line": 13,
+      "column": 10,
+      "context": "<Modal title=\"Nueva categoría de gasto\" onClose={onClose} protectChanges hasChanges={!!name} busy={action.saving}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/expenses/ExpenseForm.tsx",
+      "line": 31,
+      "column": 12,
+      "context": "<Modal title={expense ? 'Editar gasto' : 'Nuevo gasto'} onClose={onClose} busy={action.saving} protectChanges hasChanges={JSON.stringify(ini"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/expenses/ExpenseManager.tsx",
+      "line": 16,
+      "column": 12,
+      "context": "<Modal title=\"Gastos\" onClose={onClose}"
+    },
+    {
+      "id": "ICO-011",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 22,
+      "column": 10,
+      "context": "<Modal title=\"Importación masiva\" onClose={onClose} busy={busy} protectChanges hasChanges={!!plan&&!notice}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/Checkout.tsx",
+      "line": 41,
+      "column": 10,
+      "context": "<Modal title=\"Pago\" onClose={back} busy={action.saving} headerAction={<span className=\"checkout-header-total\""
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/SaleDetail.tsx",
+      "line": 25,
+      "column": 10,
+      "context": "<Modal title={saleNumber(sale.number)} onClose={onClose} busy={action.saving} protectChanges={voiding} hasChanges={voiding && (!!reason || r"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Events.tsx",
+      "line": 43,
+      "column": 23,
+      "context": "<Modal title={currentDetail.name} onClose={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Events.tsx",
+      "line": 44,
+      "column": 22,
+      "context": "<Modal title={confirmation.type === 'finish' ? 'Finalizar evento' : confirmation.type === 'deactivate' ? 'Desactivar evento' : 'Activar even"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Promotions.tsx",
+      "line": 39,
+      "column": 16,
+      "context": "<Modal title={detail.name} onClose={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Promotions.tsx",
+      "line": 40,
+      "column": 17,
+      "context": "<Modal title=\"Archivar promoción\" onClose={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ClassificationManager.tsx",
+      "line": 28,
+      "column": 10,
+      "context": "<Modal title=\"Organizar catálogo\" onClose={onClose} busy={action.saving}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ClassificationManager.tsx",
+      "line": 34,
+      "column": 18,
+      "context": "<Modal title={editing ? `Editar ${label}` : `Crear ${label}`} onClose={reset} busy={action.saving} protectChanges"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/DeleteEntityDialog.tsx",
+      "line": 11,
+      "column": 10,
+      "context": "<Modal title=\"Eliminar definitivamente\" onClose={onClose} busy={action.saving}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 36,
+      "column": 12,
+      "context": "<Modal title=\"Historial de inventario\" onClose={onClose}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 51,
+      "column": 10,
+      "context": "<Modal title={product ? 'Editar producto' : 'Nuevo producto'} onClose={onClose} busy={action.saving || quickBusy} protectChanges hasChanges="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 74,
+      "column": 19,
+      "context": "<Modal title=\"Crear clasificación\" onClose={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 30,
+      "column": 10,
+      "context": "<Modal title={promotion ? 'Editar promoción' : 'Nueva promoción'} onClose={onClose} busy={action.saving || quickBusy} protectChanges hasChan"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/QuickClassificationDialog.tsx",
+      "line": 7,
+      "column": 10,
+      "context": "<Modal title=\"Crear clasificación\" onClose={onClose} busy={busy} protectChanges"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ReassignCategoryDialog.tsx",
+      "line": 10,
+      "column": 10,
+      "context": "<Modal title=\"Reasignar categoría\" onClose={onClose} busy={action.saving}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ReverseMovementForm.tsx",
+      "line": 24,
+      "column": 10,
+      "context": "<Modal title=\"Revertir movimiento\" onClose={onClose} busy={action.saving} protectChanges hasChanges={!!reason}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/StockForm.tsx",
+      "line": 30,
+      "column": 10,
+      "context": "<Modal title=\"Ajustar stock\" onClose={onClose} busy={action.saving} protectChanges"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/cloud/CloudConnection.tsx",
+      "line": 62,
+      "column": 10,
+      "context": "<Modal title={user ? 'Mi cuenta' : 'Iniciar sesión'} onClose={onClose} busy={busy}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 24,
+      "column": 10,
+      "context": "<Modal title=\"Datos y respaldos\" onClose={onClose} busy={!!busy} protectChanges hasChanges={!!preview}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/events/EventForm.tsx",
+      "line": 18,
+      "column": 10,
+      "context": "<Modal title={event ? 'Editar evento' : 'Nuevo evento'} onClose={onClose} busy={action.saving} protectChanges"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/expenses/ExpenseDetail.tsx",
+      "line": 20,
+      "column": 10,
+      "context": "<Modal title=\"Detalle del gasto\" onClose={onClose} busy={action.saving} protectChanges hasChanges={voiding && !!reason}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/expenses/ExpenseForm.tsx",
+      "line": 13,
+      "column": 10,
+      "context": "<Modal title=\"Nueva categoría de gasto\" onClose={onClose} protectChanges hasChanges={!!name} busy={action.saving}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/expenses/ExpenseForm.tsx",
+      "line": 31,
+      "column": 12,
+      "context": "<Modal title={expense ? 'Editar gasto' : 'Nuevo gasto'} onClose={onClose} busy={action.saving} protectChanges hasChanges={JSON.stringify(ini"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/expenses/ExpenseManager.tsx",
+      "line": 16,
+      "column": 12,
+      "context": "<Modal title=\"Gastos\" onClose={onClose}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 22,
+      "column": 10,
+      "context": "<Modal title=\"Importación masiva\" onClose={onClose} busy={busy} protectChanges hasChanges={!!plan&&!notice}"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Inventory.tsx",
+      "line": 50,
+      "column": 128,
+      "context": "<ClassificationSelect label=\"Categorías\" onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Inventory.tsx",
+      "line": 50,
+      "column": 322,
+      "context": "<ClassificationSelect label=\"Familias\" onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Inventory.tsx",
+      "line": 50,
+      "column": 506,
+      "context": "<ClassificationSelect label=\"IPs\" onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 44,
+      "column": 200,
+      "context": "<ClassificationSelect label=\"Categorías\" onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 44,
+      "column": 363,
+      "context": "<ClassificationSelect label=\"Familias\" onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 44,
+      "column": 516,
+      "context": "<ClassificationSelect label=\"IPs\" onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 56,
+      "column": 52,
+      "context": "<ClassificationSelect label=\"Categoría principal\" items={categories} selected={categoryId ? [categoryId] : []} onChange={ids ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 62,
+      "column": 69,
+      "context": "<ClassificationSelect label=\"Familias\" items={families} selected={familyIds} onChange={setFamilyIds} assign onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 62,
+      "column": 221,
+      "context": "<ClassificationSelect label=\"IPs\" items={ips} selected={ipIds} onChange={setIpIds} assign onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 37,
+      "column": 7,
+      "context": "<ClassificationSelect label=\"Eventos\" items={catalog.realEvents.map(event="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 40,
+      "column": 67,
+      "context": "<ClassificationSelect label=\"Productos\" items={productOptions} selected={draft.productIds} onChange={ids ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 40,
+      "column": 231,
+      "context": "<ClassificationSelect label=\"Categorías\" items={catalog.categories} onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 40,
+      "column": 446,
+      "context": "<ClassificationSelect label=\"Familias\" items={catalog.families} onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 40,
+      "column": 651,
+      "context": "<ClassificationSelect label=\"IPs\" items={catalog.ips} onCreate={() ="
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 581,
+      "context": "<MetricTickets metrics={metrics} financial={financial} /"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 1129,
+      "context": "<MetricTickets metrics={metrics} financial={financial} /"
+    },
+    {
+      "id": "ORN-001",
+      "file": "src/screens/Home.tsx",
+      "line": 35,
+      "column": 123,
+      "context": "<MetricTickets metrics={activeStatistics.metrics} /"
+    },
+    {
+      "id": "ORN-002",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 16,
+      "column": 38,
+      "context": "<Ornament kind=\"divider\" /"
+    },
+    {
+      "id": "ORN-003",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 18,
+      "column": 35,
+      "context": "<Ornament kind=\"bunting\" className=\"note-bunting\" /"
+    },
+    {
+      "id": "ILU-001",
+      "file": "src/screens/Events.tsx",
+      "line": 37,
+      "column": 690,
+      "context": "<CircusIllustration /"
+    },
+    {
+      "id": "ILU-001",
+      "file": "src/screens/Events.tsx",
+      "line": 40,
+      "column": 224,
+      "context": "<CircusIllustration /"
+    },
+    {
+      "id": "ILU-001",
+      "file": "src/screens/Home.tsx",
+      "line": 30,
+      "column": 7,
+      "context": "<CircusIllustration className=\"event-poster-art\" /"
+    },
+    {
+      "id": "DEC-002",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 45,
+      "column": 247,
+      "context": "<article className=\"product-card\""
+    },
+    {
+      "id": "DEC-003",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 581,
+      "context": "<MetricTickets metrics={metrics} financial={financial} /"
+    },
+    {
+      "id": "DEC-003",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 1129,
+      "context": "<MetricTickets metrics={metrics} financial={financial} /"
+    },
+    {
+      "id": "DEC-003",
+      "file": "src/screens/Home.tsx",
+      "line": 35,
+      "column": 123,
+      "context": "<MetricTickets metrics={activeStatistics.metrics} /"
+    },
+    {
+      "id": "DEC-004",
+      "file": "src/screens/Events.tsx",
+      "line": 40,
+      "column": 165,
+      "context": "<TicketFrame axis=\"ends\" />"
+    },
+    {
+      "id": "DEC-004",
+      "file": "src/screens/Promotions.tsx",
+      "line": 34,
+      "column": 163,
+      "context": "<TicketFrame />"
+    },
+    {
+      "id": "DEC-005",
+      "file": "src/screens/Home.tsx",
+      "line": 28,
+      "column": 14,
+      "context": "className=\"event-poster home-pos-poster\""
+    },
+    {
+      "id": "DEC-006",
+      "file": "src/screens/Inventory.tsx",
+      "line": 50,
+      "column": 894,
+      "context": "className={`filter-chip"
+    },
+    {
+      "id": "DEC-006",
+      "file": "src/components/catalog/ClassificationManager.tsx",
+      "line": 29,
+      "column": 106,
+      "context": "className={`filter-chip"
+    },
+    {
+      "id": "DEC-006",
+      "file": "src/components/catalog/ClassificationSelect.tsx",
+      "line": 33,
+      "column": 170,
+      "context": "className=\"filter-chip"
+    },
+    {
+      "id": "DEC-006",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 38,
+      "column": 47,
+      "context": "className={`filter-chip"
+    },
+    {
+      "id": "DEC-006",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 38,
+      "column": 204,
+      "context": "className={`filter-chip"
+    },
+    {
+      "id": "TIC-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 581,
+      "context": "<MetricTickets metrics={metrics} financial={financial} /"
+    },
+    {
+      "id": "TIC-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 1129,
+      "context": "<MetricTickets metrics={metrics} financial={financial} /"
+    },
+    {
+      "id": "TIC-001",
+      "file": "src/screens/Home.tsx",
+      "line": 35,
+      "column": 123,
+      "context": "<MetricTickets metrics={activeStatistics.metrics} /"
+    },
+    {
+      "id": "TIC-002",
+      "file": "src/screens/Analytics.tsx",
+      "line": 54,
+      "column": 1010,
+      "context": "<EventStatisticsCard key={event.id} stats={event} onOpen={open} /"
+    },
+    {
+      "id": "TIC-002",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 1571,
+      "context": "<EventStatisticsCard key={event.id} stats={event} onOpen={open} /"
+    },
+    {
+      "id": "TIC-002",
+      "file": "src/screens/Home.tsx",
+      "line": 35,
+      "column": 484,
+      "context": "<EventStatisticsCard key={event.id} stats={event} onOpen={openAnalytics} /"
+    },
+    {
+      "id": "TIC-002",
+      "file": "src/screens/Promotions.tsx",
+      "line": 34,
+      "column": 163,
+      "context": "<TicketFrame />"
+    },
+    {
+      "id": "TIC-003",
+      "file": "src/screens/Events.tsx",
+      "line": 40,
+      "column": 165,
+      "context": "<TicketFrame axis=\"ends\" /"
+    },
+    {
+      "id": "CTL-001",
+      "file": "src/components/catalog/ClassificationSelect.tsx",
+      "line": 33,
+      "column": 410,
+      "context": "×"
+    },
+    {
+      "id": "CTL-001",
+      "file": "src/components/catalog/ClassificationSelect.tsx",
+      "line": 35,
+      "column": 179,
+      "context": "×"
+    },
+    {
+      "id": "CTL-002",
+      "file": "src/components/catalog/ClassificationSelect.tsx",
+      "line": 37,
+      "column": 499,
+      "context": "✓"
+    },
+    {
+      "id": "CTL-003",
+      "file": "src/components/catalog/ClassificationSelect.tsx",
+      "line": 32,
+      "column": 534,
+      "context": "+"
+    },
+    {
+      "id": "CTL-003",
+      "file": "src/components/catalog/CreateEntityMenu.tsx",
+      "line": 7,
+      "column": 284,
+      "context": "+ Crear nuevo"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/DiscountEditor.tsx",
+      "line": 21,
+      "column": 448,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 54,
+      "column": 191,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 74,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 94,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 57,
+      "column": 201,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/Events.tsx",
+      "line": 38,
+      "column": 144,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/History.tsx",
+      "line": 20,
+      "column": 273,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/History.tsx",
+      "line": 20,
+      "column": 588,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/screens/Promotions.tsx",
+      "line": 33,
+      "column": 151,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/EventPricesEditor.tsx",
+      "line": 9,
+      "column": 32,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 39,
+      "column": 70,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 39,
+      "column": 410,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 69,
+      "column": 215,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 35,
+      "column": 58,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 39,
+      "column": 227,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 39,
+      "column": 531,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/ReassignCategoryDialog.tsx",
+      "line": 12,
+      "column": 61,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/StockForm.tsx",
+      "line": 35,
+      "column": 32,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/catalog/StockForm.tsx",
+      "line": 36,
+      "column": 49,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 126,
+      "column": 32,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 142,
+      "column": 40,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/cloud/InventorySyncPanel.tsx",
+      "line": 55,
+      "column": 28,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/cloud/InventorySyncPanel.tsx",
+      "line": 65,
+      "column": 36,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 30,
+      "column": 20,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 31,
+      "column": 23,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 33,
+      "column": 107,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/expenses/ExpenseForm.tsx",
+      "line": 36,
+      "column": 72,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/expenses/ExpenseForm.tsx",
+      "line": 37,
+      "column": 20,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/expenses/ExpenseManager.tsx",
+      "line": 19,
+      "column": 129,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/expenses/ExpenseManager.tsx",
+      "line": 19,
+      "column": 422,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-001",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 36,
+      "column": 200,
+      "context": "<select"
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/SaleDetail.tsx",
+      "line": 30,
+      "column": 333,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 67,
+      "column": 42,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 47,
+      "column": 38,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 47,
+      "column": 215,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/cloud/CatalogInclusionReview.tsx",
+      "line": 61,
+      "column": 66,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 73,
+      "column": 16,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 92,
+      "column": 18,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 148,
+      "column": 16,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/cloud/CommercialSyncPanel.tsx",
+      "line": 23,
+      "column": 14,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/cloud/InventorySyncPanel.tsx",
+      "line": 62,
+      "column": 18,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/cloud/InventorySyncPanel.tsx",
+      "line": 75,
+      "column": 14,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-002",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 38,
+      "column": 38,
+      "context": "<input type=\"checkbox\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 373,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 532,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/screens/History.tsx",
+      "line": 20,
+      "column": 48,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/screens/History.tsx",
+      "line": 20,
+      "column": 150,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 45,
+      "column": 57,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 45,
+      "column": 205,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 32,
+      "column": 26,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 32,
+      "column": 156,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 33,
+      "column": 395,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 33,
+      "column": 526,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/events/EventForm.tsx",
+      "line": 24,
+      "column": 58,
+      "context": "<input required type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/events/EventForm.tsx",
+      "line": 24,
+      "column": 182,
+      "context": "<input required type=\"date\""
+    },
+    {
+      "id": "NAT-003",
+      "file": "src/components/expenses/ExpenseForm.tsx",
+      "line": 35,
+      "column": 348,
+      "context": "<input type=\"date\""
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/SaleDetail.tsx",
+      "line": 31,
+      "column": 339,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/SaleDetail.tsx",
+      "line": 36,
+      "column": 37,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/screens/Analytics.tsx",
+      "line": 56,
+      "column": 1346,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/screens/Analytics.tsx",
+      "line": 57,
+      "column": 1496,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/screens/Analytics.tsx",
+      "line": 58,
+      "column": 45,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/catalog/EventPricesEditor.tsx",
+      "line": 6,
+      "column": 51,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 40,
+      "column": 1406,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/catalog/MovementHistory.tsx",
+      "line": 40,
+      "column": 2615,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 63,
+      "column": 46,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogInclusionReview.tsx",
+      "line": 67,
+      "column": 45,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogInclusionReview.tsx",
+      "line": 74,
+      "column": 42,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogInclusionReview.tsx",
+      "line": 119,
+      "column": 63,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 45,
+      "column": 66,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 70,
+      "column": 18,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 134,
+      "column": 20,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 158,
+      "column": 18,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 164,
+      "column": 65,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 170,
+      "column": 163,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CommercialSyncPanel.tsx",
+      "line": 22,
+      "column": 16,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/CommercialSyncPanel.tsx",
+      "line": 27,
+      "column": 33,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/InventorySyncPanel.tsx",
+      "line": 83,
+      "column": 38,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/cloud/InventorySyncPanel.tsx",
+      "line": 84,
+      "column": 33,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 33,
+      "column": 20,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/data/DataManager.tsx",
+      "line": 39,
+      "column": 79,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/expenses/ExpenseDetail.tsx",
+      "line": 25,
+      "column": 456,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/expenses/ExpenseDetail.tsx",
+      "line": 25,
+      "column": 752,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 31,
+      "column": 16,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 32,
+      "column": 16,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 33,
+      "column": 46,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-004",
+      "file": "src/components/importing/ImportManager.tsx",
+      "line": 35,
+      "column": 16,
+      "context": "<summary"
+    },
+    {
+      "id": "NAT-005",
+      "file": "src/components/ui.tsx",
+      "line": 7,
+      "column": 64,
+      "context": "<input type=\"search\""
+    },
+    {
+      "id": "NAT-005",
+      "file": "src/components/catalog/ClassificationManager.tsx",
+      "line": 40,
+      "column": 134,
+      "context": "<input type=\"search\""
+    },
+    {
+      "id": "NAT-005",
+      "file": "src/components/catalog/ClassificationSelect.tsx",
+      "line": 36,
+      "column": 7,
+      "context": "<input aria-label={`Buscar ${label}`} type=\"search\""
+    },
+    {
+      "id": "NAT-005",
+      "file": "src/components/cloud/CatalogInclusionReview.tsx",
+      "line": 86,
+      "column": 36,
+      "context": "<input type=\"search\""
+    },
+    {
+      "id": "NAT-005",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 49,
+      "column": 36,
+      "context": "<input type=\"search\""
+    },
+    {
+      "id": "NAT-005",
+      "file": "src/components/cloud/CatalogSyncPanel.tsx",
+      "line": 127,
+      "column": 40,
+      "context": "<input type=\"search\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/ClassificationManager.tsx",
+      "line": 37,
+      "column": 173,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/ProductForm.tsx",
+      "line": 69,
+      "column": 598,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 36,
+      "column": 60,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 39,
+      "column": 991,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 42,
+      "column": 65,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/PromotionManager.tsx",
+      "line": 42,
+      "column": 255,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/StockForm.tsx",
+      "line": 37,
+      "column": 63,
+      "context": "<input autoFocus type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/catalog/StockForm.tsx",
+      "line": 38,
+      "column": 67,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "NAT-006",
+      "file": "src/components/cloud/InventorySyncPanel.tsx",
+      "line": 66,
+      "column": 70,
+      "context": "<input type=\"number\""
+    },
+    {
+      "id": "DAT-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 54,
+      "column": 414,
+      "context": "<BarChart title={`${comparisonLabels[comparison]} por evento`} rows={eventRows} unit={comparison === 'margin' ? '%' : comparison === 'units'"
+    },
+    {
+      "id": "DAT-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 638,
+      "context": "<BarChart title=\"Ingresos por día\" unit=\"CLP · Chile\" rows={days.days.map(row ="
+    },
+    {
+      "id": "DAT-001",
+      "file": "src/screens/Analytics.tsx",
+      "line": 57,
+      "column": 471,
+      "context": "<BarChart title=\"Ranking de productos\" emptyTitle={order === 'profit' && ranking.length ? 'Utilidad no disponible' : undefined} emptyDescrip"
+    },
+    {
+      "id": "DEC-001",
+      "file": "src/navigation/Navigation.tsx",
+      "line": 14,
+      "column": 1,
+      "context": "sidebar::before (4/10 px)"
+    },
+    {
+      "id": "DEC-001",
+      "file": "src/screens/PointOfSale.tsx",
+      "line": 49,
+      "column": 1,
+      "context": "cart-panel::before (7 px)"
+    },
+    {
+      "id": "CTL-003",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 936,
+      "context": "Signo +, .analytics-day summary::after (cerrado)"
+    },
+    {
+      "id": "CTL-003",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 1966,
+      "context": "Signo +, .analytics-day summary::after (cerrado)"
+    },
+    {
+      "id": "CTL-004",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 936,
+      "context": "Signo − al abrir detalle diario"
+    },
+    {
+      "id": "CTL-004",
+      "file": "src/screens/Analytics.tsx",
+      "line": 55,
+      "column": 1966,
+      "context": "Signo − al abrir detalle diario"
+    }
+  ],
+  "limitations": [
+    {
+      "elemento": "Imágenes de productos en IndexedDB",
+      "motivo": "Contenido del usuario, fuera del repositorio. No se accedió a IndexedDB ni se copiaron fotos comerciales. No se inventó miniatura.",
+      "ruta": "src/components/ProductImage.tsx; src/components/catalog/ProductForm.tsx",
+      "medidas": "Blob variable. CSS contain; pequeño44 × 44 px; catálogo aspect-ratio1.55 o1.45 (≥1300)."
+    },
+    {
+      "elemento": "Iconos nativos Android",
+      "motivo": "Se capturó Edge, no Android físico; forma y tamaño dependen de plataforma.",
+      "ruta": "NAT-001 a NAT-006",
+      "medidas": "Variables; no hay px propios del recurso en código."
+    },
+    {
+      "elemento": "Autoría de dibujos locales",
+      "motivo": "El manifiesto anterior no demuestra origen para carpa, iconos y estrellas. Se conserva Origen desconocido.",
+      "ruta": "Icon.tsx, Ornament.tsx, SVG locales",
+      "medidas": "ViewBox verificado; procedencia pendiente."
+    }
+  ]
+}

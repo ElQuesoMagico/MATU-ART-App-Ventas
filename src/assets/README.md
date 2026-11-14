@@ -13,7 +13,7 @@ No interviene en precios, ventas, eventos ni inventario.
 - `pending-verification`: no hay evidencia suficiente. **No significa IA**.
 
 La extracción de un SVG de JSX a un archivo no demuestra quién creó su dibujo.
-Por eso la carpa, muestras de productos, ornamentos y marca anterior siguen
+Por eso la carpa anterior, muestras de productos, otros ornamentos y marca anterior siguen
 pendientes. El CSS ornamental nuevo de estadísticas sí se identifica como
 creado por el asistente. Los gráficos de datos son componentes funcionales.
 Las imágenes del usuario están en IndexedDB y no deben asumirse generadas por IA.
@@ -21,7 +21,7 @@ Las imágenes del usuario están en IndexedDB y no deben asumirse generadas por 
 ## Organización y sustitución
 
 - `placeholders/illustrations/circus-tent.svg`: símbolo `circus-tent`, 320 × 300.
-  Usado por `CircusIllustration` en Inicio y Eventos. Colores heredados mediante
+  Conservado sin uso desde 14-11-2026. Colores heredados mediante
   `--accent`, `--cherry`, `--canvas`, `--ink`. Mantener transparencia y proporción.
 - `placeholders/illustrations/product-samples.svg`: seis símbolos `product-*`,
   180 × 150. Ilustraciones legacy sin uso en el catálogo real; no se insertan datos.
@@ -69,3 +69,12 @@ reemplazable en el manifiesto. `tickets.css` centra el payaso mediante los lími
 alfa (245,633)-(1106,1394) del PNG de 1414 × 2000. El archivo oficial no se recortó
 ni modificó. El PDF financiero usa el logo oficial; no es el catálogo artístico
 definitivo, cuya entrega continúa pendiente de la futura integración con Sheets.
+
+## Recurso del artista — 14-11-2026
+
+`illustrations/circus-tent-artist.svg` es copia intacta de `Circus tent2.svg`
+(viewBox 0 0 1080 1080), proporcionado por el usuario. Una sola fuente sirve
+a ORN-003 (`Ornament`, lateral, 128 px cuadrados) y temporalmente a ILU-001
+(`CircusIllustration`, Inicio/Eventos). Ambos usan `<img>` con proporción 1:1
+y object-fit contain. La carpa anterior 320 × 300 queda conservada sin uso.
+La referencia `circusTent` puede cambiarse posteriormente sin sustituir ORN-003.
