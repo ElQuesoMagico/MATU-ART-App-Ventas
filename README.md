@@ -1,5 +1,56 @@
 # MATU ART
 
+## Eliminación compartida del catálogo — 17-11-2026
+
+Productos, categorías, familias e IPs compartidos usan ahora un tombstone terminal
+`deleted: {at, by}` en el registro remoto, con revisión incrementada, UUID de operación,
+recibo inmutable y `confirmedAt` del servidor. No se borran documentos de Firestore.
+Las filas locales y sus referencias históricas se conservan, pero los repositorios
+operativos las excluyen; no aparecen tampoco entre archivados. IndexedDB sigue en v13.
+La restauración de respaldos entiende el campo opcional; al reconectar, un marcador
+remoto prevalece sobre cualquier respaldo o edición antigua. Los cambios pendientes
+se conservan como conflicto; no se publican ni se restauran automáticamente.
+
+Antes de eliminar se exige conexión, sesión editora (administrador o encargado),
+revisión de dependencias, ausencia de operaciones locales pendientes y confirmación
+por nombre. No se confirma éxito antes del commit remoto. Una revisión global en
+`catalogControl/revision`, actualizada junto a cada escritura, invalida vistas previas
+si cambió el catálogo. Los clientes anteriores deben recargar: sus escrituras sin
+este control serán rechazadas, conservando sus colas. Las dependencias comerciales
+se revisan en cliente sobre datos confirmados y dentro de transacciones con revisiones;
+las Rules protegen roles, estructura, revisiones, recibos, terminalidad y stock.
+No son un motor de validación exhaustiva de todo el grafo comercial.
+
+Categorías: acceso a reasignación explícita. Familias/IPs: vista previa y desvinculación
+confirmada. Esperar la sincronización de esas modificaciones antes de eliminar.
+No se alteran precios, stock ni snapshots históricos al cambiar asociaciones.
+Productos: ventas, movimientos y costos históricos por sí solos no impiden retirarlos.
+Existencias distintas de cero, condiciones de promociones/packs/precios por evento y
+operaciones pendientes sí bloquean la eliminación. Un saldo retirado conserva su
+marcador incluso al anular una venta y devolver unidades; no admite ventas nuevas.
+
+Alcance revisado y límites:
+- Promociones/combos y eventos usan `commercialConfiguration`, no el protocolo del
+  catálogo. Su eliminación definitiva compartida **no está implementada**: conservar
+  desactivación/archivo/cierre y sus auditorías. No presentar esa parte como completada.
+- Gastos y categorías de gastos mantienen sus flujos actuales y restricciones de
+  auditoría. Ventas, pagos, movimientos y auditorías no se eliminan.
+- No hay purga de tombstones ni liberación de nombres reservados; la protección ante
+  dispositivos antiguos tiene prioridad. El límite de 2.000 registros por tipo incluye
+  tombstones. La paginación/ampliación de ese límite permanece pendiente.
+- Dispositivo sin vincular: conserva el borrado local conservador anterior. Un registro
+  local aún no compartido debe revisarse/vincularse antes de usar la eliminación cloud.
+- No puede inspeccionarse una cola offline de otro dispositivo: al reconectar, se rechaza
+  la escritura sobre el UUID retirado y se conserva para revisión.
+
+Archivos principales: catalogDeletion.ts, catalogRemote/Local/Model.ts,
+catalogRepository.ts, classificationRepository.ts, entityAdministration.ts,
+DeleteEntityDialog.tsx, client.ts, configurationRemote.ts, inventoryRemote.ts,
+saleRemote.ts; firestore.catalog/inventory/commercial.rules y sus fragmentos fuente.
+No se tocaron recursos artísticos ni el motor de precios/descuentos.
+
+Pruebas: ver registro de publicación y resultados en docs/catalog-deletion.md.
+
 ## Carpa del artista — 14-11-2026
 
 Se integra `src/assets/illustrations/circus-tent-artist.svg`, copia intacta del

@@ -25,7 +25,7 @@ export function reviewDeletion(data: DataSnapshot, kind: EntityKind, id: string)
   const item = data[kind].find(row => row.id === id)
   if (!item) throw new CatalogError('El registro ya no existe.')
   const blockers: string[] = []
-  if(kind!=='promotions'&&data.catalogSync?.length)blockers.push('Catálogo vinculado: usa Archivar. La eliminación definitiva compartida está bloqueada para evitar que un dispositivo offline recree el registro; no se propagan borrados físicos.')
+  if(kind!=='promotions'&&data.catalogSync?.length)blockers.push('Este catálogo requiere el flujo de eliminación compartida con confirmación remota; no admite borrados físicos locales.')
   try { assertNoPendingOperations(data) } catch { blockers.push('Estado de sincronización o metadatos no reconocidos: solo se permite archivar.') }
   for (const key of stores) {
     const count = data[key].filter(row => {
@@ -71,13 +71,23 @@ export class EntityAdministration {
       await tx.objectStore(review.kind).delete(review.id)
     })
   }
+  previewDetach(kind:'families'|'ips',id:string){return this.transaction(async data=>{
+    const products=data.products.filter(p=>!data.catalogSync[0]?.baseline[`products/${p.id}`]?.deleted&&(kind==='families'?p.familyIds:p.ipIds)?.includes(id))
+    return {products,token:canonical(products)}
+  })}
+  detach(kind:'families'|'ips',id:string,expected:string){return this.transaction(async(data,tx)=>{
+    const products=data.products.filter(p=>!data.catalogSync[0]?.baseline[`products/${p.id}`]?.deleted&&(kind==='families'?p.familyIds:p.ipIds)?.includes(id))
+    if(canonical(products)!==expected)throw new CatalogError('Los productos cambiaron. Revisa de nuevo.')
+    for(const p of products)await tx.objectStore('products').put({...p,[kind==='families'?'familyIds':'ipIds']:(kind==='families'?p.familyIds:p.ipIds)!.filter(value=>value!==id),revision:p.revision+1,updatedAt:new Date().toISOString()})
+    return products.length
+  })}
   previewCategory(sourceId: string, targetId: string) {
     return this.transaction(async data => this.categoryPlan(data, sourceId, targetId))
   }
   private categoryPlan(data: DataSnapshot, sourceId: string, targetId: string) {
-    validId(sourceId); validId(targetId); assertNoPendingOperations(data)
+    validId(sourceId); validId(targetId); if(!data.catalogSync.length)assertNoPendingOperations(data)
     if (sourceId === targetId || !data.categories.some(c => c.id === sourceId) || !data.categories.some(c => c.id === targetId && c.isActive)) throw new CatalogError('Selecciona otra categoría activa.')
-    const products = data.products.filter(p => p.categoryId === sourceId || p.categoryIds.includes(sourceId))
+    const products = data.products.filter(p => !data.catalogSync[0]?.baseline[`products/${p.id}`]?.deleted&&(p.categoryId === sourceId || p.categoryIds.includes(sourceId)))
     if (products.some(product => Object.keys(product).some(key => /sync|cloud|remote|tombstone/i.test(key)))) throw new CatalogError('Hay productos con información cloud; no se permite una reasignación masiva sin protocolo de sincronización.')
     return { sourceId, targetId, products, token: canonical({ categories: data.categories, products }) }
   }

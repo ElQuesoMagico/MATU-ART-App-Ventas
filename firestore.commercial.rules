@@ -5,7 +5,7 @@ service cloud.firestore {
   function editor(w) { return member(w) && get(/databases/$(database)/documents/workspaces/$(w)/members/$(request.auth.uid)).data.role in ['administrator','manager']; }
   function uuid(v) { return v is string && v.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'); }
   function kind(k) { return k in ['categories','families','ips','products']; }
-  function ref(w,k,id) { return uuid(id) && exists(/databases/$(database)/documents/workspaces/$(w)/$(k)/$(id)); }
+  function ref(w,k,id) { return uuid(id) && get(/databases/$(database)/documents/workspaces/$(w)/$(k)/$(id)).data.get('deleted',null)==null; }
   function refs(w,k,ids) { return ids is list && ids.size() <= 3 && ids.toSet().size()==ids.size() && (ids.size()<1||ref(w,k,ids[0])) && (ids.size()<2||ref(w,k,ids[1])) && (ids.size()<3||ref(w,k,ids[2])); }
   function payload(w,k,id,p) {
     return p is map && p.id == id && uuid(id) && p.entity == k && p.name is string && p.name.size()>0 && p.name.size()<=120 && !p.name.matches('.*[/].*')
@@ -19,11 +19,14 @@ service cloud.firestore {
   function validRecord(w,k,id) {
     let d=request.resource.data;
     let receipt=getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogOperations/$(d.operationId)).data;
-    let nameId=k+'_'+d.payload.name.lower();
-    return d.keys().hasOnly(['payload','revision','operationId','actorUid','confirmedAt']) && d.actorUid==request.auth.uid && d.confirmedAt==request.time
-      && d.revision is int && d.revision>0 && uuid(d.operationId) && payload(w,k,id,d.payload)
-      && receipt.actorUid==request.auth.uid && receipt.record=={'payload':d.payload,'revision':d.revision,'operationId':d.operationId}
-      && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.id==id && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(nameId)).data.entity==k;
+    let terminal=('deleted' in d);
+    let record=terminal?{'payload':d.payload,'revision':d.revision,'operationId':d.operationId,'deleted':d.deleted}:{'payload':d.payload,'revision':d.revision,'operationId':d.operationId};
+    return d.keys().hasOnly(['payload','revision','operationId','actorUid','confirmedAt','deleted']) && d.actorUid==request.auth.uid && d.confirmedAt==request.time
+      && d.revision is int && d.revision>0 && uuid(d.operationId)
+      && (terminal ? exists(/databases/$(database)/documents/workspaces/$(w)/$(k)/$(id)) && d.payload==resource.data.payload && d.deleted.keys().hasOnly(['at','by']) && d.deleted.by==request.auth.uid && d.deleted.at is string
+        && (k!='products'||!exists(/databases/$(database)/documents/workspaces/$(w)/inventory/$(id))||(get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(id)).data.balance.stock==0 && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(id)).data.deleted==true)) : payload(w,k,id,d.payload))
+      && receipt.actorUid==request.auth.uid && receipt.record==record
+      && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogControl/revision).data.operationId==d.operationId;
   }
   match /workspaces/{w} {
 // D4 candidate. Immutable operations connect one sale and all of its inventory effects.
@@ -56,6 +59,7 @@ function saleLine(r,n) {
     && m.sharedOperationId==r.sale.operationId && m.actorUid==request.auth.uid && m.sharedStatus=='confirmed'
     && m.quantityChange==0-i.stock.quantityDeducted && m.previousStock==b.stock && m.resultingStock==a.stock
     && m.requestedQuantity==i.quantity && m.uncoveredQuantity==i.stock.uncoveredQuantity
+    && get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.get('deleted',false)==false
     && get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==b
     && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==a;
 }
@@ -128,7 +132,8 @@ match /sharedSales/{id} {
       : getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.operationId)).data.kind=='sale');
 }
 match /inventory/{id} {
-  allow update: if member(w) && request.resource.data.keys().hasOnly(['balance','confirmedAt']) && request.resource.data.confirmedAt==request.time
+  allow update: if member(w) && request.resource.data.keys().hasOnly(['balance','confirmedAt','deleted']) && request.resource.data.confirmedAt==request.time
+    && request.resource.data.get('deleted',false)==resource.data.get('deleted',false)
     && !exists(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId))
     && getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId)).data.receipt.after[id]==request.resource.data.balance
     && saleInventory(getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId)).data,id);
@@ -208,11 +213,16 @@ function invValidReceipt(r,op) {
     && r.keys().hasOnly(['intent','before','after','quantityChange','confirmedAt']) && r.confirmedAt==request.time
     && invIntent(r.intent,op) && invTransition(r)
     && get(/databases/$(database)/documents/workspaces/$(w)/products/$(r.intent.productId)).data.payload.isArchived==false
+    && !('deleted' in get(/databases/$(database)/documents/workspaces/$(w)/products/$(r.intent.productId)).data)
     && (r.before==null
       ? !exists(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId))
       : get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId)).data.balance==r.before);
 }
 match /inventory/{id} {
+  allow update: if editor(w) && request.resource.data.keys().hasOnly(['balance','confirmedAt','deleted'])
+    && request.resource.data.balance==resource.data.balance && request.resource.data.deleted==true && request.resource.data.confirmedAt==request.time
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/products/$(id)).data.deleted.by==request.auth.uid
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/products/$(id)).data.confirmedAt==request.time;
   allow read: if member(w);
   allow create, update: if editor(w)
     && request.resource.data.keys().hasAll(['balance','confirmedAt']) && request.resource.data.keys().hasOnly(['balance','confirmedAt'])
@@ -227,12 +237,18 @@ match /inventoryOperations/{op} {
     && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(request.resource.data.intent.productId)).data.balance==request.resource.data.after;
 }
 
+    match /catalogControl/revision {
+      allow read: if member(w);
+      allow create,update: if editor(w) && request.resource.data.keys().hasOnly(['revision','operationId','entity','id'])
+        && request.resource.data.revision==(exists(/databases/$(database)/documents/workspaces/$(w)/catalogControl/revision)?resource.data.revision+1:1)
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.entity)/$(request.resource.data.id)).data.operationId==request.resource.data.operationId;
+    }
     allow get: if member(w);
     match /members/{uid} { allow get: if request.auth!=null && request.auth.uid==uid && member(w); }
     match /{k}/{id} {
       allow read: if kind(k) && member(w);
-      allow create: if kind(k) && editor(w) && request.resource.data.revision==1 && validRecord(w,k,id);
-      allow update: if kind(k) && editor(w) && request.resource.data.revision==resource.data.revision+1
+      allow create: if kind(k) && editor(w) && !('deleted' in request.resource.data) && request.resource.data.revision==1 && validRecord(w,k,id);
+      allow update: if kind(k) && editor(w) && !('deleted' in resource.data) && request.resource.data.revision==resource.data.revision+1
         && request.resource.data.payload.createdAt==resource.data.payload.createdAt
         && (k!='products'||request.resource.data.payload.kind==resource.data.payload.kind) && validRecord(w,k,id);
     }
@@ -241,6 +257,7 @@ match /inventoryOperations/{op} {
       allow create: if editor(w) && uuid(op) && request.resource.data.keys().hasOnly(['record','actorUid','deviceId','confirmedAt'])
         && request.resource.data.actorUid==request.auth.uid && uuid(request.resource.data.deviceId) && request.resource.data.confirmedAt==request.time
         && request.resource.data.record.operationId==op
+        && getAfter(/databases/$(database)/documents/workspaces/$(w)/catalogNames/$(request.resource.data.record.payload.entity+'_'+request.resource.data.record.payload.name.lower())).data.id==request.resource.data.record.payload.id
         && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.operationId==op
         && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.payload==request.resource.data.record.payload
         && getAfter(/databases/$(database)/documents/workspaces/$(w)/$(request.resource.data.record.payload.entity)/$(request.resource.data.record.payload.id)).data.revision==request.resource.data.record.revision;

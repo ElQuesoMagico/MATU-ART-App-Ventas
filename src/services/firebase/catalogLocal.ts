@@ -32,7 +32,7 @@ export function includeUploadDependencies(local:LocalView,remote:Record<string,R
   const required=new Set<string>()
   for(const choice of choices)if(choice.action==='upload'){
     const payload=local.records[choice.key]
-    if(payload)for(const ref of references(payload))if(!remote[ref])required.add(ref)
+    if(payload)for(const ref of references(payload))if(!remote[ref]||remote[ref].deleted)required.add(ref)
   }
   for(const ref of required)if(!local.records[ref])throw new Error(`Falta clasificación local: ${ref}. Corrige el producto antes de vincular.`)
   return choices.map(choice=>required.has(choice.key)?{...choice,action:'upload'}:choice)
@@ -70,6 +70,11 @@ export async function applyLocal(expected: LocalView, state: SyncState, incoming
         await tx.objectStore(p.entity).put({...fields,normalizedName:normalizedName(p.name),...(p.entity==='categories'?{activeName:p.isActive?normalizedName(p.name):undefined}:{}),updatedAt:new Date().toISOString()})
       }
     }
+    for(const [key,r] of Object.entries(state.baseline))if(r.deleted){
+      const [kind,id]=key.split('/')
+      if(kind==='products'){const p=await tx.objectStore('products').get(id);if(p&&!p.isArchived)await tx.objectStore('products').put({...p,isArchived:true,activeName:undefined})}
+      else if(kind==='categories'||kind==='families'||kind==='ips'){const c=await tx.objectStore(kind).get(id);if(c?.isActive)await tx.objectStore(kind).put({...c,isActive:false,...(kind==='categories'?{activeName:undefined}:{})})}
+    }
     if(unlink)await tx.objectStore('catalogSync').delete('catalog')
     else await tx.objectStore('catalogSync').put(state)
     await tx.done
@@ -87,6 +92,7 @@ export async function linkCatalog(local:LocalView,remote:Record<string,RemoteRec
   if(local.state)throw new Error('El dispositivo ya está vinculado.')
   const state:SyncState={key:'catalog',workspaceId,ownerUid:uid,canWrite,deviceId:crypto.randomUUID(),baseline:{},pending:{},excluded:[],conflicts:{}}
   const incoming:Payload[]=[]
+  for(const choice of choices)if(remote[choice.key]?.deleted&&choice.action==='upload')throw new Error('El registro fue eliminado y no puede restaurarse desde un respaldo.');
   const all=new Set([...Object.keys(local.records),...Object.keys(remote),...Object.keys(local.invalid)])
   if(choices.length!==all.size||new Set(choices.map(c=>c.key)).size!==all.size)throw new Error('Revisa todos los registros antes de confirmar.')
   for(const choice of choices){const {key,action}=choice;if(!all.has(key))throw new Error('Registro inesperado.')
@@ -107,6 +113,15 @@ export async function reconcile(remote:Record<string,RemoteRecord>,canWrite:bool
   const state=structuredClone(local.state), incoming:Payload[]=[]
   for(const [key,message] of Object.entries(local.invalid))if(!state.excluded.includes(key))state.conflicts[key]=message
   for(const key of new Set([...Object.keys(local.records),...Object.keys(remote)])) {
+    if(remote[key]?.deleted){
+      const r=remote[key],b=state.baseline[key],l=local.records[key]
+      if(!l)incoming.push(r.payload)
+      const expected=b?.deleted?(b.payload.entity==='products'?{...b.payload,isArchived:true}:{...b.payload,isActive:false}):b?.payload
+      if(state.pending[key]||(l&&b&&stable(l)!==stable(expected)))state.conflicts[key]='Este registro fue eliminado en otro dispositivo. Sus cambios locales no se enviarán. Usa la versión compartida para descartar el cambio pendiente.'
+      state.baseline[key]=r;state.excluded=state.excluded.filter(k=>k!==key)
+      continue
+    }
+    if(state.baseline[key]?.deleted)continue
     if(state.excluded.includes(key)||state.pending[key]||state.conflicts[key])continue
     const l=local.records[key],r=remote[key],b=state.baseline[key]
     const edited=l&&(!b||stable(l)!==stable(b.payload))
@@ -138,7 +153,7 @@ export async function reconcile(remote:Record<string,RemoteRecord>,canWrite:bool
 export async function flush(transport:CatalogTransport,name?:string){
   for(const kind of kinds){const first=await localView(name);if(!first.state)return
     for(const [key,pending] of Object.entries(first.state.pending).filter(([,p])=>p.payload.entity===kind)){
-      if(first.state.conflicts[key])continue
+      if(first.state.conflicts[key]||first.state.baseline[key]?.deleted)continue
       let ack:RemoteRecord
       try{ack=await transport.commit(pending,first.state.deviceId)}catch(error){
         if(error instanceof Error&&error.message.includes('CONFLICT')){
@@ -160,7 +175,7 @@ export async function resolveConflict(key:string,choice:'local'|'remote'|'exclud
   delete state.pending[key];delete state.conflicts[key]
   const incoming:Payload[]=[]
   if(choice==='exclude')state.excluded=[...new Set([...state.excluded,key])]
-  else if(choice==='remote'){if(!r)throw new Error('No hay versión remota.');state.baseline[key]=r;incoming.push(r.payload)}
-  else {if(!canWrite||!p)throw new Error('No se puede subir esta versión.');if(r)state.baseline[key]=r;state.pending[key]={id:crypto.randomUUID(),payload:p,expectedRevision:r?.revision??0}}
+  else if(choice==='remote'){if(!r)throw new Error('No hay versión remota.');state.baseline[key]=r;if(!r.deleted)incoming.push(r.payload)}
+  else {if(r?.deleted||state.baseline[key]?.deleted)throw new Error('La eliminación es definitiva. No se puede restaurar esta versión.');if(!canWrite||!p)throw new Error('No se puede subir esta versión.');if(r)state.baseline[key]=r;state.pending[key]={id:crypto.randomUUID(),payload:p,expectedRevision:r?.revision??0}}
   await applyLocal(local,state,incoming,name)
 }

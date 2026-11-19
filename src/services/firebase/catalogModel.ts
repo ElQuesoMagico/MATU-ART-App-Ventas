@@ -10,14 +10,14 @@ export const payloadSchema = z.discriminatedUnion('entity', [
   ...(['categories','families','ips'] as const).map(entity => z.object({ ...common, entity: z.literal(entity), isActive: z.boolean(), order: z.number().int().min(0).max(1_000_000) }).strict()),
 ])
 export type Payload = z.infer<typeof payloadSchema>
-export interface RemoteRecord { payload: Payload; revision: number; operationId: string }
+export interface RemoteRecord { payload: Payload; revision: number; operationId: string; deleted?: { at: string; by: string } }
 export interface Pending { id: string; payload: Payload; expectedRevision: number }
 export interface SyncState {
   key: 'catalog'; workspaceId: string; deviceId: string; ownerUid: string; canWrite: boolean;
   baseline: Record<string, RemoteRecord>; pending: Record<string, Pending>;
   excluded: string[]; conflicts: Record<string, string>; lastConfirmed?: string;
 }
-const remoteSchema = z.object({ payload: payloadSchema, revision: z.number().int().positive(), operationId: id }).strict()
+export const remoteSchema = z.object({ payload: payloadSchema, revision: z.number().int().positive(), operationId: id, deleted: z.object({at:z.iso.datetime({offset:true}),by:z.string().min(1)}).strict().optional() }).strict()
 export const syncStateSchema = z.object({ key: z.literal('catalog'), workspaceId: z.string().regex(/^[A-Za-z0-9_-]+$/), deviceId: id, ownerUid: z.string().min(1), canWrite:z.boolean(), baseline: z.record(z.string(), remoteSchema), pending: z.record(z.string(), z.object({ id, payload: payloadSchema, expectedRevision: z.number().int().nonnegative() }).strict()), excluded: z.array(z.string()), conflicts: z.record(z.string(), z.string()), lastConfirmed: z.iso.datetime({offset:true}).optional() }).strict()
 export const keyOf = (p: Payload) => `${p.entity}/${p.id}`
 export const stable = (value: unknown): string => {

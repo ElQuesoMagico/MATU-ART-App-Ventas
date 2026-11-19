@@ -47,11 +47,16 @@ function invValidReceipt(r,op) {
     && r.keys().hasOnly(['intent','before','after','quantityChange','confirmedAt']) && r.confirmedAt==request.time
     && invIntent(r.intent,op) && invTransition(r)
     && get(/databases/$(database)/documents/workspaces/$(w)/products/$(r.intent.productId)).data.payload.isArchived==false
+    && !('deleted' in get(/databases/$(database)/documents/workspaces/$(w)/products/$(r.intent.productId)).data)
     && (r.before==null
       ? !exists(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId))
       : get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(r.intent.productId)).data.balance==r.before);
 }
 match /inventory/{id} {
+  allow update: if editor(w) && request.resource.data.keys().hasOnly(['balance','confirmedAt','deleted'])
+    && request.resource.data.balance==resource.data.balance && request.resource.data.deleted==true && request.resource.data.confirmedAt==request.time
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/products/$(id)).data.deleted.by==request.auth.uid
+    && getAfter(/databases/$(database)/documents/workspaces/$(w)/products/$(id)).data.confirmedAt==request.time;
   allow read: if member(w);
   allow create, update: if editor(w)
     && request.resource.data.keys().hasAll(['balance','confirmedAt']) && request.resource.data.keys().hasOnly(['balance','confirmedAt'])

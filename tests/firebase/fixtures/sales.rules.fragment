@@ -28,6 +28,7 @@ function saleLine(r,n) {
     && m.sharedOperationId==r.sale.operationId && m.actorUid==request.auth.uid && m.sharedStatus=='confirmed'
     && m.quantityChange==0-i.stock.quantityDeducted && m.previousStock==b.stock && m.resultingStock==a.stock
     && m.requestedQuantity==i.quantity && m.uncoveredQuantity==i.stock.uncoveredQuantity
+    && get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.get('deleted',false)==false
     && get(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==b
     && getAfter(/databases/$(database)/documents/workspaces/$(w)/inventory/$(i.productId)).data.balance==a;
 }
@@ -100,7 +101,8 @@ match /sharedSales/{id} {
       : getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.operationId)).data.kind=='sale');
 }
 match /inventory/{id} {
-  allow update: if member(w) && request.resource.data.keys().hasOnly(['balance','confirmedAt']) && request.resource.data.confirmedAt==request.time
+  allow update: if member(w) && request.resource.data.keys().hasOnly(['balance','confirmedAt','deleted']) && request.resource.data.confirmedAt==request.time
+    && request.resource.data.get('deleted',false)==resource.data.get('deleted',false)
     && !exists(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId))
     && getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId)).data.receipt.after[id]==request.resource.data.balance
     && saleInventory(getAfter(/databases/$(database)/documents/workspaces/$(w)/saleOperations/$(request.resource.data.balance.operationId)).data,id);

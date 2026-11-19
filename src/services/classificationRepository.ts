@@ -7,11 +7,12 @@ export class ClassificationRepository {
   async snapshot(): Promise<ClassificationSnapshot> {
     const db = await openCatalogDatabase(this.databaseName)
     try {
-      const tx = db.transaction(['categories', 'families', 'ips'], 'readonly')
+      const tx = db.transaction(['categories', 'families', 'ips', 'catalogSync'], 'readonly')
       const [categories, families, ips] = await Promise.all([tx.objectStore('categories').getAll(), tx.objectStore('families').getAll(), tx.objectStore('ips').getAll()])
+      const state=await tx.objectStore('catalogSync').get('catalog')
       await tx.done
       const sort = (items: CatalogClassification[]) => items.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, 'es'))
-      return { categories: categories.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, 'es')), families: sort(families), ips: sort(ips) }
+      return { categories: categories.filter(c=>!state?.baseline[`categories/${c.id}`]?.deleted).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, 'es')), families: sort(families.filter(c=>!state?.baseline[`families/${c.id}`]?.deleted)), ips: sort(ips.filter(c=>!state?.baseline[`ips/${c.id}`]?.deleted)) }
     } finally { db.close() }
   }
   async save(kind: ClassificationKind, input: { id: string; name: string; description?: string; order: number; isActive: boolean; expectedUpdatedAt?: string }): Promise<CatalogClassification> {

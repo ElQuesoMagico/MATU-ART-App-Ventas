@@ -42,15 +42,17 @@ export function saleRemote(db: Firestore, workspace: string, uid: string) {
       const original = saleIntent?.sale ?? saved.data()!.sale as SharedSaleReceipt['sale']
       const ids = kind === 'sale' || voidIntent?.returnStock ? original.items.map(i => i.productId) : []
       const balances: Record<string, InventoryBalance> = {}
+      const retired = new Set<string>()
       for (const productId of ids) {
         const snapshot = await tx.get(doc(db, `${root}/inventory/${productId}`))
         if (!snapshot.exists()) throw new Error('Falta inventario compartido para un producto de esta venta.')
+        if(snapshot.data().deleted){if(kind==='sale')throw new Error('El producto fue eliminado del catálogo. Revisa la venta pendiente.');retired.add(productId)}
         balances[productId] = inventoryBalanceSchema.parse(snapshot.data().balance)
       }
       const operation: CommercialSaleReceipt = saleIntent ? { kind: 'sale', receipt: planSharedSale(saleIntent, balances) }
         : { kind: 'void', receipt: planSharedVoid(voidIntent!, original, balances) }
       if (new TextEncoder().encode(JSON.stringify(operation)).length > 700_000) throw new Error('La venta supera el límite seguro de tamaño compartido.')
-      for (const [productId, balance] of Object.entries(operation.receipt.after)) tx.set(doc(db, `${root}/inventory/${productId}`), { balance, confirmedAt: serverTimestamp() })
+      for (const [productId, balance] of Object.entries(operation.receipt.after)) tx.set(doc(db, `${root}/inventory/${productId}`), { balance, ...(retired.has(productId)?{deleted:true}:{}), confirmedAt: serverTimestamp() })
       // Do not JSON-serialize serverTimestamp sentinels.
       tx.set(saleRef, { ...clean({ sale: operation.receipt.sale, operationId: id, actorUid: uid, deviceId: intent.deviceId }), confirmedAt: serverTimestamp() })
       tx.set(operationRef, { ...clean(operation), confirmedAt: serverTimestamp() })

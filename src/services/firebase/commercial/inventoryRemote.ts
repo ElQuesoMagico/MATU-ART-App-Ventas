@@ -58,7 +58,7 @@ export function inventoryRemote(db: Firestore, workspaceId: string, uid: string)
           return result
         }
         const [previous, product] = await Promise.all([tx.get(balance), tx.get(doc(db, `${root}/products/${intent.productId}`))])
-        if (!product.exists() || product.data().payload.isArchived) throw new Error('El producto no está disponible para modificar existencias.')
+        if (!product.exists() || product.data().deleted || product.data().payload.isArchived) throw new Error('El producto no está disponible para modificar existencias.')
         const receipt = planInventory(intent, previous.exists() ? inventoryBalanceSchema.parse(previous.data().balance) : null)
         tx.set(balance, { balance: receipt.after, confirmedAt: serverTimestamp() })
         // The immutable receipt embeds the complete movement: no separately writable duplicate ledger.

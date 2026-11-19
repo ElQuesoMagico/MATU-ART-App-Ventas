@@ -20,10 +20,11 @@ export class CatalogRepository {
   async close() { (await this.database)?.close(); this.database = undefined }
   async snapshot() {
     const db = await this.db()
-    const tx = db.transaction(['products', 'categories'], 'readonly')
+    const tx = db.transaction(['products', 'categories', 'catalogSync'], 'readonly')
     const [products, categories] = await Promise.all([tx.objectStore('products').getAll(), tx.objectStore('categories').getAll()])
+    const state=await tx.objectStore('catalogSync').get('catalog')
     await tx.done
-    return { products: products.sort((a, b) => a.name.localeCompare(b.name, 'es')), categories: categories.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, 'es')) }
+    return { products: products.filter(p=>!state?.baseline[`products/${p.id}`]?.deleted).sort((a, b) => a.name.localeCompare(b.name, 'es')), categories: categories.filter(c=>!state?.baseline[`categories/${c.id}`]?.deleted).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, 'es')) }
   }
   private async write<T>(operation: (tx: WriteTransaction) => Promise<T>): Promise<T> {
     const db = await this.db()
