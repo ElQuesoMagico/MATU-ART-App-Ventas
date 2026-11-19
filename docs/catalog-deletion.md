@@ -54,3 +54,14 @@ revisiones nuevo: deben recargar; sus colas no se borran.
 Las dependencias se revisan en el cliente sobre lecturas confirmadas, con control
 transaccional de revisiones. Las Rules verifican roles, terminalidad, recibos y stock;
 no validan exhaustivamente el grafo comercial de un cliente manipulado.
+
+## Resultado de publicación — 18-11-2026
+
+- Commit funcional: `f27c938e48c8511c45b92341736868bf61352579`.
+- GitHub Pages: workflow 44444983821, `completed / success`.
+- URL comprobada: https://elquesomagico.github.io/MATU-ART-App-Ventas/
+- Bundle servido: `assets/index-SN6kW7jP.js`; contiene el protocolo
+  `catalogControl/revision` y el nuevo diálogo de eliminación compartida.
+- Reglas Firestore: despliegue CLI confirmado en `matu-art`.
+- Validación local final: 332/332; emuladores: 33/33; TypeScript, lint y build aprobados.
+- Verificación de producción de solo lectura; cero eliminaciones comerciales reales.
